@@ -341,6 +341,11 @@ body.burnt #countdown .cd-first{background:#FBF7EE;border:2px solid #201914;colo
           <button class="btn-sm useg on" id="unitC">°C</button><button class="btn-sm useg" id="unitFbtn">°F</button>
         </div>
       </div>
+      <div><label>Sound effects</label>
+        <div class="unitseg" role="group" aria-label="Sound effects">
+          <button class="btn-sm useg on" id="sndOn">On</button><button class="btn-sm useg" id="sndOff">Off</button>
+        </div>
+      </div>
       <div><label>Weight unit</label>
         <div class="unitseg" role="group" aria-label="Weight units">
           <button class="btn-sm useg on" id="wG">g</button><button class="btn-sm useg" id="wOz">oz</button>
@@ -826,6 +831,73 @@ let simIv=null,simMode=false,ble={device:null,connected:false};
 let brewTrace=[];   // [seconds, grams] sampled ~1/s while brewing with live weight
 let unitF=false,cdIv=null,curRating=0,curTags=new Set(),restoring=false;
 let paused=false,pauseStart=0;
+/* ---- SFX: synthesized with Web Audio. No audio files; everything is generated.
+   Countdown ticks, GO tone, last-3-seconds step ticks, advance chime, and a
+   looping filtered-noise "pouring water" bed during pour steps. ---- */
+let soundOn=true,actx=null,pourNode=null,lastTickSec=null;
+function audioInit(){ // must be called from a user gesture (browser autoplay policy)
+  if(actx||typeof AudioContext==='undefined'&&typeof webkitAudioContext==='undefined')return;
+  try{actx=new (window.AudioContext||window.webkitAudioContext)();loadPourSample();}catch(_){actx=null;}
+}
+function beep(freq,dur,vol,type){
+  if(!soundOn||!actx)return;
+  try{
+    const o=actx.createOscillator(),g=actx.createGain();
+    o.type=type||'sine';o.frequency.value=freq;
+    g.gain.setValueAtTime(0,actx.currentTime);
+    g.gain.linearRampToValueAtTime(vol||0.18,actx.currentTime+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,actx.currentTime+(dur||0.12));
+    o.connect(g).connect(actx.destination);
+    o.start();o.stop(actx.currentTime+(dur||0.12)+0.02);
+  }catch(_){}
+}
+function sfxTick(){beep(880,0.09,0.15,'square');}                 // 3 · 2 · 1
+function sfxGo(){beep(660,0.1,0.2,'square');setTimeout(()=>beep(1320,0.3,0.22,'sine'),90);}  // GO!
+function sfxAdvance(){beep(1040,0.12,0.16,'sine');}               // step change chime
+function sfxDone(){[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,0.22,0.16,'sine'),i*110));} // brew complete
+/* Pour sound: a REAL recording. Drop a royalty-free "pour.mp3" next to
+   index.html (Pixabay/Mixkit/Freesound CC0 — search "water pour"). Loops
+   during pour steps, fades in/out, follows pause + the sound toggle.
+   No file present → water stays silent; ticks and chimes still work. */
+let pourBuf=null,pourTried=false;
+async function loadPourSample(){
+  if(pourBuf||pourTried||!actx)return;
+  pourTried=true;
+  try{
+    const r=await fetch('pour.mp3');
+    if(!r.ok)return;
+    pourBuf=await actx.decodeAudioData(await r.arrayBuffer());
+  }catch(_){/* stay silent */}
+}
+function pourStart(){
+  if(!soundOn||!actx||pourNode)return;
+  if(!pourBuf){loadPourSample();return;}   // ready by the next pour if it exists
+  try{
+    const src=actx.createBufferSource();src.buffer=pourBuf;src.loop=true;
+    const g=actx.createGain();
+    g.gain.setValueAtTime(0,actx.currentTime);
+    g.gain.linearRampToValueAtTime(0.5,actx.currentTime+0.3);
+    src.connect(g).connect(actx.destination);
+    src.start();
+    pourNode={src,g};
+  }catch(_){pourNode=null;}
+}
+function pourStop(){
+  if(!pourNode)return;
+  try{
+    const {src,g}=pourNode;
+    g.gain.linearRampToValueAtTime(0.0001,actx.currentTime+0.2);
+    setTimeout(()=>{try{src.stop();}catch(_){}} ,260);
+  }catch(_){}
+  pourNode=null;
+}
+function setSound(on){
+  soundOn=on;
+  $('sndOn').classList.toggle('on',on);
+  $('sndOff').classList.toggle('on',!on);
+  if(!on)pourStop();else audioInit();
+  saveSettings();
+}
 let weightOz=false;
 const G2OZ=1/28.3495;
 /* Display-only unit: inputs stay in grams (every coffee scale doses in grams);
@@ -864,7 +936,7 @@ function currentSettings(){
     tool, recipeId:recipe?recipe.id:null,
     dose:$('dose').value, water:$('water').value, ratio:$('ratioInput').value,
     grindSetting:$('grindSetting').value,
-    theme, weightOz, beanName:$('beanName').value, roaster:$('roasterSel').value, bean:$('beanSel').value,
+    theme, weightOz, soundOn, beanName:$('beanName').value, roaster:$('roasterSel').value, bean:$('beanSel').value,
     roast:$('roast').value, roastDate:$('roastDate').value,
     unitF
   };
@@ -882,6 +954,7 @@ function restoreSettings(){
   $('unitC').classList.toggle('on',!unitF);
   $('unitFbtn').classList.toggle('on',unitF);
   if(s&&s.theme)setTheme(s.theme);
+  if(s&&'soundOn'in s){soundOn=s.soundOn;$('sndOn').classList.toggle('on',soundOn);$('sndOff').classList.toggle('on',!soundOn);}
   if(s&&'weightOz'in s){weightOz=s.weightOz;$('wG').classList.toggle('on',!weightOz);$('wOz').classList.toggle('on',weightOz);}
   if(s){
     if(s.tool&&TOOLS.some(t=>t.id===s.tool))tool=s.tool;
@@ -1510,7 +1583,7 @@ function togglePause(){
   if(!brewing||brewIdx>=schedule.length)return;
   paused=!paused;
   if(paused){
-    pauseStart=Date.now();
+    pauseStart=Date.now();pourStop();
     $('btnPause').textContent='Resume ▶';
     $('pace').textContent='⏸ PAUSED';$('pace').className='pace hold';$('pace').style.display='inline-block';
   }else{
@@ -1527,12 +1600,13 @@ function startCountdown(){
   $('setup').style.display='none';$('brew').style.display='block';
   buildTimeline();renderLiveMethodStatic();
   $('countdown').style.display='flex';
-  let n=3;$('cdNum').textContent=n;
+  audioInit();
+  let n=3;$('cdNum').textContent=n;sfxTick();
   if(navigator.vibrate)navigator.vibrate(40);
   cdIv=setInterval(()=>{
     n--;
-    if(n>0){$('cdNum').textContent=n;if(navigator.vibrate)navigator.vibrate(40);}
-    else if(n===0){$('cdNum').textContent='GO';if(navigator.vibrate)navigator.vibrate([60,40,120]);}
+    if(n>0){$('cdNum').textContent=n;sfxTick();if(navigator.vibrate)navigator.vibrate(40);}
+    else if(n===0){$('cdNum').textContent='GO';sfxGo();if(navigator.vibrate)navigator.vibrate([60,40,120]);}
     else{clearInterval(cdIv);cdIv=null;$('countdown').style.display='none';beginBrew();}
   },1000);
 }
@@ -1566,6 +1640,14 @@ function tick(){
   const st=schedule[brewIdx];
   if(st){
     const inStep=el-stepStart;
+    // any step that will auto-advance on the clock gets an audible 3·2·1
+    const timed=st.type!=='pour'||!hasLiveWeight();
+    if(timed){
+      const remain=Math.ceil(st.dur-inStep);
+      if(remain>=1&&remain<=3&&remain!==lastTickSec){lastTickSec=remain;sfxTick();}
+    }
+    // water sound rides along with pour steps only
+    if(st.type==='pour'&&!paused)pourStart();else pourStop();
     if(st.type!=='pour'&&inStep>=st.dur){advance();return;}
     if(st.type==='pour'&&!hasLiveWeight()&&inStep>=st.dur){advance();return;}
   }
@@ -1706,7 +1788,7 @@ function renderLiveMethod(el,w){
 }
 function finishUI(){
   if(finishedAt===null){
-    paused=false;
+    paused=false;pourStop();sfxDone();
     finishedAt=elapsed();
     clearInterval(timerIv);timerIv=null;      // brew is over: stop the clock
     if(navigator.vibrate)navigator.vibrate([80,60,160]);
@@ -1741,6 +1823,7 @@ function cleanupBrewUI(){
 }
 function advance(){
   if(paused)return;
+  lastTickSec=null;pourStop();sfxAdvance();
   const leaving=schedule[brewIdx];
   if(leaving&&leaving.type==='pour'&&hasLiveWeight()&&metrics){
     const over=Math.max(0,displayedWeight()-leaving.target);
@@ -1771,6 +1854,7 @@ function disarmExit(){
   b.style.background='';
 }
 function endBrew(){
+  pourStop();lastTickSec=null;
   paused=false;$('btnPause').textContent='Pause ⏸';
   disarmExit();
   const madeProgress=schedule.slice(0,brewIdx).some(st=>st.type==='pour');
@@ -2046,6 +2130,8 @@ function wireSetup(){
   $('roastDate').onchange=()=>{renderAge();saveSettings();};
   $('unitC').onclick=()=>setUnit(false);
   $('unitFbtn').onclick=()=>setUnit(true);
+  $('sndOn').onclick=()=>{audioInit();setSound(true);sfxTick();}   // audible confirmation
+  $('sndOff').onclick=()=>setSound(false);
   $('wG').onclick=()=>setWeightUnit(false);
   $('wOz').onclick=()=>setWeightUnit(true);
   $('themeMax').onclick=()=>setTheme('max');
