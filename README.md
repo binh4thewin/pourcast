@@ -1,11 +1,11 @@
 # ☕ Pourcast
 
-**How much water, exactly when — at any ratio.**
+**Make the perfect pour over coffee — pour over ratios made easy.**
 
-Pourcast is a brewing companion for pour-over, AeroPress, and French press. Pick a
-method, dial in your dose, and it tells you exactly what to do and when — scaling
-every pour to *your* numbers, coaching your pace in real time, and telling you
-afterward what went wrong and what to change.
+Pourcast is a guided brewing companion for pour-over, AeroPress, French press, and
+Vietnamese phin. Pick a method, enter your coffee amount, and it handles the rest:
+every pour amount and timing calculated for you, real-time pace coaching, and honest
+feedback afterward on what went wrong and what to change next time.
 
 **Live app → https://binh4thewin.github.io/pourcast/**
 
@@ -37,9 +37,37 @@ Open the live link above in **Chrome or Edge** (desktop or Android).
 iPhone/iPad note: everything works *except* Bluetooth scales — iOS Safari has no
 Web Bluetooth. A native iOS app is on the roadmap for exactly this reason.
 
-To connect a scale: power it on (don't pair it in your OS settings), tap
-**Connect scale**, choose it from the popup. Tap the connection status line any
-time to open a step-by-step Bluetooth debug log.
+## Connecting an Acaia Pearl (or other Bluetooth scale)
+
+**Requirements — all three, no exceptions:**
+1. The app must be open at its **https://** address (Bluetooth is blocked on
+   non-secure pages and on files opened from disk).
+2. Browser must be **Chrome or Edge on desktop**, or **Chrome on Android**.
+   iPhone and iPad do not work — no browser on iOS supports Web Bluetooth.
+   (This is why a native iOS app is on the roadmap.)
+3. The scale must **not** be paired in your computer/phone's Bluetooth
+   settings. If it appears there, choose "Forget / Remove" first — OS-level
+   pairing blocks the browser from reaching it.
+
+**Steps:**
+1. Turn the Pearl on and set it on the counter near your computer.
+2. In the app, the **Scale** card shows a red dot ("Not connected"). Tap
+   **Connect**.
+3. A device picker pops up. Select your scale — it appears as
+   **PEARL-xxxx** or **ACAIA-xxxx** — and confirm.
+4. Success: the dot turns **green**, the status names your scale and protocol
+   (e.g. "Connected: PEARL (Acaia)" or "(Acaia (Pearl/legacy))" for older
+   firmware — both are supported), and the card folds itself to a green
+   one-line summary. Put a mug on the scale: the app's live weight should
+   track it.
+
+**If it doesn't connect:** tap the folded Scale header to reopen the card,
+then tap the status line — a step-by-step Bluetooth debug log opens showing
+exactly where the handshake stopped. That log is the diagnosis; report it
+and the fix is usually a one-line adapter change.
+
+No scale? Everything works without one — the **Simulator** button runs the
+full experience with generated weight (yellow dot, "SIM" badge).
 
 ## Privacy
 
