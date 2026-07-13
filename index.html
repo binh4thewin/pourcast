@@ -38,8 +38,11 @@ label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06
 input[type=number],select{width:100%;background:#fff;border:var(--border);border-radius:12px;color:var(--ink);font-family:'Space Grotesk';font-size:20px;font-weight:700;padding:10px 12px;font-variant-numeric:tabular-nums}
 select{font-size:15px}
 input:focus,select:focus{outline:3px solid var(--magenta)}
-.row{display:flex;gap:12px}.row>div{flex:1}
+.row{display:flex;gap:12px;flex-wrap:wrap}.row>div{flex:1 1 120px;min-width:0}
+.row>div input,.row>div select{width:100%;box-sizing:border-box}
 .dose-row{gap:8px}
+.dose-row>div{flex:1 1 70px}
+@media (max-width:390px){.dose-row>div{flex:1 1 40%}}
 .dose-row input{font-size:17px;padding:9px 8px}
 .dose-row label{font-size:10.5px;letter-spacing:.03em;white-space:nowrap}
 button{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;border:var(--border);border-radius:14px;padding:12px 16px;font-size:15px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .08s,box-shadow .08s;text-transform:uppercase;letter-spacing:.03em;background:#fff;color:var(--ink)}
@@ -289,6 +292,33 @@ body.burnt #countdown{background:rgba(245,240,230,.97)}
 body.burnt #countdown .cd-num{text-shadow:none;-webkit-text-stroke:0;color:#201914;font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:900}
 body.burnt #countdown .cd-lbl{background:#201914;border:none;color:#F5F0E6;border-radius:12px}
 body.burnt #countdown .cd-first{background:#FBF7EE;border:2px solid #201914;color:#201914;border-radius:12px}
+/* ================= RESPONSIVE LAYOUT ================= */
+/* Tablet & small desktop: widen, and let setup cards flow into two columns */
+@media (min-width:760px){
+  .wrap{max-width:920px;padding:32px 28px 90px}
+  #setup{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  #setup>*{min-width:0}
+  #setup .card{margin:0}
+  /* full-width rows in the grid: settings, recipe/method, dose, and the log read better wide */
+  #settingsCard,#recipeCard,#doseCard,#logCard,#editor{grid-column:1/-1}
+  /* brew + rating stay a focused single column, centered like a recipe card on a counter */
+  #brew,#rating{max-width:640px;margin:0 auto}
+  header{max-width:920px;margin:0 auto}
+  h1{font-size:44px}
+}
+/* Large desktop: a little more air, bigger live numbers while brewing */
+@media (min-width:1200px){
+  .wrap{max-width:1040px}
+  #brew,#rating{max-width:680px}
+  .instr-main{font-size:44px}
+  #timer{font-size:30px}
+}
+/* Short phone landscape: compress vertical chrome so the brew fits on screen */
+@media (max-height:480px) and (orientation:landscape){
+  .wrap{padding-top:8px}
+  header{display:none}
+  .card{padding:12px}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -362,7 +392,7 @@ body.burnt #countdown .cd-first{background:#FBF7EE;border:2px solid #201914;colo
     <div class="chips" id="toolChips"></div>
   </div>
 
-  <div class="card pink">
+  <div class="card pink" id="recipeCard">
     <h2>Method</h2>
     <select id="recipeSel"></select>
     <div class="mini">
@@ -374,7 +404,7 @@ body.burnt #countdown .cd-first{background:#FBF7EE;border:2px solid #201914;colo
     <div class="timing-note" id="timingNote"></div>
   </div>
 
-  <div class="card yellow">
+  <div class="card yellow" id="doseCard">
     <h2>Your dose</h2>
     <div class="row dose-row">
       <div><label for="dose">Coffee g</label><input type="number" id="dose" step="0.1" min="5" max="80"></div>
