@@ -1,0 +1,2050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,900;1,9..144,700;1,9..144,900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POURCAST — how much water, exactly when</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1B0B2E; --paper:#FFF3E4;
+  --magenta:#FF2E93; --orange:#FF7A00; --acid:#E8FF2E; --teal:#00D6C3; --violet:#7A2EFF; --blue:#2E7DFF;
+  --radius:18px; --border:3px solid var(--ink); --shadow:6px 6px 0 var(--ink);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Space Grotesk',system-ui,sans-serif;color:var(--ink);min-height:100vh;
+  background:radial-gradient(circle at 12% 8%,rgba(255,46,147,.35),transparent 34%),
+  radial-gradient(circle at 88% 18%,rgba(0,214,195,.4),transparent 36%),
+  radial-gradient(circle at 22% 92%,rgba(122,46,255,.3),transparent 40%),
+  radial-gradient(circle at 80% 80%,rgba(255,122,0,.35),transparent 38%),var(--paper);}
+.wrap{max-width:560px;margin:0 auto;padding:22px 16px 70px}
+header{margin-bottom:20px}
+h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;line-height:.95;letter-spacing:-.02em;text-transform:uppercase;
+  background:linear-gradient(92deg,var(--magenta),var(--orange) 35%,var(--violet) 70%,var(--teal));
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1.5px var(--ink);}
+.tag{font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;margin-top:6px}
+.tag b{background:var(--acid);border:2px solid var(--ink);padding:2px 8px;border-radius:99px}
+.card{background:#fff;border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:18px}
+.card.pink{background:linear-gradient(160deg,#FFD9EC,#FFE9F5)}
+.card.teal{background:linear-gradient(160deg,#CFFFF9,#EAFFFC)}
+.card.yellow{background:linear-gradient(160deg,#FBFFC8,#FFFDE6)}
+.card.violet{background:linear-gradient(160deg,#E7D9FF,#F4EDFF)}
+.card h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:inline-block;background:var(--ink);color:var(--acid);padding:4px 12px;border-radius:8px;transform:rotate(-1deg)}
+label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px}
+input[type=number],select{width:100%;background:#fff;border:var(--border);border-radius:12px;color:var(--ink);font-family:'Space Grotesk';font-size:20px;font-weight:700;padding:10px 12px;font-variant-numeric:tabular-nums}
+select{font-size:15px}
+input:focus,select:focus{outline:3px solid var(--magenta)}
+.row{display:flex;gap:12px}.row>div{flex:1}
+.dose-row{gap:8px}
+.dose-row input{font-size:17px;padding:9px 8px}
+.dose-row label{font-size:10.5px;letter-spacing:.03em;white-space:nowrap}
+button{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;border:var(--border);border-radius:14px;padding:12px 16px;font-size:15px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .08s,box-shadow .08s;text-transform:uppercase;letter-spacing:.03em;background:#fff;color:var(--ink)}
+button:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--ink)}
+button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+button:focus-visible{outline:3px solid var(--blue)}
+.btn-primary{background:linear-gradient(92deg,var(--magenta),var(--orange));color:#fff;width:100%;font-size:20px;padding:16px;text-shadow:1px 1px 0 var(--ink)}
+.btn-sm{padding:8px 12px;font-size:12px;box-shadow:3px 3px 0 var(--ink)}
+.btn-teal{background:var(--teal)}.btn-acid{background:var(--acid)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:var(--border);border-radius:99px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer;background:#fff;box-shadow:3px 3px 0 var(--ink);user-select:none}
+.chip.on{background:var(--violet);color:#fff}
+.chip:nth-child(4n+1).on{background:var(--magenta)}
+.chip:nth-child(4n+2).on{background:var(--orange)}
+.chip:nth-child(4n+3).on{background:var(--teal);color:var(--ink)}
+.scale-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dot{width:14px;height:14px;border-radius:50%;background:#bbb;border:2px solid var(--ink);flex:none}
+.dot.on{background:#2EE86B}.dot.sim{background:var(--acid)}
+.scale-status{font-size:13px;font-weight:500;flex:1;min-width:120px}
+.recipe-meta{font-size:13px;line-height:1.55;margin-top:10px}
+.badges{margin-top:8px}
+.badge{display:inline-block;border:2px solid var(--ink);border-radius:99px;padding:2px 10px;font-size:11px;font-weight:700;margin:0 6px 6px 0;background:var(--acid)}
+.badge.b2{background:#FFD9EC}.badge.b3{background:#CFFFF9}
+.badge.rigid{background:var(--ink);color:var(--acid)}
+.badge.adaptive{background:var(--teal)}
+.timing-note{font-size:12px;font-weight:700;margin-top:10px;padding:8px 12px;border:2px dashed var(--ink);border-radius:10px;background:rgba(255,255,255,.6)}
+.steps{margin-top:12px;border-top:3px dashed var(--ink);padding-top:10px}
+.step-row{position:relative;overflow:hidden;display:grid;grid-template-columns:52px 24px 1fr auto;gap:8px;align-items:center;font-size:13.5px;font-weight:600;padding:8px 8px;border-radius:10px;font-variant-numeric:tabular-nums}
+.step-row>*{position:relative;z-index:1}
+.step-row .fill{position:absolute;inset:0;z-index:0;width:0%;background:rgba(232,255,46,.85);border-radius:10px}
+.step-row.active{border:2px solid var(--ink)}
+.step-row.done{opacity:.4}
+.step-row.done .fill{width:100%!important;background:rgba(0,214,195,.35)}
+.step-row .t{color:var(--blue);font-weight:800}
+.step-row .cum{color:var(--violet);font-weight:800;text-align:right}
+.icn{font-size:15px;text-align:center}
+/* ============ BREW SCREEN ============ */
+#brew{display:none}
+.brew-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.timer{font-family:'Bricolage Grotesque';font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;flex:none}
+.scaletag{font-size:10.5px;font-weight:800;border:2px solid var(--ink);border-radius:99px;padding:3px 9px;flex:none;white-space:nowrap}
+.scaletag.real{background:#B8F5C0}
+.scaletag.sim{background:var(--acid)}
+.sim-on{background:var(--acid)!important;outline:3px solid var(--ink)}
+body.calm .scaletag.real{background:#DCE8DC}body.calm .scaletag.sim{background:#F1E7D2}
+.pace{font-size:10.5px;font-weight:800;border:2px solid var(--ink);border-radius:99px;padding:3px 9px;flex:none;white-space:nowrap}
+.pace.ok{background:#B8F5C0}.pace.behind{background:#FFC2C2}.pace.ahead{background:#CFE4FF}.pace.hold{background:var(--acid)}
+/* Timeline: segments proportional to duration */
+.timeline{position:relative;flex:1;height:12px;border:2px solid var(--ink);border-radius:99px;overflow:hidden;background:#fff;display:flex}
+.seg{position:relative;height:100%;border-right:1px solid rgba(27,11,46,.25);min-width:4px}
+.seg:last-child{border-right:none}
+.seg.pour{background:#FFD9EC}.seg.wait{background:#E9F3FF}.seg.stir{background:#E7D9FF}.seg.swirl{background:#D9FFF6}
+.seg .segfill{position:absolute;left:0;top:0;bottom:0;width:0%;background:rgba(27,11,46,.16)}
+.seg.now{z-index:2}
+.seg .segicon{display:none}
+.playhead{position:absolute;top:0;bottom:0;width:3px;background:var(--ink);z-index:3;border-radius:2px}
+.playhead::after{content:none}
+.tl-times{display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:12px;color:var(--violet)}
+/* Big instruction */
+.instruction{background:var(--ink);color:#fff;border-radius:14px;border:var(--border);padding:14px 16px;margin-bottom:12px;text-align:center}
+.instr-kicker{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--acid);margin-bottom:4px}
+.instr-main{font-family:'Bricolage Grotesque';font-weight:800;font-size:24px;line-height:1.15}
+.instr-sub{font-size:13px;font-weight:600;margin-top:6px;color:#FFD9EC;min-height:18px}
+/* In-step progress: big bar for pours, countdown for waits */
+.stepbar-wrap{border:var(--border);border-radius:14px;background:#fff;overflow:hidden;height:64px;position:relative;margin-bottom:12px}
+.stepbar{position:absolute;inset:0;width:0%;background:linear-gradient(92deg,var(--magenta),var(--orange),var(--violet))}
+.stepbar-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Bricolage Grotesque';font-weight:800;font-size:26px;font-variant-numeric:tabular-nums;z-index:1;mix-blend-mode:normal}
+.stepbar-label small{font-size:14px;font-weight:700}
+/* Overall water bar */
+.waterbar-wrap{border:var(--border);border-radius:12px;background:#fff;overflow:visible;height:30px;position:relative;margin:2px 0 14px 0}
+.waterbar{position:absolute;left:0;top:0;bottom:0;width:0%;background:var(--teal);border-radius:9px 0 0 9px}
+.watertick{position:absolute;top:-6px;bottom:-6px;width:3px;background:var(--ink);border-radius:2px}
+.watertick.hit{background:var(--teal)}
+.waterbar-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;z-index:1}
+.water-caption{font-size:11px;font-weight:700;color:var(--violet);text-align:center;margin-bottom:12px}
+.brew-btns{display:flex;gap:10px;margin-top:2px}.brew-btns button{flex:1}
+.footer-note{font-size:11.5px;line-height:1.7;margin-top:22px;font-weight:500}
+/* live method list */
+.step-row.compact{grid-template-columns:24px 1fr auto;font-size:12px;padding:4px 8px;opacity:.45}
+.step-row.expanded{display:block;background:#fff;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:12px;margin:6px 0}
+.exp-head{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:15px}
+.exp-detail{font-size:13px;font-weight:600;margin-top:6px;color:var(--violet)}
+.exp-live{font-family:'Bricolage Grotesque';font-weight:800;font-size:22px;margin-top:4px;font-variant-numeric:tabular-nums}
+.eta{font-size:11px;font-weight:700;color:var(--blue)}
+/* flow rate gauge */
+.flow{display:none;justify-content:space-between;align-items:center;border:var(--border);border-radius:12px;padding:8px 12px;margin-bottom:12px;background:#fff}
+.flow .fr-num{font-family:'Bricolage Grotesque';font-weight:800;font-size:22px;font-variant-numeric:tabular-nums}
+.flow .fr-verdict{font-weight:800;font-size:13px;border:2px solid var(--ink);border-radius:99px;padding:4px 12px}
+.fr-verdict.ok{background:#B8F5C0}.fr-verdict.fast{background:#FFC2C2}.fr-verdict.slow{background:#CFE4FF}
+/* beans + rating */
+input[type=text]{width:100%;background:#fff;border:var(--border);border-radius:12px;color:var(--ink);font-family:'Space Grotesk';font-size:15px;font-weight:600;padding:10px 12px}
+input[type=text]:focus{outline:3px solid var(--magenta)}
+#rating{display:none}
+.stars{display:flex;gap:8px;justify-content:center;margin:10px 0}
+.star{font-size:40px;cursor:pointer;filter:grayscale(1);transition:transform .1s}
+.star.on{filter:none;transform:scale(1.15)}
+.log-row{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;font-weight:600;padding:7px 8px;border-radius:8px;align-items:center}
+.log-row:nth-child(odd){background:rgba(255,255,255,.55)}
+.log-stars{color:var(--orange);letter-spacing:1px}
+input[type=date]{width:100%;background:#fff;border:var(--border);border-radius:12px;color:var(--ink);font-family:'Space Grotesk';font-size:15px;font-weight:600;padding:9px 12px}
+input[type=date]:focus{outline:3px solid var(--magenta)}
+.age{margin-top:10px;font-size:12.5px;font-weight:700;padding:8px 12px;border:2px solid var(--ink);border-radius:10px}
+.age.fresh{background:#CFE4FF}.age.peak{background:#B8F5C0}.age.fading{background:#FFF3C4}.age.stale{background:#FFC2C2}
+.unitseg{display:flex}
+.useg{border-radius:12px 0 0 12px;box-shadow:3px 3px 0 var(--ink)}
+.useg+.useg{border-radius:0 12px 12px 0;border-left:none}
+.useg.on{background:var(--violet);color:#fff}
+/* recipe editor */
+#editor{display:none}
+.ed-steps{margin-top:10px}
+.ed-row{display:grid;grid-template-columns:86px 1fr 64px 64px 34px;gap:6px;margin-bottom:6px;align-items:center}
+.ed-row select,.ed-row input{font-size:13px;padding:7px 8px;font-weight:600}
+.ed-row .ed-del{border:var(--border);border-radius:10px;background:#FFC2C2;font-weight:800;cursor:pointer;padding:6px 0;box-shadow:2px 2px 0 var(--ink);text-align:center}
+.ed-head{display:grid;grid-template-columns:86px 1fr 64px 64px 34px;gap:6px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;color:var(--violet)}
+.ed-note{width:100%;margin:-2px 0 8px 0}
+.ed-note input{font-size:12px;padding:6px 8px}
+.fracsum{font-size:12px;font-weight:800;margin-top:6px;padding:6px 10px;border:2px solid var(--ink);border-radius:10px;display:inline-block}
+.fracsum.ok{background:#B8F5C0}.fracsum.bad{background:#FFC2C2}
+.mini{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+/* taste tags + report */
+.tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
+.tagc{border:var(--border);border-radius:99px;padding:7px 13px;font-weight:700;font-size:13px;cursor:pointer;background:#fff;box-shadow:3px 3px 0 var(--ink);user-select:none}
+.tagc.on{background:var(--magenta);color:#fff}
+.tagc.good.on{background:#2EE86B;color:var(--ink)}
+.report{text-align:left;margin-top:14px}
+.insight{border:2px solid var(--ink);border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:13px;font-weight:600;line-height:1.5;background:#fff}
+.insight b{display:block;font-family:'Bricolage Grotesque';font-size:13px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.insight.grind{background:#FFE9F5}.insight.pour{background:#E9F3FF}.insight.ratio{background:#FBFFC8}.insight.temp{background:#E7D9FF}.insight.win{background:#D9FFE4}
+/* Countdown overlay */
+#countdown{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;
+  background:radial-gradient(circle at 50% 40%,rgba(255,46,147,.92),rgba(122,46,255,.95));}
+#countdown .cd-num{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:160px;line-height:1;color:#fff;
+  text-shadow:6px 6px 0 var(--ink);-webkit-text-stroke:3px var(--ink);animation:pop .9s ease-out infinite}
+#countdown .cd-lbl{font-family:'Bricolage Grotesque';font-weight:800;font-size:18px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--acid);background:var(--ink);padding:8px 20px;border-radius:99px;border:3px solid #fff}
+#countdown .cd-first{font-size:14px;font-weight:700;color:#fff;background:rgba(27,11,46,.55);border:2px solid #fff;border-radius:12px;padding:8px 16px;max-width:320px;text-align:center}
+@keyframes pop{0%{transform:scale(.5);opacity:0}25%{transform:scale(1.12);opacity:1}45%{transform:scale(1)}100%{opacity:1}}
+@keyframes pulseGlow{0%,100%{box-shadow:4px 4px 0 var(--ink)}50%{box-shadow:4px 4px 0 var(--ink),0 0 22px var(--magenta)}}
+.pulse{animation:pulseGlow 1.2s ease-in-out infinite}
+/* ================= CACTUS (Succulent Hues: blush adobe · terracotta rose · sage · olive) ================= */
+body.calm{
+  --ink:#4A473A; --paper:#F6EAE0;
+  --magenta:#D19277; --orange:#D19277; --acid:#DDE0CE; --teal:#A1A18A; --violet:#969268; --blue:#A1A18A;
+  --border:1px solid #E3CDBC; --shadow:none;
+  background:#F6EAE0; color:#4A473A;
+}
+body.calm h1{background:none;color:#615D4C;-webkit-text-stroke:0;font-weight:600;letter-spacing:0;font-size:34px}
+body.calm .tag{color:#969268}
+body.calm .tag b{background:transparent;border:1px solid #D9C2B0;color:#D19277}
+body.calm .card,body.calm .card.pink,body.calm .card.teal,body.calm .card.yellow,body.calm .card.violet{background:#FCF7F1;border:1px solid #E3CDBC;box-shadow:none}
+body.calm .card h2{background:transparent;color:#969268;padding:0;transform:none;letter-spacing:.12em;font-size:12px}
+body.calm input,body.calm select{background:#FCF7F1;border:1px solid #E3CDBC;color:#4A473A;font-weight:600}
+body.calm button{background:#FCF7F1;color:#4A473A;border:1px solid #D9C2B0;box-shadow:none;font-weight:600;text-transform:none;letter-spacing:0}
+body.calm button:hover,body.calm button:active{transform:none;box-shadow:none;background:#F3E4D6}
+body.calm .btn-primary{background:#615D4C;color:#F6EAE0;text-shadow:none}
+body.calm .btn-acid{background:#D19277;color:#FCF7F1}
+body.calm .btn-teal{background:#DDE0CE;color:#4A473A}
+body.calm .chip{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none;color:#7C7867}
+body.calm .chip.on{background:#969268!important;color:#FCF7F1!important}
+body.calm .useg.on{background:#615D4C;color:#F6EAE0}
+body.calm .badge,body.calm .badge.b2,body.calm .badge.b3{background:#F0E4D6;border-color:#E3CDBC;color:#7C7867}
+body.calm .badge.rigid{background:#615D4C;color:#F6EAE0}
+body.calm .badge.adaptive{background:#DDE0CE;color:#4A473A}
+body.calm .timing-note,body.calm .age{background:#F0E4D6;border:1px dashed #D9C2B0}
+body.calm .age.stale{background:#F0D5C7}body.calm .age.peak{background:#DDE0CE}body.calm .age.fresh{background:#E9E4D2}body.calm .age.fading{background:#F0DFC6}
+body.calm .step-row.active{background:#F0E4D6;border:1px solid #D9C2B0}
+body.calm .step-row .fill{background:#EBDCC9}
+body.calm .step-row.expanded{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none}
+body.calm .instruction{background:#615D4C;border:none;color:#F6EAE0}
+body.calm .instr-kicker{color:#EFCBB5}body.calm .instr-sub{color:#C9C4AE}
+body.calm .stepbar-wrap,body.calm .waterbar-wrap,body.calm .timeline{background:#FCF7F1;border:1px solid #D9C2B0}
+body.calm .stepbar{background:#D19277}
+body.calm .waterbar{background:#A1A18A}
+body.calm .seg.pour{background:#F1DCCB}body.calm .seg.wait{background:#EAEBE0}body.calm .seg.stir,body.calm .seg.swirl{background:#E6E0D4}
+body.calm .playhead{background:#615D4C}
+body.calm .watertick{background:#CBB8A5}body.calm .watertick.hit{background:#969268}
+body.calm .pace{border-color:#D9C2B0}
+body.calm .pace.behind{background:#F0D5C7}body.calm .pace.ahead{background:#E9E4D2}
+body.calm .flow,body.calm .fr-verdict{border-color:#D9C2B0;background:#FCF7F1}
+body.calm .fr-verdict.fast{background:#F0D5C7}body.calm .fr-verdict.slow{background:#E9E4D2}
+body.calm .insight{background:#F0E4D6!important;border:1px solid #D9C2B0}
+body.calm .tagc{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none;color:#7C7867}
+body.calm .tagc.on{background:#969268;color:#FCF7F1}
+body.calm .log-row:nth-child(odd){background:#F0E4D6}
+body.calm .dot{border-color:#D9C2B0}
+body.calm .scaletag.real{background:#DDE0CE}body.calm .scaletag.sim{background:#F0DFC6}
+body.calm #countdown{background:rgba(246,234,224,.97)}
+body.calm #countdown .cd-num{text-shadow:none;-webkit-text-stroke:0;color:#969268}
+body.calm #countdown .cd-lbl{background:#615D4C;border:none;color:#F6EAE0}
+body.calm #countdown .cd-first{background:#FCF7F1;border:1px solid #D9C2B0;color:#4A473A}
+/* ================= BURNT ORANGE (cream paper · ink outlines · fun serif) ================= */
+body.burnt{
+  --ink:#201914; --paper:#F5F0E6;
+  --magenta:#9C5526; --orange:#C0642B; --acid:#F0DFC8; --teal:#B4886B; --violet:#8A5A3C; --blue:#A98A72;
+  --border:2px solid #201914; --shadow:none;
+  background:#F5F0E6; color:#201914;
+}
+/* the Jacumba page frame: one confident ink outline around everything */
+body.burnt::after{content:'';position:fixed;inset:7px;border:2.5px solid #201914;border-radius:16px;pointer-events:none;z-index:99}
+body.burnt h1{background:none;color:#201914;-webkit-text-stroke:0;
+  font-family:'Fraunces',Georgia,serif;font-weight:900;font-style:italic;
+  font-size:42px;letter-spacing:-.01em;text-transform:none}
+body.burnt .tag{color:#7A5138;font-weight:700}
+body.burnt .tag b{background:transparent;border:2px solid #201914;color:#9C5526;border-radius:99px}
+body.burnt .card,body.burnt .card.pink,body.burnt .card.teal,body.burnt .card.yellow,body.burnt .card.violet{background:#FBF7EE;border:2px solid #201914;border-radius:16px;box-shadow:none}
+body.burnt .card h2{background:transparent;color:#201914;padding:0;transform:none;
+  font-family:'Fraunces',Georgia,serif;font-weight:900;font-style:italic;font-size:19px;letter-spacing:0;text-transform:none}
+body.burnt input,body.burnt select{background:#F0E9DA;border:2px solid #201914;border-radius:10px;color:#201914;font-weight:700}
+body.burnt button{background:#F5F0E6;color:#201914;border:2px solid #201914;border-radius:10px;box-shadow:none;font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:12.5px}
+body.burnt button:hover,body.burnt button:active{transform:none;box-shadow:none;background:#EDE3CE}
+body.burnt .btn-primary{background:#201914;color:#F5F0E6;text-shadow:none}
+body.burnt .btn-acid{background:#C0642B;color:#F5F0E6}
+body.burnt .btn-teal{background:#F0DFC8;color:#201914}
+body.burnt .chip{background:#F5F0E6;border:2px solid #201914;border-radius:99px;box-shadow:none;color:#201914}
+body.burnt .chip.on{background:#C0642B!important;color:#F5F0E6!important}
+body.burnt .useg{border:2px solid #201914}
+body.burnt .useg.on{background:#201914;color:#F5F0E6}
+body.burnt .badge,body.burnt .badge.b2,body.burnt .badge.b3{background:#F0DFC8;border:1.5px solid #201914;color:#201914;border-radius:99px}
+body.burnt .badge.rigid{background:#201914;color:#F5F0E6}
+body.burnt .badge.adaptive{background:#C0642B;color:#F5F0E6}
+body.burnt .timing-note,body.burnt .age{background:#F0E9DA;border:1.5px dashed #201914;border-radius:10px}
+body.burnt .age.stale{background:#EFD0C4}body.burnt .age.peak{background:#E4E3CE}body.burnt .age.fresh{background:#EDE2D4}body.burnt .age.fading{background:#F0DDC2}
+body.burnt .step-row.active{background:#F0E9DA;border:1.5px solid #201914;border-radius:10px}
+body.burnt .step-row .fill{background:#EBDCC2}
+body.burnt .step-row.expanded{background:#FBF7EE;border:2px solid #201914;border-radius:12px;box-shadow:none}
+body.burnt .instruction{background:#201914;border:none;border-radius:14px;color:#F5F0E6}
+body.burnt .instr-kicker{color:#E0A472;font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:700;letter-spacing:.02em;text-transform:none;font-size:14px}
+body.burnt .instr-sub{color:#CBB59A}
+body.burnt .stepbar-wrap,body.burnt .waterbar-wrap,body.burnt .timeline{background:#F0E9DA;border:2px solid #201914;border-radius:99px}
+body.burnt .stepbar{background:#C0642B}
+body.burnt .waterbar{background:#9C5526}
+body.burnt .seg.pour{background:#EBD5B7}body.burnt .seg.wait{background:#EFE8DA}body.burnt .seg.stir,body.burnt .seg.swirl{background:#E7DCD2}
+body.burnt .playhead{background:#201914}
+body.burnt .watertick{background:#C9B394}body.burnt .watertick.hit{background:#201914}
+body.burnt .pace{border:2px solid #201914;border-radius:99px}
+body.burnt .pace.behind{background:#EFD0C4}body.burnt .pace.ahead{background:#EDE2D4}
+body.burnt .flow,body.burnt .fr-verdict{border:2px solid #201914;background:#FBF7EE;border-radius:12px}
+body.burnt .fr-verdict.fast{background:#EFD0C4}body.burnt .fr-verdict.slow{background:#EDE2D4}
+body.burnt .insight{background:#F0E9DA!important;border:1.5px solid #201914;border-radius:12px}
+body.burnt .tagc{background:#F5F0E6;border:2px solid #201914;border-radius:99px;box-shadow:none;color:#201914}
+body.burnt .tagc.on{background:#C0642B;color:#F5F0E6}
+body.burnt .log-row:nth-child(odd){background:#F0E9DA}
+body.burnt .dot{border:2px solid #201914}
+body.burnt .scaletag{border:2px solid #201914;border-radius:99px}
+body.burnt .scaletag.real{background:#E4E3CE}body.burnt .scaletag.sim{background:#F0DDC2}
+body.burnt #countdown{background:rgba(245,240,230,.97)}
+body.burnt #countdown .cd-num{text-shadow:none;-webkit-text-stroke:0;color:#201914;font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:900}
+body.burnt #countdown .cd-lbl{background:#201914;border:none;color:#F5F0E6;border-radius:12px}
+body.burnt #countdown .cd-first{background:#FBF7EE;border:2px solid #201914;color:#201914;border-radius:12px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+    <h1>Pourcast</h1>
+    <button class="btn-sm" id="btnSettings" aria-label="Settings" title="Settings">⚙</button>
+  </div>
+  <div class="tag">HOW MUCH WATER, <b>EXACTLY WHEN</b> — AT ANY RATIO</div>
+</header>
+
+<div id="setup">
+  <div class="card" id="settingsCard" style="display:none">
+    <h2>Settings</h2>
+    <div class="row" style="align-items:center">
+      <div><label>Temperature units</label>
+        <div class="unitseg" role="group" aria-label="Temperature units">
+          <button class="btn-sm useg on" id="unitC">°C</button><button class="btn-sm useg" id="unitFbtn">°F</button>
+        </div>
+      </div>
+      <div><label>Weight unit</label>
+        <div class="unitseg" role="group" aria-label="Weight units">
+          <button class="btn-sm useg on" id="wG">g</button><button class="btn-sm useg" id="wOz">oz</button>
+        </div>
+      </div>
+      <div><label>Look</label>
+        <div class="unitseg" role="group" aria-label="Theme">
+          <button class="btn-sm useg on" id="themeMax">Max</button><button class="btn-sm useg" id="themeCalm">Cactus</button><button class="btn-sm useg" id="themeBurnt">Burnt</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card teal">
+    <h2>Scale</h2>
+    <div class="scale-bar">
+      <div class="dot" id="scaleDot"></div>
+      <div class="scale-status" id="scaleStatus" style="cursor:pointer" title="Tap for connection log">Not connected — works fine without one</div>
+    <pre id="bleDebug" style="display:none;font-size:10.5px;line-height:1.5;background:#1B0B2E;color:#B8F5C0;padding:10px;border-radius:10px;white-space:pre-wrap;margin-top:8px"></pre>
+      <button class="btn-sm btn-teal" id="btnConnect">Connect</button>
+      <button class="btn-sm btn-acid" id="btnSim">Simulator</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Beans</h2>
+    <div class="row">
+      <div><label for="roasterSel">Roaster</label><select id="roasterSel"></select></div>
+      <div><label for="beanSel">Bean</label><select id="beanSel"></select></div>
+    </div>
+    <div class="row" id="libAddRow" style="display:none;margin-top:8px">
+      <div style="flex:2"><input type="text" id="libAddName" placeholder=""></div>
+      <div id="libAddRoastWrap" style="display:none"><select id="libAddRoast"><option>Light</option><option>Light-Medium</option><option selected>Medium</option><option>Medium-Dark</option><option>Dark</option></select></div>
+      <div style="flex:0 0 auto;display:flex;align-items:flex-end"><button class="btn-sm btn-acid" id="libAddBtn">Add</button></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div><label for="roast">Roast (from bean)</label><select id="roast"><option>Light</option><option>Light-Medium</option><option selected>Medium</option><option>Medium-Dark</option><option>Dark</option></select></div>
+    </div>
+    <input type="hidden" id="beanName">
+    <div class="row" style="margin-top:10px">
+      <div><label for="roastDate">Roast date</label><input type="date" id="roastDate"></div>
+      <div style="display:flex;align-items:flex-end"><div class="age" id="ageChip" style="display:none;width:100%"></div></div>
+    </div>
+  </div>
+
+
+  <div class="card violet">
+    <h2>Your brewer</h2>
+    <div class="chips" id="toolChips"></div>
+  </div>
+
+  <div class="card pink">
+    <h2>Method</h2>
+    <select id="recipeSel"></select>
+    <div class="mini">
+      <button class="btn-sm btn-acid" id="btnCustomize">Customize ✎</button>
+      <button class="btn-sm" id="btnDeleteCustom" style="display:none;background:#FFC2C2">Delete custom</button>
+    </div>
+    <div class="badges" id="recipeBadges"></div>
+    <div class="recipe-meta" id="recipeMeta"></div>
+    <div class="timing-note" id="timingNote"></div>
+  </div>
+
+  <div class="card yellow">
+    <h2>Your dose</h2>
+    <div class="row dose-row">
+      <div><label for="dose">Coffee g</label><input type="number" id="dose" step="0.1" min="5" max="80"></div>
+      <div><label for="ratioInput">Ratio 1:</label><input type="number" id="ratioInput" step="0.1" min="10" max="20"></div>
+      <div><label for="water">Water g</label><input type="number" id="water" step="1" min="80" max="1500"></div>
+      <div><label for="grindSetting">Grind</label><input type="number" id="grindSetting" step="0.1" min="0" max="99" placeholder="6.7"></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--violet);margin-top:6px" id="ozHint"></div>
+    <div class="mini"><button class="btn-sm" id="btnRatioReset" style="display:none">↺ Recipe default (1:<span id="defRatio"></span>)</button></div>
+
+    <div class="recipe-meta" id="ratioMeta"></div>
+    <div class="steps" id="stepPreview"></div>
+  </div>
+
+  <div class="card violet" id="editor">
+    <h2>Custom method</h2>
+    <div class="row">
+      <div style="flex:2"><label for="edName">Name</label><input type="text" id="edName" placeholder="My 4:6, weekday edition"></div>
+      <div><label for="edRatio">Ratio 1 : x</label><input type="number" id="edRatio" step="0.1" min="10" max="20"></div>
+    </div>
+    <div class="timing-note" id="edLocked" style="display:none;margin-top:10px">🔒 <b>Championship steps are locked.</b> You're customizing the ratio only — every pour weight and (for adaptive methods) pour duration rescales automatically from your ratio × dose. The champion's structure stays intact.</div>
+    <div id="edFull">
+    <div class="row" style="margin-top:10px">
+      <div><label for="edGrind">Grind</label><select id="edGrind"><option>Coarse</option><option>Medium-coarse</option><option>Medium</option><option>Medium-fine</option><option>Fine</option></select></div>
+      <div><label for="edTiming">Timing</label><select id="edTiming"><option value="adaptive">Adaptive (scales)</option><option value="rigid">Rigid clock</option></select></div>
+    </div>
+    <div class="ed-steps">
+      <div class="ed-head"><span>Type</span><span>Label</span><span>Water %</span><span>Secs</span><span></span></div>
+      <div id="edRows"></div>
+      <div class="mini">
+        <button class="btn-sm" id="edAddPour">+ Pour</button>
+        <button class="btn-sm" id="edAddWait">+ Wait</button>
+        <button class="btn-sm" id="edAddStir">+ Stir</button>
+        <button class="btn-sm" id="edAddSwirl">+ Swirl</button>
+        <span class="fracsum ok" id="fracSum">pours = 100%</span>
+      </div>
+    </div>
+    </div><!-- /edFull -->
+    <div class="brew-btns" style="margin-top:14px">
+      <button id="btnEdCancel">Cancel</button>
+      <button class="btn-acid" id="btnEdSave">Save as custom</button>
+    </div>
+  </div>
+
+  <button class="btn-primary" id="btnStart">Start brewing ☕</button>
+
+  <div class="card teal" id="logCard" style="display:none;margin-top:18px">
+    <h2>Brew log</h2>
+    <div id="logList"></div>
+  </div>
+
+  <p class="footer-note">
+    Scale connection tries the standard Bluetooth Weight Scale service first, then a generic decoder that
+    listens to every notifying characteristic and auto-detects grams (works with many coffee scales,
+    Fellow Tally included on most firmware). Chrome / Edge / Android for Bluetooth — iOS Safari doesn't support Web Bluetooth.
+    No scale? The app runs fully guided on timers.
+  </p>
+</div>
+
+<div id="countdown" role="alert">
+  <div class="cd-lbl">Kettle up · scale zeroes at GO</div>
+  <div class="cd-num" id="cdNum">3</div>
+  <div class="cd-first" id="cdFirst"></div>
+</div>
+
+<div id="rating">
+  <div class="card pink" style="text-align:center">
+    <h2>How was it?</h2>
+    <div class="recipe-meta" id="ratingSummary"></div>
+    <div class="stars" id="stars">
+      <span class="star" data-v="1">⭐</span><span class="star" data-v="2">⭐</span><span class="star" data-v="3">⭐</span><span class="star" data-v="4">⭐</span><span class="star" data-v="5">⭐</span>
+    </div>
+    <label style="text-align:left">How did it taste? (pick any)</label>
+    <div class="tags" id="tasteTags">
+      <span class="tagc" data-t="sour">Sour</span>
+      <span class="tagc" data-t="weak">Weak / tea-like</span>
+      <span class="tagc" data-t="bitter">Bitter</span>
+      <span class="tagc" data-t="astringent">Drying / astringent</span>
+      <span class="tagc" data-t="harsh">Bitter + sour</span>
+      <span class="tagc" data-t="strong">Too strong / muddy</span>
+      <span class="tagc" data-t="hollow">Hollow / flat</span>
+      <span class="tagc good" data-t="balanced">🎯 Balanced</span>
+    </div>
+    <div id="brewPrint" style="margin:10px 0"></div>
+    <div class="report" id="brewReport"></div>
+    <label for="brewNote" style="text-align:left;margin-top:10px">Notes</label>
+    <input type="text" id="brewNote" placeholder="e.g. juicy, slightly under — grind finer next time">
+    <div class="brew-btns" style="margin-top:14px">
+      <button id="btnSkipRating">Skip</button>
+      <button class="btn-acid" id="btnSaveRating">Save to log</button>
+    </div>
+  </div>
+</div>
+
+<div id="brew">
+  <div class="card">
+    <div class="brew-top">
+      <div class="timer" id="timer">0:00</div>
+      <div class="timeline" id="timeline"></div>
+      <div class="scaletag" id="scaleTag" style="display:none"></div>
+      <div class="pace ok" id="pace" style="display:none">ON PACE</div>
+    </div>
+    <div class="tl-times" style="display:none"><span>0:00</span><span id="tlMid"></span><span id="tlEnd"></span></div>
+
+    <div class="instruction">
+      <div class="instr-kicker" id="instrKicker">STEP 1 OF 9</div>
+      <div class="instr-main" id="instrMain">Pour slowly to 60 g</div>
+      <div class="instr-sub" id="instrSub"></div>
+    </div>
+
+    <div class="flow" id="flow">
+      <div><div style="font-size:11px;font-weight:800;letter-spacing:.1em">FLOW RATE</div>
+        <div class="fr-num"><span id="frNow">0.0</span> <small style="font-size:13px">g/s · target <span id="frTarget">2.0</span></small></div></div>
+      <div class="fr-verdict ok" id="frVerdict">ON TARGET</div>
+    </div>
+
+    <div class="stepbar-wrap">
+      <div class="stepbar" id="stepbar"></div>
+      <div class="stepbar-label" id="stepbarLabel"></div>
+    </div>
+
+    <div class="waterbar-wrap" id="waterbarWrap">
+      <div class="waterbar" id="waterbar"></div>
+      <div class="waterbar-label" id="waterbarLabel">0 / 300 g</div>
+    </div>
+    <span id="bedInfo" style="display:none"></span>
+
+    <div class="brew-btns">
+      <button id="btnBack">Exit</button>
+
+      <button class="btn-teal" id="btnPause">Pause ⏸</button>
+      <button class="btn-acid" id="btnNext">Next step ›</button>
+    </div>
+  </div>
+  <div class="card">
+    <button class="btn-sm" id="btnMethodToggle" style="width:100%">Show full method ▾</button>
+    <div id="stepList" style="display:none;margin-top:12px"></div>
+  </div>
+</div>
+</div>
+
+<script>
+/* =====================================================================
+   POURFECT app script — organized top-down. Order matters only at INIT,
+   which is the last thing in the file. Everything above is declarations.
+
+   1. DATA        tools, recipes
+   2. STATE       runtime variables
+   3. STORE       persistence (settings, beans, log) with in-memory fallback
+   4. ENGINES     schedule, drainage physics, temperature, bean age,
+                  flow rate, insights
+   5. DEVICES     bluetooth scale, simulator
+   6. SETUP UI    chips, recipe card, dose card, previews
+   7. BREW UI     countdown, timeline, instruction, bars, living method list
+   8. RATING+LOG  stars, taste tags, report, history
+   9. INIT        restore settings, first render
+===================================================================== */
+
+/* ============================ 1. DATA ============================ */
+const TOOLS=[
+ {id:'v60',name:'Hario V60'},{id:'kalita',name:'Kalita Wave'},{id:'chemex',name:'Chemex'},
+ {id:'origami',name:'Origami'},{id:'melitta',name:'Melitta / flat wedge'},
+ {id:'aeropress',name:'AeroPress'},{id:'frenchpress',name:'French Press'},{id:'any',name:'Any dripper'}
+];
+/* Step types: pour{frac,dur} wait{dur} stir{dur} swirl{dur}.
+   timing 'rigid' = championship clock (weights scale, times fixed);
+   'adaptive' = pour durations scale with water volume.
+   tempC is calibrated for roastRec. */
+const RECIPES=[
+ {id:'kasuya46',tool:['v60','origami','any'],champ:'Competition-born classic',timing:'rigid',
+  name:'The 4:6 Method',ratio:15,defaultDose:20,grind:'Coarse',tempC:[92,96],roastRec:'Light',
+  desc:'Five equal pours on a fixed 45s clock, letting the bed fully drain between pours. First 40% of water tunes sweetness vs acidity, last 60% tunes strength.',
+  steps:[
+    {type:'pour',frac:.20,dur:10,label:'Pour 1 · flavor'},
+    {type:'wait',dur:35,label:'Drain fully',note:'wait for a dry-ish bed'},
+    {type:'pour',frac:.20,dur:10,label:'Pour 2 · flavor'},
+    {type:'wait',dur:35,label:'Drain fully',note:'wait for a dry-ish bed'},
+    {type:'pour',frac:.20,dur:10,label:'Pour 3 · strength'},
+    {type:'wait',dur:35,label:'Drain fully',note:'wait for a dry-ish bed'},
+    {type:'pour',frac:.20,dur:10,label:'Pour 4 · strength'},
+    {type:'wait',dur:20,label:'Drain fully'},
+    {type:'pour',frac:.20,dur:10,label:'Pour 5 · strength'},
+    {type:'wait',dur:45,label:'Final drawdown'}
+  ]},
+ {id:'winton5',tool:['v60','origami','any'],champ:'Modern competition style',timing:'rigid',
+  name:'Five Even Pours',ratio:16.7,defaultDose:30,grind:'Medium-coarse',tempC:[92,94],roastRec:'Light',
+  desc:'Five equal center pours on a 40s clock. No dedicated bloom (pour 1 acts as one), no stirs, no swirls, minimal agitation.',
+  steps:[
+    {type:'pour',frac:.20,dur:12,label:'Pour 1 · center'},{type:'wait',dur:28,label:'Settle'},
+    {type:'pour',frac:.20,dur:12,label:'Pour 2 · center'},{type:'wait',dur:28,label:'Settle'},
+    {type:'pour',frac:.20,dur:12,label:'Pour 3 · center'},{type:'wait',dur:28,label:'Settle'},
+    {type:'pour',frac:.20,dur:12,label:'Pour 4 · center'},{type:'wait',dur:28,label:'Settle'},
+    {type:'pour',frac:.20,dur:12,label:'Pour 5 · center'},{type:'wait',dur:50,label:'Final drawdown'}
+  ]},
+ {id:'hoffmann',tool:['v60','origami'],champ:'The internet\'s favorite V60',timing:'adaptive',
+  name:'The Gear-Change V60',ratio:16.7,defaultDose:30,grind:'Medium-fine',tempC:[95,100],roastRec:'Light',roastNote:'the hotter end for the lightest roasts',
+  desc:'Big bloom with a swirl, then ONE continuous pour with a gear change: brisk to 60% by 1:15, then ease off ~20% slower to 100% by 1:45 (shown as two steps so each phase gets its own flow-rate target). Stir + final swirl for a flat bed; drawdown ~3:30.',
+  steps:[
+    {type:'pour',frac:.12,dur:10,label:'Bloom pour · 2x coffee'},
+    {type:'swirl',dur:8,label:'Swirl the bloom',note:'wet every ground'},
+    {type:'wait',dur:27,label:'Bloom rest'},
+    {type:'pour',frac:.48,dur:30,label:'Main pour → 60% · brisk spiral',note:'one continuous pour begins — checkpoint: 60% of water by 1:15'},
+    {type:'pour',frac:.40,dur:30,label:'Final pour → 100% · ease off',note:'do NOT stop — same pour, ~20% slower and gentler to the end'},
+    {type:'stir',dur:8,label:'Stir · 1x each way',note:'knock grounds off walls'},
+    {type:'wait',dur:15,label:'Let bed settle'},
+    {type:'swirl',dur:5,label:'Final gentle swirl'},
+    {type:'wait',dur:60,label:'Drawdown to flat bed'}
+  ]},
+ {id:'rao',tool:['v60','any'],champ:'High-extraction school',timing:'adaptive',
+  name:'Single Spiral & Spin',ratio:16.7,defaultDose:22,grind:'Medium-fine',tempC:[93,95],roastRec:'Light',
+  desc:'Bloom with 3x coffee weight and stir it thoroughly. One continuous spiral pour, then a confident spin to flatten the bed.',
+  steps:[
+    {type:'pour',frac:.18,dur:10,label:'Bloom pour · 3x coffee'},
+    {type:'stir',dur:10,label:'Stir bloom thoroughly',note:'every ground wet, no dry clumps'},
+    {type:'wait',dur:25,label:'Bloom rest'},
+    {type:'pour',frac:.82,dur:60,label:'Continuous spiral pour'},
+    {type:'swirl',dur:6,label:'Flattening spin',note:'flatten the bed'},
+    {type:'wait',dur:75,label:'Drawdown'}
+  ]},
+ {id:'hedrick',tool:['v60','origami','any'],champ:'Sweetness-first approach',timing:'adaptive',
+  name:'Low & Slow',ratio:16,defaultDose:20,grind:'Medium',tempC:[88,92],roastRec:'Medium',roastNote:'built around medium & dark roasts',
+  desc:'Cooler water, gentle bloom, two low-and-slow pours keeping the slurry calm. Built for sweetness and body; rescues medium/dark roasts that go bitter on hot recipes.',
+  steps:[
+    {type:'pour',frac:.15,dur:10,label:'Bloom pour'},
+    {type:'swirl',dur:5,label:'Gentle swirl'},
+    {type:'wait',dur:25,label:'Bloom rest'},
+    {type:'pour',frac:.45,dur:35,label:'Pour 2 · low & slow'},
+    {type:'wait',dur:20,label:'Let it drop'},
+    {type:'pour',frac:.40,dur:35,label:'Pour 3 · low & slow'},
+    {type:'swirl',dur:5,label:'Tiny finishing swirl'},
+    {type:'wait',dur:60,label:'Drawdown'}
+  ]},
+ {id:'chemexClassic',tool:['chemex'],champ:'House classic',timing:'adaptive',
+  name:'Chemex — Classic Batch',ratio:16,defaultDose:34,grind:'Medium-coarse',tempC:[94,96],roastRec:'Medium',
+  desc:'Thick filters drain slowly, so stay patient. Bloom with a stir, then three spiral pours staying off the filter walls. Scales happily from 500g to 900g.',
+  steps:[
+    {type:'pour',frac:.13,dur:12,label:'Bloom pour'},
+    {type:'stir',dur:8,label:'Stir bloom gently'},
+    {type:'wait',dur:25,label:'Bloom rest'},
+    {type:'pour',frac:.29,dur:30,label:'Pour 2 · spiral'},
+    {type:'wait',dur:30,label:'Pause · water near bed'},
+    {type:'pour',frac:.29,dur:30,label:'Pour 3 · spiral'},
+    {type:'wait',dur:30,label:'Pause · water near bed'},
+    {type:'pour',frac:.29,dur:30,label:'Pour 4 · spiral'},
+    {type:'wait',dur:90,label:'Long Chemex drawdown'}
+  ]},
+ {id:'kalitaPulse',tool:['kalita','origami','melitta'],champ:'Flat-bed standard',timing:'adaptive',
+  name:'Kalita Wave — Pulse Pours',ratio:15.5,defaultDose:21,grind:'Medium',tempC:[92,94],roastRec:'Light',
+  desc:'Flat bed loves rhythm: bloom plus four small pulses, keeping the water level low and consistent. Very even, very forgiving.',
+  steps:[
+    {type:'pour',frac:.14,dur:10,label:'Bloom pour'},
+    {type:'wait',dur:30,label:'Bloom rest'},
+    {type:'pour',frac:.215,dur:12,label:'Pulse 1'},{type:'wait',dur:23,label:'Let it drop'},
+    {type:'pour',frac:.215,dur:12,label:'Pulse 2'},{type:'wait',dur:23,label:'Let it drop'},
+    {type:'pour',frac:.215,dur:12,label:'Pulse 3'},{type:'wait',dur:23,label:'Let it drop'},
+    {type:'pour',frac:.215,dur:12,label:'Pulse 4'},{type:'wait',dur:65,label:'Drawdown'}
+  ]},
+ {id:'melitta1cup',tool:['melitta','kalita','any'],champ:'Daily driver',timing:'adaptive',
+  name:'One-Cup Wedge — Easy Morning',ratio:15,defaultDose:15,grind:'Medium-fine',tempC:[91,93],roastRec:'Medium',
+  desc:'Small-dose weekday recipe: bloom then two pours. Wedge drippers restrict flow, so grind slightly finer and let the brewer do the work.',
+  steps:[
+    {type:'pour',frac:.20,dur:8,label:'Bloom pour'},
+    {type:'wait',dur:27,label:'Bloom rest'},
+    {type:'pour',frac:.40,dur:20,label:'Pour 2'},
+    {type:'wait',dur:25,label:'Pause · water near bed'},
+    {type:'pour',frac:.40,dur:20,label:'Pour 3'},
+    {type:'wait',dur:60,label:'Drawdown'}
+  ]},
+ {id:'osmotic',tool:['v60','origami'],champ:"Popular in Spain's comp scene",timing:'adaptive',
+  name:'Osmotic Flow — Center Drip',ratio:15,defaultDose:20,grind:'Medium-fine',tempC:[90,93],roastRec:'Light',
+  desc:'After the bloom, pour pencil-thin and dead-center the entire time, letting water migrate outward through the bed. Slow, meditative, juicy.',
+  steps:[
+    {type:'pour',frac:.15,dur:10,label:'Bloom pour'},
+    {type:'wait',dur:30,label:'Bloom rest'},
+    {type:'pour',frac:.85,dur:105,label:'Center drip · continuous',note:'thin stream, never move'},
+    {type:'wait',dur:45,label:'Drawdown'}
+  ]},
+ {id:'v60hario1cup',tool:['v60'],champ:'Hario house method',timing:'adaptive',
+  name:'V60 — Classic 1-Cup',ratio:15,defaultDose:15,grind:'Medium-fine',tempC:[92,94],roastRec:'Medium',
+  desc:'The straightforward daily single cup: bloom, then two easy pours. Fast, forgiving, done by 2:30. The recipe to reach for before caffeine.',
+  steps:[
+    {type:'pour',frac:.20,dur:8,label:'Bloom pour'},
+    {type:'swirl',dur:4,label:'Quick swirl'},
+    {type:'wait',dur:23,label:'Bloom rest'},
+    {type:'pour',frac:.40,dur:18,label:'Pour 2 · steady spiral'},
+    {type:'wait',dur:20,label:'Pause · water near bed'},
+    {type:'pour',frac:.40,dur:18,label:'Pour 3 · steady spiral'},
+    {type:'wait',dur:55,label:'Drawdown'}
+  ]},
+ {id:'v60iced',tool:['v60'],champ:'Japanese iced standard',timing:'adaptive',
+  name:'V60 — Japanese Iced (flash brew)',ratio:15,defaultDose:22,grind:'Medium-fine',tempC:[93,96],roastRec:'Light',
+  desc:'Brew hot, directly onto ice. Set your total water as usual, then put 40% of it IN THE SERVER AS ICE — the app schedules only the hot 60% you actually pour. Grind a touch finer since less hot water passes through.',
+  steps:[
+    {type:'pour',frac:.15,dur:8,label:'Bloom pour'},
+    {type:'stir',dur:6,label:'Stir bloom',note:'small dose needs help wetting'},
+    {type:'wait',dur:26,label:'Bloom rest'},
+    {type:'pour',frac:.225,dur:14,label:'Pour 2'},
+    {type:'wait',dur:20,label:'Pause · water near bed'},
+    {type:'pour',frac:.225,dur:14,label:'Pour 3'},
+    {type:'wait',dur:20,label:'Pause · water near bed'},
+    {type:'wait',dur:55,label:'Drawdown · swirl server to melt ice'}
+  ],waterNote:0.6},
+ {id:'kasuyaSweet',tool:['v60','origami','any'],champ:'4:6 system · sweetness setting',timing:'rigid',
+  name:'The 4:6 Method — Sweet Variant',ratio:15,defaultDose:20,grind:'Coarse',tempC:[92,96],roastRec:'Light',
+  desc:"The 4:6 system's own sweetness dial: shrink pour 1, grow pour 2 (same first-40% total), keep the strength pours identical. Compare against standard 4:6 on the same beans to taste what the dial does.",
+  steps:[
+    {type:'pour',frac:.14,dur:8,label:'Pour 1 · small = sweeter'},
+    {type:'wait',dur:37,label:'Drain fully',note:'wait for a dry-ish bed'},
+    {type:'pour',frac:.26,dur:12,label:'Pour 2 · big = sweeter'},
+    {type:'wait',dur:33,label:'Drain fully',note:'wait for a dry-ish bed'},
+    {type:'pour',frac:.20,dur:10,label:'Pour 3 · strength'},
+    {type:'wait',dur:35,label:'Drain fully'},
+    {type:'pour',frac:.20,dur:10,label:'Pour 4 · strength'},
+    {type:'wait',dur:20,label:'Drain fully'},
+    {type:'pour',frac:.20,dur:10,label:'Pour 5 · strength'},
+    {type:'wait',dur:45,label:'Final drawdown'}
+  ]},
+ {id:'chemexHoffmann',tool:['chemex'],champ:'Gear-change technique',timing:'adaptive',
+  name:'Chemex — Gear Change',ratio:16.7,defaultDose:30,grind:'Medium-coarse',tempC:[95,100],roastRec:'Light',roastNote:'the hotter end for the lightest roasts',
+  desc:'His V60 logic adapted to thick Chemex paper: big stirred bloom, ONE continuous pour with a gear change at 60% (two steps = two flow-rate targets), then a gentle swirl. Patience on the drawdown — the filter is the brake.',
+  steps:[
+    {type:'pour',frac:.12,dur:10,label:'Bloom pour · 2x coffee'},
+    {type:'stir',dur:8,label:'Stir the bloom',note:'thick filter needs full wetting'},
+    {type:'wait',dur:27,label:'Bloom rest'},
+    {type:'pour',frac:.48,dur:35,label:'Main pour → 60% · brisk',note:'one continuous pour begins'},
+    {type:'pour',frac:.40,dur:35,label:'Final pour → 100% · ease off',note:'do NOT stop — same pour, slower'},
+    {type:'swirl',dur:6,label:'Gentle swirl'},
+    {type:'wait',dur:110,label:'Long Chemex drawdown'}
+  ]},
+ {id:'chemexSmall',tool:['chemex'],champ:'Small-batch daily',timing:'adaptive',
+  name:'Chemex — Small Batch (1–2 cups)',ratio:16,defaultDose:22,grind:'Medium',tempC:[93,95],roastRec:'Medium',
+  desc:'The Chemex at weekday scale. Grind finer than a full batch — a shallow bed drains fast through even Chemex paper. Bloom plus two patient pours.',
+  steps:[
+    {type:'pour',frac:.16,dur:10,label:'Bloom pour'},
+    {type:'wait',dur:30,label:'Bloom rest'},
+    {type:'pour',frac:.42,dur:26,label:'Pour 2 · slow spiral'},
+    {type:'wait',dur:25,label:'Pause · water near bed'},
+    {type:'pour',frac:.42,dur:26,label:'Pour 3 · slow spiral'},
+    {type:'wait',dur:80,label:'Drawdown'}
+  ]},
+ {id:'chemexIced',tool:['chemex'],champ:'Japanese iced standard',timing:'adaptive',
+  name:'Chemex — Japanese Iced (flash brew)',ratio:15,defaultDose:34,grind:'Medium',tempC:[94,96],roastRec:'Light',
+  desc:'Summer batch: set total water as usual, put 40% of it IN THE CHEMEX AS ICE, and the app schedules only the hot 60%. Grind finer than your hot Chemex — concentrated hot phase needs the extra extraction.',
+  steps:[
+    {type:'pour',frac:.14,dur:12,label:'Bloom pour'},
+    {type:'stir',dur:8,label:'Stir bloom'},
+    {type:'wait',dur:25,label:'Bloom rest'},
+    {type:'pour',frac:.23,dur:20,label:'Pour 2'},
+    {type:'wait',dur:25,label:'Pause · water near bed'},
+    {type:'pour',frac:.23,dur:20,label:'Pour 3'},
+    {type:'wait',dur:90,label:'Drawdown · swirl to melt ice'}
+  ],waterNote:0.6},
+ {id:'aeropressHoffmann',tool:['aeropress'],champ:'The sealed-steep technique',timing:'adaptive',immersion:true,
+  name:'AeroPress — Sealed Steep',ratio:18.2,defaultDose:11,grind:'Fine',tempC:[95,99],roastRec:'Light',
+  desc:'Small dose, fine grind, very hot water. Pour everything, cap immediately (plunger seal holds heat and stops dripping), long undisturbed steep, gentle swirl, slow press. No bloom, no stir.',
+  steps:[
+    {type:'pour',frac:1.0,dur:15,label:'Pour all water'},
+    {type:'press',dur:8,label:'Insert plunger · just the seal',note:'creates vacuum, stops drip-through'},
+    {type:'wait',dur:97,label:'Steep · hands off'},
+    {type:'swirl',dur:6,label:'Gentle swirl'},
+    {type:'wait',dur:30,label:'Settle'},
+    {type:'press',dur:30,label:'Press slowly to the hiss'}
+  ]},
+ {id:'aeropressClassic',tool:['aeropress'],champ:'House standard',timing:'adaptive',immersion:true,
+  name:'AeroPress — Classic',ratio:14.5,defaultDose:15,grind:'Medium-fine',tempC:[85,90],roastRec:'Medium',
+  desc:'The everyday AeroPress: pour, brief stir, short steep, steady press. Cooler water than pour over — immersion extracts efficiently.',
+  steps:[
+    {type:'pour',frac:1.0,dur:15,label:'Pour all water'},
+    {type:'stir',dur:10,label:'Stir · 3 gentle turns'},
+    {type:'wait',dur:60,label:'Steep'},
+    {type:'press',dur:25,label:'Press steadily · stop at the hiss'}
+  ]},
+ {id:'frenchHoffmann',tool:['frenchpress'],champ:'The patient method',timing:'adaptive',immersion:true,
+  name:'French Press — Patient Press',ratio:16.7,defaultDose:30,grind:'Medium',tempC:[95,100],roastRec:'Light',roastNote:'boiling is fine here',
+  desc:'The patient method: full steep, break and skim the crust, then a LONG settle so fines sink. Plunger barely submerged — it strains, never presses. Silty-free cups.',
+  steps:[
+    {type:'pour',frac:1.0,dur:20,label:'Pour all water'},
+    {type:'wait',dur:240,label:'Steep · 4 minutes, lid off'},
+    {type:'stir',dur:10,label:'Break the crust · then skim foam'},
+    {type:'wait',dur:300,label:'Settle · 5 min, fines sink'},
+    {type:'press',dur:10,label:'Plunger to surface only',note:'strain, don\'t plunge — pour gently'}
+  ]},
+ {id:'frenchClassic',tool:['frenchpress'],champ:'House standard',timing:'adaptive',immersion:true,
+  name:'French Press — Classic 4:00',ratio:15,defaultDose:30,grind:'Coarse',tempC:[93,96],roastRec:'Medium',
+  desc:'The four-minute standard: pour, stir, steep, press. Coarse grind keeps the plunge clean.',
+  steps:[
+    {type:'pour',frac:1.0,dur:20,label:'Pour all water'},
+    {type:'stir',dur:8,label:'Stir the crust in'},
+    {type:'wait',dur:232,label:'Steep · lid on'},
+    {type:'press',dur:20,label:'Press slowly & serve'}
+  ]},
+ {id:'custom',tool:['any','v60','kalita','chemex','origami','melitta'],champ:'Yours',timing:'adaptive',
+  name:'Custom — Even Pours',ratio:16,defaultDose:22,grind:'Your call',tempC:[92,94],roastRec:'Any',
+  desc:'Bloom at 15%, then three even pours with a finishing swirl. A neutral canvas to tweak.',
+  steps:[
+    {type:'pour',frac:.15,dur:10,label:'Bloom pour'},
+    {type:'wait',dur:30,label:'Bloom rest'},
+    {type:'pour',frac:.2833,dur:15,label:'Pour 2'},
+    {type:'wait',dur:25,label:'Pause · water near bed'},
+    {type:'pour',frac:.2833,dur:15,label:'Pour 3'},
+    {type:'wait',dur:25,label:'Pause · water near bed'},
+    {type:'pour',frac:.2834,dur:15,label:'Pour 4'},
+    {type:'swirl',dur:5,label:'Finishing swirl'},
+    {type:'wait',dur:60,label:'Drawdown'}
+  ]}
+];
+
+/* ---- custom recipes (persisted, merged with built-ins) ---- */
+function customRecipes(){return Store.get(KEYS.customs,[]);}
+function allRecipes(){return RECIPES.concat(customRecipes());}
+/* ============================ 2. STATE ============================ */
+const $=id=>document.getElementById(id);
+const ICONS={pour:'🫗',wait:'⏳',stir:'🥄',swirl:'🌀',press:'🔽'};
+const ROAST_IDX={'Light':0,'Light-Medium':1,'Medium':2,'Medium-Dark':3,'Dark':4};
+let tool='v60',recipe=null,schedule=[],totalWater=0,totalDur=0;
+let brewIdx=0,brewStart=0,timerIv=null,brewing=false,stepStart=0,finishedAt=null;
+let weight=0,weightOffset=0,wSamples=[],metrics=null,liveTrace=null;
+let simIv=null,simMode=false,ble={device:null,connected:false};
+let brewTrace=[];   // [seconds, grams] sampled ~1/s while brewing with live weight
+let unitF=false,cdIv=null,curRating=0,curTags=new Set(),restoring=false;
+let paused=false,pauseStart=0;
+let weightOz=false;
+const G2OZ=1/28.3495;
+/* Display-only unit: inputs stay in grams (every coffee scale doses in grams);
+   oz converts what you READ — live weight, targets, bars, logs. */
+function fmtW(g,dec){ return weightOz ? (g*G2OZ).toFixed(dec===0?2:2)+' oz' : (dec===0?Math.round(g):g.toFixed(dec===undefined?0:dec))+' g'; }
+function setWeightUnit(oz){
+  weightOz=oz;
+  $('wG').classList.toggle('on',!oz);
+  $('wOz').classList.toggle('on',oz);
+  if(recipe){computeSchedule();}
+  renderOzHint();
+  saveSettings();
+}
+function renderOzHint(){
+  const d=parseFloat($('dose').value),w=parseFloat($('water').value);
+  $('ozHint').textContent=(weightOz&&d&&w)?`= ${(d*G2OZ).toFixed(2)} oz coffee · ${(w*G2OZ).toFixed(2)} oz water (inputs stay in grams — scales dose in grams)`:'';
+}
+const hasLiveWeight=()=>ble.connected||simMode;
+const fmtT=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+
+/* ============================ 3. STORE ============================ */
+/* All persistence flows through Store. localStorage when available
+   (this file runs as a real page, not a sandboxed artifact), with an
+   in-memory fallback so nothing crashes in restricted contexts. */
+const Store={
+  _mem:{},
+  get(k,fallback){try{const v=localStorage.getItem(k);return v===null?( k in this._mem?this._mem[k]:fallback):JSON.parse(v);}catch(_){return k in this._mem?this._mem[k]:fallback;}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(_){this._mem[k]=v;}}
+};
+const KEYS={settings:'pourfect-settings',log:'pourfect-log',unit:'pourfect-unit',customs:'pourfect-customs',library:'pourfect-library'};
+/* Everything worth restoring lives in one settings object. Saved on every
+   change (debounced), restored once at INIT. Dose/water are included too:
+   beans and method persist for days; dose is the field you'll tweak. */
+function currentSettings(){
+  return{
+    tool, recipeId:recipe?recipe.id:null,
+    dose:$('dose').value, water:$('water').value, ratio:$('ratioInput').value,
+    grindSetting:$('grindSetting').value,
+    theme, weightOz, beanName:$('beanName').value, roaster:$('roasterSel').value, bean:$('beanSel').value,
+    roast:$('roast').value, roastDate:$('roastDate').value,
+    unitF
+  };
+}
+let saveT=null;
+function saveSettings(){
+  if(restoring)return;                       // don't save mid-restore
+  clearTimeout(saveT);
+  saveT=setTimeout(()=>Store.set(KEYS.settings,currentSettings()),250);
+}
+function restoreSettings(){
+  const s=Store.get(KEYS.settings,null);
+  restoring=true;
+  unitF=s&&'unitF'in s?s.unitF:(Store.get(KEYS.unit,'C')==='F');
+  $('unitC').classList.toggle('on',!unitF);
+  $('unitFbtn').classList.toggle('on',unitF);
+  if(s&&s.theme)setTheme(s.theme);
+  if(s&&'weightOz'in s){weightOz=s.weightOz;$('wG').classList.toggle('on',!weightOz);$('wOz').classList.toggle('on',weightOz);}
+  if(s){
+    if(s.tool&&TOOLS.some(t=>t.id===s.tool))tool=s.tool;
+    renderChips();populateRecipes();          // builds list for restored tool
+    if(s.recipeId&&allRecipes().some(r=>r.id===s.recipeId)&&[...$('recipeSel').options].some(o=>o.value===s.recipeId)){
+      loadRecipe(s.recipeId);
+    }
+    migrateLegacyBean(s);
+    renderLibrary(s.roaster,s.bean);
+    if(s.roast)$('roast').value=s.roast;       // manual override survives
+    if(s.roastDate)$('roastDate').value=s.roastDate;
+    if(s.dose){$('dose').value=s.dose;}
+    if(s.ratio){$('ratioInput').value=s.ratio;}
+    if(s.grindSetting)$('grindSetting').value=s.grindSetting;
+    if(s.water){$('water').value=s.water;}
+    // Ratio must NEVER sit blank — and when legacy settings (no ratio key) carry
+    // a saved dose+water, the ratio shown must be THEIR ratio, not the recipe's,
+    // even if an earlier computeSchedule backfilled a default into the field.
+    if(!s.ratio){
+      const d=parseFloat($('dose').value),w=parseFloat($('water').value);
+      $('ratioInput').value=(d&&w)?Math.round(w/d*10)/10:recipe.ratio;
+    }
+    computeSchedule();renderTempAdvice();renderAge();syncCustomized();
+  }else{
+    renderChips();populateRecipes();
+    renderLibrary(null,null);
+  }
+  restoring=false;
+}
+
+/* ============================ 4. ENGINES ============================ */
+/* ---- schedule ---- */
+function buildSchedule(dose,water){
+  const defWater=recipe.defaultDose*recipe.ratio;
+  const scaleF=recipe.timing==='adaptive'?water/defWater:1;
+  let t=0,cum=0;
+  return recipe.steps.map(st=>{
+    const dur=st.type==='pour'?Math.max(4,Math.round(st.dur*scaleF)):st.dur;
+    const out={type:st.type,label:st.label,note:st.note||'',start:t,dur,end:t+dur};
+    if(st.type==='pour'){cum+=st.frac*water;out.target=Math.round(cum*10)/10;out.amount=Math.round(st.frac*water);}
+    t+=dur;return out;
+  });
+}
+/* ---- drainage physics ----
+   Scale weight = total water added (monotonic). Slurry = water in the bed,
+   draining at K*sqrt(head)/resistance; resistance grows with dose^0.6 and
+   grind fineness. Kitchen model, not CFD. */
+const GRIND_R={'coarse':0.75,'medium-coarse':0.95,'medium':1.15,'medium-fine':1.4,'fine':1.75};
+function grindResistance(txt){
+  const t=(txt||'medium').toLowerCase();
+  for(const k of['medium-coarse','medium-fine','coarse','medium','fine'])if(t.includes(k))return GRIND_R[k];
+  return GRIND_R['medium'];
+}
+function simulateBrew(sched,dose){
+  const K=2.1,R=grindResistance(recipe.grind)*Math.pow(dose/recipe.defaultDose,0.6);
+  const dt=0.25,totalT=sched[sched.length-1].end,horizon=totalT+240;
+  let t=0,slurry=0,added=0,finish=null;
+  const drainEvents=[],trace=[];
+  while(t<horizon){
+    let inflow=0;
+    for(const st of sched)if(st.type==='pour'&&t>=st.start&&t<st.end){inflow=st.amount/st.dur;break;}
+    added+=inflow*dt;
+    const outflow=slurry>0?Math.min(slurry/dt,K*Math.sqrt(slurry)/R):0;
+    slurry=Math.max(0,slurry+(inflow-outflow)*dt);
+    for(const st of sched)if(st.type==='wait'&&Math.abs(t-st.end)<dt/2)drainEvents.push({label:st.label,end:st.end,slurryLeft:slurry});
+    if(finish===null&&added>=totalWater-0.5&&slurry<=Math.max(1.5,dose*0.06))finish=t;
+    if(t%1<dt)trace.push([Math.round(t),Math.round(slurry*10)/10]);
+    t+=dt;
+    if(finish!==null&&t>totalT)break;
+  }
+  return{finish,drainEvents,trace,R};
+}
+function brewPrediction(){
+  const dose=parseFloat($('dose').value)||recipe.defaultDose;
+  if(recipe.immersion){
+    // Immersion: no bed drainage — the steep time IS the schedule.
+    return{sim:{finish:schedule[schedule.length-1].end,drainEvents:[],trace:[]},warnings:[],immersion:true};
+  }
+  const sim=simulateBrew(schedule,dose);
+  const warnings=[];
+  if(recipe.timing==='rigid'){
+    const wet=sim.drainEvents.filter(e=>/drain fully/i.test(e.label)&&e.slurryLeft>Math.max(4,dose*0.25));
+    if(wet.length)warnings.push(`⚠ At ${dose} g, the bed likely won't fully drain inside the fixed ${wet.length>1?'windows':'window'} (${wet.map(e=>fmtT(e.end)).join(', ')}). Grind coarser or reduce the dose to keep the 4:6 structure honest.`);
+  }
+  if(sim.finish===null)warnings.push('⚠ Model predicts a stalled drawdown at this dose/grind — grind coarser.');
+  const schedEnd=schedule[schedule.length-1].end;
+  if(sim.finish!==null&&sim.finish>schedEnd+45)warnings.push(`⚠ Predicted drawdown runs ~${Math.round(sim.finish-schedEnd)}s past the schedule — consider a coarser grind at this dose.`);
+  return{sim,warnings};
+}
+function slurryAt(t){
+  if(!liveTrace)return null;
+  let best=null;
+  for(const p of liveTrace){if(p[0]<=t)best=p;else break;}
+  return best?best[1]:null;
+}
+/* ---- temperature ---- */
+const c2f=c=>Math.round(c*9/5+32);
+const fmtTemp=(lo,hi)=>unitF?`${c2f(lo)}–${c2f(hi)}°F`:`${lo}–${hi}°C`;
+function adjustedTemp(){
+  const[lo,hi]=recipe.tempC;
+  if(recipe.roastRec==='Any')return{lo,hi,delta:0};
+  const diff=(ROAST_IDX[$('roast').value]??2)-(ROAST_IDX[recipe.roastRec]??2);
+  const d=Math.round(diff>0?-2*diff:-1.5*diff);   // half-steps: darker −2°C, lighter +1.5°C
+  const clamp=c=>Math.min(100,Math.max(80,c+d));
+  return{lo:clamp(lo),hi:clamp(hi),delta:d};
+}
+/* ---- bean age (roast-aware: darker degasses & stales faster) ---- */
+function beanAgeDays(){
+  const v=$('roastDate').value;
+  if(!v)return null;
+  const d=Math.floor((Date.now()-new Date(v+'T12:00:00').getTime())/86400000);
+  return d>=0&&d<400?d:null;
+}
+function beanAgeState(){
+  const d=beanAgeDays();
+  if(d===null)return null;
+  const ri=ROAST_IDX[$('roast').value]??2;
+  const shift=Math.max(0,ri-2)*1.5;
+  const freshEnd=Math.max(3,5-Math.max(0,ri-2)*0.5),peakEnd=28-shift*2,fadeEnd=42-shift*3;
+  if(d<freshEnd)return{d,cls:'fresh',txt:`☁️ ${d} day${d===1?'':'s'} off roast — still degassing hard. Expect a wild bloom; a longer bloom rest helps, and don't chase sourness with the grinder yet.`};
+  if(d<=peakEnd)return{d,cls:'peak',txt:`✅ ${d} days off roast — peak window for filter${ri>2?' (windows tightened for darker roasts)':''}. Recipes should behave as designed.`};
+  if(d<=fadeEnd)return{d,cls:'fading',txt:`🍂 ${d} days off roast — past peak${ri>2?' for a darker roast':''}. Expect a smaller bloom and softer aromatics; a slightly finer grind or tighter ratio can compensate.`};
+  return{d,cls:'stale',txt:`💀 ${d} days off roast — likely stale${ri>2?' (darker roasts fade faster)':''}. Flat or papery cups at this age are the beans, not your technique.`};
+}
+/* ---- flow rate ---- */
+let _firstW=false;
+function pushWeight(g){
+  if(!_firstW){_firstW=true;blog('★ first weight received: '+g.toFixed(1)+' g — stream is LIVE');}
+  weight=g;
+  const now=Date.now();
+  wSamples.push([now,g]);
+  while(wSamples.length&&now-wSamples[0][0]>1600)wSamples.shift();
+  if(brewing)updateBrewUI();
+}
+const displayedWeight=()=>weight-weightOffset;
+function liveFlowRate(){
+  if(wSamples.length<3)return null;
+  const[t0,w0]=wSamples[0],[t1,w1]=wSamples[wSamples.length-1];
+  const dt=(t1-t0)/1000;
+  return dt>0.4?(w1-w0)/dt:null;
+}
+/* ---- post-mortem insights (age- and data-aware) ---- */
+function buildInsights(){
+  const out=[];
+  const dose=parseFloat($('dose').value)||recipe.defaultDose;
+  const schedEnd=schedule[schedule.length-1].end;
+  const actual=finishedAt||schedEnd;
+  const drift=recipe.immersion?0:actual-schedEnd;   // steeps end on the clock
+  const pouredFast=metrics&&metrics._tot>5&&metrics.frFastPct>0.35;
+  const bigOver=metrics&&metrics.overshoot>Math.max(6,totalWater*0.03);
+  const roast=$('roast').value;
+  const T=curTags,age=beanAgeState();
+  const under=T.has('sour')||T.has('weak')||T.has('hollow');
+  const over=T.has('bitter')||T.has('astringent');
+
+  if(T.has('balanced')){
+    out.push({cls:'win',title:'Reference brew 🎯',body:`Save this one: ${dose} g · 1:${(totalWater/dose).toFixed(1)} · ${recipe.grind.toLowerCase()} · finished ${fmtT(actual)}. Change nothing next time — repeatability first, experiments after.`});
+    return out;
+  }
+  // Freshness first — it overrides technique diagnoses.
+  if(age&&age.cls==='stale'&&(T.has('hollow')||T.has('weak'))){
+    out.push({cls:'temp',title:`Check the beans first (${age.d} days off roast)`,body:'Flat or hollow cups at this age are usually staling, not extraction. No grind change fixes oxidized aromatics — verify with a fresher bag before adjusting anything else.'});
+  }
+  if(age&&age.cls==='fresh'&&T.has('sour')){
+    out.push({cls:'temp',title:`Very fresh beans (${age.d} days off roast)`,body:'Heavy CO2 degassing pushes water away from the grounds and reads as sourness. Before grinding finer, try: rest the bag a few more days, or extend the bloom 15–20s and stir it. Re-taste, then adjust grind.'});
+  }
+  if(age&&age.cls==='fading'&&under&&!T.has('sour')){
+    out.push({cls:'temp',title:`Beans past peak (${age.d} days)`,body:'Softer cups are partly age. A slightly finer grind or a 1-point tighter ratio can pull back some intensity while you finish the bag.'});
+  }
+  if(T.has('harsh')||(T.has('bitter')&&T.has('sour'))){
+    out.push({cls:'pour',title:'Uneven extraction (bitter + sour together)',body:`This usually means channeling, not the wrong grind — some grounds over-extract while others under-extract.${pouredFast?' Your flow rate ran hot on '+Math.round(metrics.frFastPct*100)+'% of pour time, which digs craters in the bed — pour lower and slower.':' Keep the flow gentle, pour in circles not one spot, and swirl to keep the bed flat.'}`});
+  }
+  const staleExplainsIt=age&&age.cls==='stale'&&(T.has('hollow')||T.has('weak'))&&!T.has('sour');
+  if(under&&!over&&!staleExplainsIt){
+    const grindLine=drift<-15
+      ?`Your drawdown ran ${Math.round(-drift)}s FASTER than schedule — the water isn't spending enough time in the coffee. Grind finer (the data agrees with your tongue).`
+      :`Grind one step finer, or raise water temp${roast.startsWith('Light')?` — lighter roasts want ${fmtTemp(96,100)}`:''}.`;
+    out.push({cls:'grind',title:'Under-extracted (sour / weak / hollow)',body:grindLine});
+    if(T.has('weak')&&!T.has('sour'))out.push({cls:'ratio',title:'Or: strength, not extraction',body:`Weak without sourness can just be dilution. Try tightening the ratio a notch (1:${(totalWater/dose-1).toFixed(0)}) before touching the grind.`});
+  }
+  if(over&&!under){
+    const grindLine=drift>20
+      ?`Your drawdown ran ${Math.round(drift)}s SLOWER than schedule — water sat in the coffee too long. Grind coarser (the data agrees with your tongue).`
+      :`Grind one step coarser, or drop water temp a few degrees${(roast==='Dark'||roast==='Medium-Dark')?` — darker roasts extract fast, ${fmtTemp(88,92)} is friendlier`:''}.`;
+    out.push({cls:'grind',title:'Over-extracted (bitter / drying)',body:grindLine});
+    if(pouredFast)out.push({cls:'pour',title:'Agitation is stacking on top',body:`You were over target flow rate ${Math.round(metrics.frFastPct*100)}% of the time. Hard pours churn the slurry and extract more — fix the pour before the second grind change.`});
+  }
+  if(T.has('strong')){
+    out.push({cls:'ratio',title:'Too strong / muddy',body:`Widen the ratio — try 1:${(totalWater/dose+1).toFixed(0)} at the same grind. If it's muddy specifically, coarsen slightly too; fines make silt.`});
+  }
+  if(bigOver){
+    out.push({cls:'pour',title:'Pour accuracy',body:`Biggest overshoot was ${metrics.overshoot.toFixed(0)} g past a target. Overshooting stretches the ratio mid-brew. Ease off ~10 g before each target and finish in pulses.`});
+  }
+  if(!out.length&&curTags.size){
+    out.push({cls:'temp',title:'Mixed signals',body:'These tags point in different directions — change ONE variable next brew (grind first), keep everything else identical, and compare.'});
+  }
+  if(drift>20&&!over)out.push({cls:'grind',title:'FYI: slow drawdown',body:`Finished ${Math.round(drift)}s past schedule. If the next cup trends bitter, this is why — coarsen before it does.`});
+  return out;
+}
+
+/* ============================ 4b. BEAN LIBRARY ============================
+Roaster -> beans, each bean carrying its roast level. Roast is a property of
+the bean, set once; only the roast date is per-bag. Home roasters: add
+yourself as a roaster. */
+/* Preset catalogs: stable blend lineups with roast levels pre-filled.
+   Planned as a Reserve (paid) feature — free preview for now. Single
+   origins rotate seasonally, so those stay manual. */
+const PRESET_ROASTERS=[
+ {name:'Stumptown',beans:[
+   {name:'Hair Bender',roast:'Medium'},
+   {name:'Holler Mountain',roast:'Medium'},
+   {name:"Founder's Blend",roast:'Medium'},
+   {name:'Homestead Blend',roast:'Medium'},
+   {name:'Hundred Mile',roast:'Medium'},
+   {name:'French Roast',roast:'Dark'},
+   {name:'Trapper Creek Decaf',roast:'Medium-Dark'},
+   {name:'Echo Canyon Half-Caff',roast:'Medium'},
+   {name:'Guatemala El Injerto Bourbon (seasonal)',roast:'Light'}
+ ]}
+];
+function addPresetRoaster(name){
+  const p=PRESET_ROASTERS.find(x=>x.name===name);
+  if(!p)return;
+  const lib=getLibrary();
+  if(!lib.some(r=>r.name===p.name))lib.push({name:p.name,beans:p.beans.map(b=>({...b}))});
+  setLibrary(lib);
+  $('libAddRow').style.display='none';
+  renderLibrary(p.name,null);
+  saveSettings();
+}
+function getLibrary(){return Store.get(KEYS.library,[]);}
+function setLibrary(lib){Store.set(KEYS.library,lib);}
+function libRoaster(name){return getLibrary().find(r=>r.name===name);}
+function renderLibrary(selRoaster,selBean){
+  const lib=getLibrary();
+  const rs=$('roasterSel');
+  const presets=PRESET_ROASTERS.filter(p=>!lib.some(r=>r.name===p.name));
+  rs.innerHTML=lib.map(r=>`<option value="${r.name}">${r.name}</option>`).join('')
+    +presets.map(p=>`<option value="${p.name}">${p.name}</option>`).join('')
+    +'<option value="__newR">＋ Add roaster…</option>';
+  if(selRoaster&&(lib.some(r=>r.name===selRoaster)||presets.some(p=>p.name===selRoaster)))rs.value=selRoaster;
+  else if(lib.length)rs.value=lib[0].name;
+  else if(presets.length)rs.value=presets[0].name;
+  ensureRoasterInstalled(rs.value);
+  renderBeans(selBean);
+}
+/* Preset roasters live in the dropdown like any other; first selection
+   quietly copies the catalog into the user's library. */
+function ensureRoasterInstalled(name){
+  if(!name||name==='__newR')return;
+  if(libRoaster(name))return;
+  const p=PRESET_ROASTERS.find(x=>x.name===name);
+  if(p){const lib=getLibrary();lib.push({name:p.name,beans:p.beans.map(b=>({...b}))});setLibrary(lib);}
+}
+function renderBeans(selBean){
+  const r=libRoaster($('roasterSel').value);
+  const bs=$('beanSel');
+  const beans=r?r.beans:[];
+  bs.innerHTML=beans.map(b=>`<option value="${b.name.replace(/"/g,'&quot;')}">${b.name} · ${b.roast}</option>`).join('')+'<option value="__newB">＋ Add bean…</option>';
+  if(selBean&&beans.some(b=>b.name===selBean))bs.value=selBean;
+  else if(beans.length)bs.value=beans[0].name;
+  applyBeanSelection();
+}
+function applyBeanSelection(){
+  const r=libRoaster($('roasterSel').value);
+  const b=r&&r.beans.find(x=>x.name===$('beanSel').value);
+  if(b){
+    $('roast').value=b.roast;                 // roast follows the bean
+    $('beanName').value=`${b.name} — ${r.name}`;
+    renderTempAdvice();renderAge();
+  }else{
+    $('beanName').value='';
+  }
+}
+function showLibAdd(kind){
+  $('libAddRow').style.display='flex';
+  $('libAddRow').dataset.kind=kind;
+  $('libAddName').value='';
+  $('libAddName').placeholder=kind==='roaster'?'Roaster name (or "Home roast")':'Bean name, e.g. Ethiopia Chelbesa';
+  $('libAddRoastWrap').style.display=kind==='bean'?'block':'none';
+  $('roasterSel').onchange=()=>{
+    if($('roasterSel').value==='__newR'){showLibAdd('roaster');return;}
+    $('libAddRow').style.display='none';
+    ensureRoasterInstalled($('roasterSel').value);
+    renderBeans(null);saveSettings();
+  };
+}
+function commitLibAdd(){
+  const kind=$('libAddRow').dataset.kind,name=$('libAddName').value.trim();
+  if(!name)return;
+  const lib=getLibrary();
+  if(kind==='roaster'){
+    if(!lib.some(r=>r.name===name))lib.push({name,beans:[]});
+    setLibrary(lib);
+    renderLibrary(name,null);
+    showLibAdd('bean');                        // natural next step: add their first bean
+  }else{
+    const r=lib.find(x=>x.name===$('roasterSel').value);
+    if(r&&!r.beans.some(b=>b.name===name)){
+      r.beans.push({name,roast:$('libAddRoast').value});
+      setLibrary(lib);
+    }
+    $('libAddRow').style.display='none';
+    renderLibrary($('roasterSel').value,name);
+  }
+  saveSettings();
+}
+function migrateLegacyBean(s){
+  // Old settings carried a freeform beanName; seed the library so nothing is lost.
+  if(getLibrary().length||!s||!s.beanName)return;
+  const nm=String(s.beanName);
+  const[bean,roaster]=nm.includes(' — ')?nm.split(' — '):[nm,'My beans'];
+  setLibrary([{name:roaster,beans:[{name:bean,roast:s.roast||'Medium'}]}]);
+}
+/* ============================ 5. DEVICES ============================ */
+const WSS={svc:0x181D,chr:0x2A9D};
+const ACAIA={
+  svc:'49535343-fe7d-4ae5-8fa9-9fafd205e455',
+  rx:'49535343-1e4d-4bd9-ba61-23c647249616',
+  tx:'49535343-8841-43f4-a8d4-ecbe34729bb3'
+};
+const FELICITA={svc:'0000ffe0-0000-1000-8000-00805f9b34fb',chr:'0000ffe1-0000-1000-8000-00805f9b34fb'};
+/* Acaia protocol (pyacaia/Beanconqueror lineage): every message EF DD <type> <payload> <cksum>.
+   We send ident + notification-config, heartbeat every 2.75s, decode type-12 event
+   packets whose payload[0]===5 as weight. */
+function acaiaEncode(msgType,payload){
+  const buf=[0xEF,0xDD,msgType];
+  let c1=msgType,c2=0;   // pyacaia checksums start from type? spec: sums over payload only
+  c1=0;c2=0;
+  for(let i=0;i<payload.length;i++){ if(i%2===0)c1+=payload[i];else c2+=payload[i]; }
+  return new Uint8Array([0xEF,0xDD,msgType,...payload,c1&0xFF,c2&0xFF]);
+}
+function acaiaDecodeWeight(dv){
+  // scan for EF DD 0C ... event payload with id 5 (weight)
+  const b=new Uint8Array(dv.buffer,dv.byteOffset,dv.byteLength);
+  for(let i=0;i+9<b.length;i++){
+    if(b[i]===0xEF&&b[i+1]===0xDD&&b[i+2]===0x0C){
+      const p=b.slice(i+4);            // skip length byte
+      if(p[0]===5&&p.length>=7){
+        let w=(p[1]|(p[2]<<8)|(p[3]<<16))/Math.pow(10,p[5]);
+        if(p[6]&0x02)w=-w;
+        return w;
+      }
+    }
+  }
+  return null;
+}
+function felicitaDecode(dv){
+  // 18-byte frames; ASCII signed grams*100 at bytes 2..8
+  if(dv.byteLength<9)return null;
+  let s='';
+  for(let i=2;i<9;i++)s+=String.fromCharCode(dv.getUint8(i));
+  const v=parseInt(s,10);
+  return Number.isFinite(v)?v/100:null;
+}
+async function tryAcaia(server){
+  try{
+    const svc=await server.getPrimaryService(ACAIA.svc);
+    const rx=await svc.getCharacteristic(ACAIA.rx);
+    const tx=await svc.getCharacteristic(ACAIA.tx);
+    await rx.startNotifications();
+    rx.addEventListener('characteristicvaluechanged',e=>{
+      const w=acaiaDecodeWeight(e.target.value);
+      if(w!==null)pushWeight(w);
+    });
+    blog('Acaia service found; starting notifications + handshake');
+    const ident=acaiaEncode(0x0B,[0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x30,0x31,0x32,0x33,0x34]);
+    const config=acaiaEncode(0x0C,[9,0,1,1,2,2,5,3,4]);
+    await tx.writeValue(ident);await tx.writeValue(config);
+    const hb=acaiaEncode(0x00,[0x02,0x00]);
+    setInterval(()=>{if(ble.connected)tx.writeValue(hb).catch(()=>{});},2750);
+    return'Acaia';
+  }catch(_){return null;}
+}
+async function tryFelicita(server){
+  try{
+    const svc=await server.getPrimaryService(FELICITA.svc);
+    const chr=await svc.getCharacteristic(FELICITA.chr);
+    await chr.startNotifications();
+    let hits=0;
+    chr.addEventListener('characteristicvaluechanged',e=>{
+      const w=felicitaDecode(e.target.value);
+      if(w!==null){hits++;pushWeight(w);}
+    });
+    return'Felicita';
+  }catch(_){return null;}
+}
+/* Adapter registry, tried in order; genericSniffer remains the universal fallback
+   (covers Fellow Tally, Timemore, DiFluid, Bookoo and friends heuristically). */
+const SCALE_ADAPTERS=[
+  {name:'Acaia',try:tryAcaia},
+  {name:'Felicita',try:tryFelicita},
+  {name:'Standard BLE scale',try:async s=>await tryStandard(s)?'Standard BLE scale':null}
+];
+const bleLog=[];
+function blog(m){
+  bleLog.push(new Date().toLocaleTimeString()+' · '+m);
+  if(bleLog.length>14)bleLog.shift();
+  const el=$('bleDebug');
+  if(el&&el.style.display!=='none')el.textContent=bleLog.join('\n');
+}
+function setScaleUI(state,msg,tag){
+  const d=$('scaleDot');d.className='dot';
+  if(state==='on')d.classList.add('on');if(state==='sim')d.classList.add('sim');
+  $('scaleStatus').textContent=msg;
+  $('btnSim').classList.toggle('sim-on',state==='sim');
+  const t=$('scaleTag');
+  if(state==='on'){t.textContent='⚖ '+(tag||'scale');t.className='scaletag real';t.style.display='inline-block';}
+  else if(state==='sim'){t.textContent='🧪 SIM';t.className='scaletag sim';t.style.display='inline-block';}
+  else{t.style.display='none';}
+}
+async function connectScale(){
+  if(!navigator.bluetooth){setScaleUI('off','Web Bluetooth unavailable — use Chrome/Edge, or Simulator.');return;}
+  try{
+    setScaleUI('off','Choosing device…');
+    const device=await navigator.bluetooth.requestDevice({acceptAllDevices:true,
+      optionalServices:[WSS.svc,0x181B,ACAIA.svc,FELICITA.svc,'0000fff0-0000-1000-8000-00805f9b34fb','0000ff12-0000-1000-8000-00805f9b34fb']});
+    ble.device=device;
+    device.addEventListener('gattserverdisconnected',()=>{ble.connected=false;blog('scale disconnected');setScaleUI('off','Scale disconnected');});
+    blog('chose device: '+(device.name||'(unnamed)'));
+    const server=await device.gatt.connect();
+    blog('GATT connected');
+    let proto=null;
+    for(const ad of SCALE_ADAPTERS){
+      blog('trying adapter: '+ad.name+'…');
+      proto=await ad.try(server);
+      if(proto){blog('✓ matched: '+proto);break;}
+      blog('  not '+ad.name);
+    }
+    if(!proto){blog('falling back to generic sniffer…');if(await genericSniffer(server)){proto='auto-detected';blog('✓ sniffer found a weight-like stream');}}
+    if(proto){ble.connected=true;simStop();setScaleUI('on',`Connected: ${device.name||'scale'} (${proto})`,`${device.name||'scale'} · ${proto}`);}
+    else setScaleUI('off','Connected but no weight stream found — try Simulator.');
+  }catch(e){blog('✗ '+e.name+': '+e.message);setScaleUI('off',e.name==='NotFoundError'?'No device chosen':'Connect failed: '+e.message);}
+}
+async function tryStandard(server){
+  try{
+    const svc=await server.getPrimaryService(WSS.svc);
+    const chr=await svc.getCharacteristic(WSS.chr);
+    await chr.startNotifications();
+    chr.addEventListener('characteristicvaluechanged',e=>{
+      const dv=e.target.value,flags=dv.getUint8(0),raw=dv.getUint16(1,true);
+      pushWeight((flags&1)?raw*0.01*28.3495:raw*5);
+    });
+    return true;
+  }catch(_){return false;}
+}
+async function genericSniffer(server){
+  let hooked=false;
+  try{
+    const services=await server.getPrimaryServices();
+    for(const svc of services){
+      let chars=[];try{chars=await svc.getCharacteristics();}catch(_){continue;}
+      for(const c of chars){
+        if(!c.properties.notify&&!c.properties.indicate)continue;
+        try{
+          await c.startNotifications();
+          c.addEventListener('characteristicvaluechanged',e=>{
+            const g=decodeGuess(e.target.value);if(g!==null)pushWeight(g);
+          });
+          hooked=true;
+        }catch(_){}
+      }
+    }
+  }catch(_){}
+  return hooked;
+}
+let lockOffset=null,lockKind=null,lastGuess=null,stableCount=0;
+function decodeGuess(dv){
+  const tryRead=(off,kind)=>{
+    try{
+      let v;
+      if(kind==='i16le')v=dv.getInt16(off,true)/10;
+      else if(kind==='i16be')v=dv.getInt16(off,false)/10;
+      else if(kind==='i32le')v=dv.getInt32(off,true)/10;
+      else v=dv.getInt32(off,false)/10;
+      return(v>=-50&&v<=2600)?v:null;
+    }catch(_){return null;}
+  };
+  if(lockOffset!==null){const v=tryRead(lockOffset,lockKind);if(v!==null)return v;lockOffset=null;}
+  for(const kind of['i32le','i32be','i16le','i16be']){
+    for(let off=0;off<dv.byteLength-1;off++){
+      const v=tryRead(off,kind);
+      if(v===null)continue;
+      if(lastGuess!==null&&Math.abs(v-lastGuess)<50)stableCount++;else stableCount=0;
+      lastGuess=v;
+      if(stableCount>4){lockOffset=off;lockKind=kind;return v;}
+    }
+  }
+  return null;
+}
+/* simulator: pours at the schedule's true rate with ±15% wobble */
+function simStop(){if(simIv){clearInterval(simIv);simIv=null;}simMode=false;}
+function simToggle(){
+  if(simMode){simStop();setScaleUI('off','Simulator off');return;}
+  simMode=true;weight=0;weightOffset=0;
+  setScaleUI('sim','Simulator — fake pours for practice, no hardware. Weight climbs by itself during pour steps.');
+  let simLast=Date.now();
+  simIv=setInterval(()=>{
+    const now=Date.now(),dt=(now-simLast)/1000;simLast=now;
+    if(!brewing||paused)return;
+    const st=schedule[brewIdx];if(!st||st.type!=='pour')return;
+    if(displayedWeight()<st.target){
+      const rate=st.amount/st.dur,wobble=0.85+Math.random()*0.3;
+      pushWeight(Math.min(weightOffset+st.target+0.4,weight+rate*wobble*dt));
+    }
+  },100);
+}
+
+/* ============================ 6. SETUP UI ============================ */
+function renderChips(){
+  $('toolChips').innerHTML=TOOLS.map(t=>`<div class="chip ${t.id===tool?'on':''}" data-t="${t.id}" role="button" tabindex="0">${t.name}</div>`).join('');
+  document.querySelectorAll('.chip').forEach(c=>{
+    const pick=()=>{tool=c.dataset.t;renderChips();populateRecipes();saveSettings();};
+    c.onclick=pick;c.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')pick()};
+  });
+}
+function populateRecipes(){
+  const list=allRecipes().filter(r=>r.tool.includes(tool)||tool==='any');
+  $('recipeSel').innerHTML=list.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+  loadRecipe(list[0].id);
+}
+function loadRecipe(id){
+  recipe=allRecipes().find(r=>r.id===id);
+  $('recipeSel').value=id;
+  if(!restoring){
+    $('dose').value=recipe.defaultDose;
+    $('ratioInput').value=recipe.ratio;
+    $('water').value=Math.round(recipe.defaultDose*recipe.ratio);
+  }
+  const tBadge=recipe.timing==='rigid'
+    ?'<span class="badge rigid">⏱ CHAMPIONSHIP CLOCK</span>'
+    :'<span class="badge adaptive">〰 ADAPTIVE TIMING</span>';
+  const roastBadge=recipe.roastRec==='Any'?'':`<span class="badge b2">☕ dialed on ${recipe.roastRec.toLowerCase()} roast</span>`;
+  $('recipeBadges').innerHTML=`<span class="badge">${recipe.champ}</span>${tBadge}<span class="badge b2">1:${recipe.ratio}</span><span class="badge b3">${recipe.grind}</span><span class="badge" id="tempBadge"></span>${roastBadge}`;
+  $('recipeMeta').innerHTML=recipe.desc+'<div style="margin-top:8px" id="tempAdvice"></div>';
+  $('timingNote').innerHTML=recipe.timing==='rigid'
+    ?'⏱ <b>Championship clock:</b> pour weights scale to your dose, but pour windows and rests stay exactly on the published clock — the timing structure is the method. Big dose changes may need a grind adjustment to keep drawdown on time.'
+    :'〰 <b>Adaptive timing:</b> pour durations stretch or shrink with your water amount (steady pour rate), while blooms, stirs, and rests stay fixed. The whole clock recomputes for your dose.';
+  $('btnDeleteCustom').style.display=recipe.custom?'inline-block':'none';
+  computeSchedule();
+  renderTempAdvice();
+  syncCustomized();
+  saveSettings();
+}
+function computeSchedule(){
+  const dose=parseFloat($('dose').value)||recipe.defaultDose;
+  if(!parseFloat($('ratioInput').value))$('ratioInput').value=recipe.ratio;
+  totalWater=parseFloat($('water').value)||Math.round(dose*curRatio());
+  schedule=buildSchedule(dose,totalWater);
+  totalDur=schedule[schedule.length-1].end;
+  const pred=brewPrediction();
+  const finishTxt=pred.sim.finish!==null?fmtT(pred.sim.finish):'—';
+  const pourSum=recipe.steps.filter(x=>x.type==='pour').reduce((z,x)=>z+x.frac,0);
+  const icedNote=pourSum<0.95?` · 🧊 pour ${Math.round(pourSum*100)}% hot (${Math.round(totalWater*pourSum)} g) + ${Math.round((1-pourSum)*100)}% ice (${Math.round(totalWater*(1-pourSum))} g) in the vessel`:'';
+  const modelNote=pred.immersion?'<span style="font-weight:500">(immersion — steep time is the schedule)</span>':`· predicted finish <b>~${finishTxt}</b> <span style="font-weight:500">(drainage model: ${recipe.grind.toLowerCase()} grind, ${dose} g bed)</span>`;
+  $('ratioMeta').innerHTML=`Ratio <b>1:${(totalWater/dose).toFixed(1)}</b>${icedNote} · schedule <b>${fmtT(totalDur)}</b> ${modelNote}`
+    +pred.warnings.map(w=>`<div class="timing-note" style="margin-top:8px;background:#FFE3E3">${w}</div>`).join('');
+  $('stepPreview').innerHTML=schedule.map((st,i)=>stepRowHTML(st,i,-1)).join('');
+}
+function stepRowHTML(st,i,activeIdx){
+  const cls=i<activeIdx?'done':i===activeIdx?'active':'';
+  const detail=st.type==='pour'
+    ?`${st.label} — <b>${fmtW(st.amount)}</b> over ${st.dur}s${st.note?' · '+st.note:''}`
+    :`${st.label} (${st.dur}s)${st.note?' · '+st.note:''}`;
+  const cum=st.type==='pour'?`→ ${fmtW(st.target)}`:'';
+  return `<div class="step-row ${cls}" id="srow${i}"><div class="fill" id="sfill${i}"></div><span class="t">${fmtT(st.start)}</span><span class="icn">${ICONS[st.type]}</span><span>${detail}</span><span class="cum">${cum}</span></div>`;
+}
+function renderTempAdvice(){
+  if(!recipe)return;
+  const a=adjustedTemp();
+  const tb=$('tempBadge');if(tb)tb.textContent=`💧 ${fmtTemp(a.lo,a.hi)}`;
+  const userRoast=$('roast').value;
+  let line;
+  if(recipe.roastRec==='Any'){
+    line=`💧 Water: <b>${fmtTemp(a.lo,a.hi)}</b> — neutral baseline, nudge hotter for lighter roasts, cooler for darker.`;
+  }else if(a.delta===0){
+    line=`💧 Water: <b>${fmtTemp(a.lo,a.hi)}</b>${recipe.roastNote?` — ${recipe.roastNote}`:''}. This method was dialed on <b>${recipe.roastRec.toLowerCase()} roasts</b> — your bag matches. Any roast works.`;
+  }else{
+    line=`💧 Water: <b>${fmtTemp(a.lo,a.hi)}</b>, adjusted ${a.delta>0?'+':''}${unitF?Math.round(a.delta*9/5)+'°F':a.delta+'°C'} for your <b>${userRoast.toLowerCase()} roast</b>. The champion dialed this on ${recipe.roastRec.toLowerCase()} roasts (published: ${fmtTemp(recipe.tempC[0],recipe.tempC[1])}) — any roast works with the shift.`;
+  }
+  const ta=$('tempAdvice');if(ta)ta.innerHTML=line;
+}
+function renderAge(){
+  const a=beanAgeState(),chip=$('ageChip');
+  if(!a){chip.style.display='none';return;}
+  chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
+}
+
+let theme='max';
+function setTheme(t){
+  theme=t;
+  document.body.classList.toggle('calm',t==='calm');
+  document.body.classList.toggle('burnt',t==='burnt');
+  $('themeMax').classList.toggle('on',t==='max');
+  $('themeCalm').classList.toggle('on',t==='calm');
+  $('themeBurnt').classList.toggle('on',t==='burnt');
+  saveSettings();
+}
+function setUnit(f){
+  unitF=f;
+  $('unitC').classList.toggle('on',!f);
+  $('unitFbtn').classList.toggle('on',f);
+  renderTempAdvice();
+  saveSettings();
+}
+function curRatio(){
+  const r=parseFloat($('ratioInput').value);
+  return r>=10&&r<=20?r:recipe.ratio;
+}
+/* When the working ratio departs from the recipe's, the method presents as a
+   customization — the select's label changes and a one-tap reset appears. */
+function syncCustomized(){
+  if(!recipe)return;
+  const off=Math.abs(curRatio()-recipe.ratio)>0.05;
+  const opt=[...$('recipeSel').options].find(o=>o.value===recipe.id);
+  if(opt)opt.textContent=(off?'Customized · ':'')+recipe.name;
+  $('btnRatioReset').style.display=off?'inline-block':'none';
+  $('defRatio').textContent=recipe.ratio;
+}
+/* ============================ 7. BREW UI ============================ */
+/* Pausing freezes brew time itself: while paused, elapsed() is pinned to the
+   pause moment; on resume, brewStart shifts forward by the paused duration so
+   every countdown, ETA, and pace calc continues exactly where it stopped. */
+const elapsed=()=>((paused?pauseStart:Date.now())-brewStart)/1000;
+function togglePause(){
+  if(!brewing||brewIdx>=schedule.length)return;
+  paused=!paused;
+  if(paused){
+    pauseStart=Date.now();
+    $('btnPause').textContent='Resume ▶';
+    $('pace').textContent='⏸ PAUSED';$('pace').className='pace hold';$('pace').style.display='inline-block';
+  }else{
+    brewStart+=Date.now()-pauseStart;
+    $('btnPause').textContent='Pause ⏸';
+  }
+  if(navigator.vibrate)navigator.vibrate(40);
+  updateBrewUI();
+}
+function startCountdown(){
+  computeSchedule();
+  const first=schedule[0];
+  $('cdFirst').textContent=first?`First up: ${ICONS[first.type]} ${first.label}${first.type==='pour'?` — ${first.amount} g over ${first.dur}s`:''}`:'';
+  $('setup').style.display='none';$('brew').style.display='block';
+  buildTimeline();renderLiveMethodStatic();
+  $('countdown').style.display='flex';
+  let n=3;$('cdNum').textContent=n;
+  if(navigator.vibrate)navigator.vibrate(40);
+  cdIv=setInterval(()=>{
+    n--;
+    if(n>0){$('cdNum').textContent=n;if(navigator.vibrate)navigator.vibrate(40);}
+    else if(n===0){$('cdNum').textContent='GO';if(navigator.vibrate)navigator.vibrate([60,40,120]);}
+    else{clearInterval(cdIv);cdIv=null;$('countdown').style.display='none';beginBrew();}
+  },1000);
+}
+function beginBrew(){
+  const dose=parseFloat($('dose').value)||recipe.defaultDose;
+  liveTrace=simulateBrew(schedule,dose).trace;
+  brewIdx=0;brewing=true;weightOffset=weight;brewStart=Date.now();stepStart=0;finishedAt=null;wSamples=[];
+  metrics={pours:[],overshoot:0,frFastPct:0,_fast:0,_tot:0};
+  disarmExit();
+
+  brewTrace=[];
+  paused=false;$('btnPause').textContent='Pause ⏸';
+  clearInterval(timerIv);                      // no zombie timers from prior brews
+  timerIv=setInterval(tick,150);tick();
+}
+function buildTimeline(){
+  $('timeline').innerHTML=schedule.map((st,i)=>
+    `<div class="seg ${st.type}" id="seg${i}" style="flex:${st.dur} ${st.dur} 0"><div class="segfill" id="segfill${i}"></div><span class="segicon">${ICONS[st.type]}</span></div>`
+  ).join('')+`<div class="playhead" id="playhead" style="left:0%"></div>`;
+  $('tlMid').textContent=fmtT(totalDur/2);
+  $('tlEnd').textContent=fmtT(totalDur);
+}
+function tick(){
+  if(!brewing){clearInterval(timerIv);timerIv=null;return;}   // stray intervals kill themselves
+  if(brewIdx>=schedule.length){finishUI();return;}            // completed: frozen clock only
+  if(paused){$('timer').textContent=fmtT(elapsed());return;}  // world on hold
+  const el=elapsed();
+  if(hasLiveWeight()&&(!brewTrace.length||el-brewTrace[brewTrace.length-1][0]>=1))
+    brewTrace.push([Math.round(el*10)/10,Math.round(Math.max(0,displayedWeight())*10)/10]);
+  $('timer').textContent=fmtT(el);
+  const st=schedule[brewIdx];
+  if(st){
+    const inStep=el-stepStart;
+    if(st.type!=='pour'&&inStep>=st.dur){advance();return;}
+    if(st.type==='pour'&&!hasLiveWeight()&&inStep>=st.dur){advance();return;}
+  }
+  updateBrewUI();
+}
+function paceState(){
+  if(brewIdx>=schedule.length)return['DONE','ok'];
+  const d=stepStart-schedule[brewIdx].start;
+  if(Math.abs(d)<6)return['ON PACE','ok'];
+  if(d>0)return[`+${Math.round(d)}s BEHIND`,'behind'];
+  return[`${Math.round(-d)}s AHEAD`,'ahead'];
+}
+function pourFrac(st,w){
+  const prevPour=[...schedule.slice(0,schedule.indexOf(st))].reverse().find(x=>x.type==='pour');
+  const prev=prevPour?prevPour.target:0;
+  return Math.min(1,Math.max(0,(w-prev)/(st.target-prev)));
+}
+function updateBrewUI(){
+  const st=schedule[brewIdx],el=elapsed(),w=Math.max(0,displayedWeight());
+
+  if(paused){
+    $('pace').textContent='⏸ PAUSED';$('pace').className='pace hold';$('pace').style.display='inline-block';
+  }else{
+    const[ptxt,pcls]=paceState();
+    $('pace').textContent=ptxt;$('pace').className='pace '+pcls;
+    $('pace').style.display=(pcls==='ok')?'none':'inline-block';   // silence = on pace
+  }
+  const schedTime=st?Math.min(st.end,st.start+(el-stepStart)):totalDur;
+  $('playhead').style.left=`calc(${Math.min(100,schedTime/totalDur*100)}% - 2px)`;
+  schedule.forEach((x,i)=>{
+    const f=$('segfill'+i),sg=$('seg'+i);
+    if(!f)return;
+    if(i<brewIdx){f.style.width='100%';sg.classList.remove('now');}
+    else if(i===brewIdx){
+      const frac=x.type==='pour'&&hasLiveWeight()?pourFrac(x,w):Math.min(1,(el-stepStart)/x.dur);
+      f.style.width=(frac*100)+'%';sg.classList.add('now');
+    }else{f.style.width='0%';sg.classList.remove('now');}
+  });
+  renderWaterBar(w);
+  if(!st){finishUI();return;}
+  $('instrKicker').textContent=`STEP ${brewIdx+1} OF ${schedule.length} · ${st.type.toUpperCase()}`;
+  $('instrMain').textContent=st.type==='pour'
+    ?(hasLiveWeight()?`Pour to ${fmtW(st.target)}`:`Pour ${fmtW(st.amount)} over ${st.dur}s`)
+    :st.label;
+  const nxt=schedule[brewIdx+1];
+  $('instrSub').textContent=(st.note?st.note+'  ·  ':'')+(nxt?`next: ${ICONS[nxt.type]} ${nxt.label}${nxt.type==='pour'?` (${fmtW(nxt.amount)})`:''}`:'last step!');
+  // flow gauge
+  if(st.type==='pour'&&hasLiveWeight()){
+    const fr=liveFlowRate(),target=st.amount/st.dur;
+    $('frTarget').textContent=target.toFixed(1);
+    let show=false;
+    if(fr!==null&&fr>0.15){
+      $('frNow').textContent=fr.toFixed(1);
+      const ratio=fr/target,v=$('frVerdict');
+      if(metrics){metrics._tot++;if(ratio>1.35)metrics._fast++;metrics.frFastPct=metrics._fast/metrics._tot;}
+      if(ratio>1.35){v.textContent='SLOW DOWN';v.className='fr-verdict fast';show=true;}
+      else if(ratio<0.65){v.textContent='SPEED UP';v.className='fr-verdict slow';show=true;}
+      // on target: gauge stays hidden — calm means you're doing it right
+    }
+    $('flow').style.display=show?'flex':'none';
+  }else{$('flow').style.display='none';}
+  // in-step bar
+  if(st.type==='pour'){
+    const frac=hasLiveWeight()?pourFrac(st,w):Math.min(1,(el-stepStart)/st.dur);
+    $('stepbar').style.width=(frac*100)+'%';
+    $('stepbarLabel').innerHTML=hasLiveWeight()
+      ?`${weightOz?(w*G2OZ).toFixed(2):w.toFixed(1)}<small> / ${fmtW(st.target)}</small>`
+      :`${Math.max(0,Math.ceil(st.dur-(el-stepStart)))}<small>s of pouring left</small>`;
+    if(hasLiveWeight()&&w>=st.target-1)advance();
+  }else{
+    const remain=Math.max(0,Math.ceil(st.dur-(el-stepStart)));
+    $('stepbar').style.width=(Math.min(1,(el-stepStart)/st.dur)*100)+'%';
+    $('stepbarLabel').innerHTML=`${remain}<small>s — ${st.type==='wait'?'hands off':'go!'}</small>`;
+  }
+  if(methodOpen)renderLiveMethod(el,w);
+}
+function renderWaterBar(w){
+  const shown=hasLiveWeight()?w:estimatedWater();
+  $('waterbar').style.width=Math.min(100,shown/totalWater*100)+'%';
+  $('waterbarLabel').textContent=`${weightOz?(shown*G2OZ).toFixed(2):Math.round(shown)} / ${fmtW(totalWater)}${hasLiveWeight()?'':' (est.)'}`;
+  if(!$('waterbarWrap').dataset.ticks){
+    schedule.filter(x=>x.type==='pour').forEach(x=>{
+      const t=document.createElement('div');
+      t.className='watertick';t.style.left=`calc(${x.target/totalWater*100}% - 1px)`;
+      t.dataset.target=x.target;
+      $('waterbarWrap').appendChild(t);
+    });
+    $('waterbarWrap').dataset.ticks='1';
+  }
+  document.querySelectorAll('.watertick').forEach(t=>t.classList.toggle('hit',shown>=+t.dataset.target-1));
+  const st=schedule[brewIdx];
+  const schedTime=st?Math.min(st.end,st.start+(elapsed()-stepStart)):totalDur;
+  const sl=slurryAt(schedTime);
+  $('bedInfo').textContent=sl!==null?`~${Math.round(sl)} g in the bed`:'';
+}
+function estimatedWater(){
+  let est=0;const el=elapsed();
+  schedule.forEach((st,i)=>{
+    if(st.type!=='pour')return;
+    if(i<brewIdx)est=st.target;
+    else if(i===brewIdx){
+      const prevPour=[...schedule.slice(0,i)].reverse().find(x=>x.type==='pour');
+      const prev=prevPour?prevPour.target:0;
+      est=prev+(st.target-prev)*Math.min(1,(el-stepStart)/st.dur);
+    }
+  });
+  return est;
+}
+function renderLiveMethodStatic(){
+  $('stepList').innerHTML=schedule.map((st,i)=>stepRowHTML(st,i,0)).join('');
+}
+function renderLiveMethod(el,w){
+  const drift=schedule[brewIdx]?stepStart-schedule[brewIdx].start:0;
+  $('stepList').innerHTML=schedule.map((st,i)=>{
+    if(i<brewIdx){
+      const amt=st.type==='pour'?` · ${fmtW(st.amount)}`:'';
+      return `<div class="step-row compact"><span class="icn">✅</span><span>${st.label}${amt}</span><span class="t">${fmtT(st.start)}</span></div>`;
+    }
+    if(i===brewIdx){
+      let live;
+      if(st.type==='pour'){
+        live=hasLiveWeight()
+          ?`${weightOz?(w*G2OZ).toFixed(2):w.toFixed(1)} / ${fmtW(st.target)}`
+          :`${Math.max(0,Math.ceil(st.dur-(el-stepStart)))}s left · aim ${fmtW(st.amount)}`;
+      }else{
+        live=`${Math.max(0,Math.ceil(st.dur-(el-stepStart)))}s`;
+      }
+      return `<div class="step-row expanded">
+        <div class="exp-head"><span>${ICONS[st.type]} NOW · ${st.label}</span><span class="eta">step ${i+1}/${schedule.length}</span></div>
+        ${st.note?`<div class="exp-detail">${st.note}</div>`:''}
+        <div class="exp-live">${live}</div>
+      </div>`;
+    }
+    const eta=st.start+Math.max(0,drift);
+    const amt=st.type==='pour'?` — ${fmtW(st.amount)}`:` (${st.dur}s)`;
+    return `<div class="step-row"><span class="t">~${fmtT(eta)}</span><span class="icn">${ICONS[st.type]}</span><span>${st.label}${amt}</span><span class="cum">${st.type==='pour'?'→ '+fmtW(st.target):''}</span></div>`;
+  }).join('');
+}
+function finishUI(){
+  if(finishedAt===null){
+    paused=false;
+    finishedAt=elapsed();
+    clearInterval(timerIv);timerIv=null;      // brew is over: stop the clock
+    if(navigator.vibrate)navigator.vibrate([80,60,160]);
+  }
+  $('timer').textContent=fmtT(finishedAt);     // frozen, matches the total
+  $('instrKicker').textContent='BREW COMPLETE';
+  $('instrMain').textContent='☕ Pull the dripper — enjoy';
+  $('instrSub').textContent='';
+  $('stepbar').style.width='100%';
+  $('stepbarLabel').innerHTML=`${fmtT(finishedAt)}<small> total</small>`;
+  $('flow').style.display='none';
+  const n=$('btnNext');
+  n.textContent='⭐ Rate this brew';
+  n.classList.add('pulse');
+  n.onclick=finishToRating;
+}
+function finishToRating(){
+  brewing=false;clearInterval(timerIv);
+  cleanupBrewUI();
+  showRating();
+}
+function resetNextBtn(){
+  const n=$('btnNext');
+  n.textContent='Next step ›';
+  n.classList.remove('pulse');
+  n.onclick=advance;
+}
+function cleanupBrewUI(){
+  $('waterbarWrap').dataset.ticks='';
+  document.querySelectorAll('.watertick').forEach(t=>t.remove());
+  resetNextBtn();
+}
+function advance(){
+  if(paused)return;
+  const leaving=schedule[brewIdx];
+  if(leaving&&leaving.type==='pour'&&hasLiveWeight()&&metrics){
+    const over=Math.max(0,displayedWeight()-leaving.target);
+    metrics.pours.push({label:leaving.label,over:Math.round(over*10)/10});
+    metrics.overshoot=Math.max(metrics.overshoot,over);
+  }
+  if(brewIdx<schedule.length){
+    brewIdx++;stepStart=elapsed();
+    updateBrewUI();
+    if(navigator.vibrate)navigator.vibrate(80);
+  }
+}
+let exitArm=null;
+function confirmExit(){
+  // Brew finished → Exit just proceeds (it leads to rating, nothing is lost).
+  if(!brewing||brewIdx>=schedule.length){disarmExit();endBrew();return;}
+  const b=$('btnBack');
+  if(exitArm){disarmExit();endBrew();return;}       // second tap within window
+  b.textContent='Tap again to exit';
+  b.style.background='#FFC2C2';
+  exitArm=setTimeout(disarmExit,3000);              // auto-disarm
+  if(navigator.vibrate)navigator.vibrate(30);
+}
+function disarmExit(){
+  if(exitArm){clearTimeout(exitArm);exitArm=null;}
+  const b=$('btnBack');
+  b.textContent='Exit';
+  b.style.background='';
+}
+function endBrew(){
+  paused=false;$('btnPause').textContent='Pause ⏸';
+  disarmExit();
+  const madeProgress=schedule.slice(0,brewIdx).some(st=>st.type==='pour');
+  brewing=false;clearInterval(timerIv);
+  if(cdIv){clearInterval(cdIv);cdIv=null;}
+  $('countdown').style.display='none';
+  cleanupBrewUI();
+  if(madeProgress){showRating();}     // rate anything you actually poured — even cut short
+  else{$('brew').style.display='none';$('setup').style.display='block';}
+}
+
+/* ---- brew print: weight + flow graph, Filtru-style, pure SVG ---- */
+function brewPrintSVG(trace,targets,W,H,steps){
+  if(!trace||trace.length<3)return'';
+  W=W||320;H=H||140;
+  const P=26,tMax=Math.max(trace[trace.length-1][0],30),wMax=Math.max(totalWater,trace[trace.length-1][1])*1.05;
+  const X=t=>P+(t/tMax)*(W-P-8),Y=w=>H-18-(w/wMax)*(H-30);
+  // weight polyline
+  const line=trace.map(p=>`${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(' ');
+  // flow bars (g/s over each sample gap), capped for display
+  let bars='';
+  for(let i=1;i<trace.length;i++){
+    const dt=trace[i][0]-trace[i-1][0];if(dt<=0)continue;
+    const fl=Math.min(10,(trace[i][1]-trace[i-1][1])/dt);
+    if(fl<=0.05)continue;
+    const h=(fl/10)*(H-30)*0.5;
+    bars+=`<rect x="${X(trace[i-1][0]).toFixed(1)}" y="${(H-18-h).toFixed(1)}" width="${Math.max(1,X(trace[i][0])-X(trace[i-1][0])-0.5).toFixed(1)}" height="${h.toFixed(1)}" fill="#00D6C3" opacity="0.45"/>`;
+  }
+  // pour target guides
+  const guides=(targets||[]).map(g=>`<line x1="${P}" x2="${W-8}" y1="${Y(g).toFixed(1)}" y2="${Y(g).toFixed(1)}" stroke="#7A2EFF" stroke-dasharray="3 4" stroke-width="1" opacity="0.5"/>`).join('');
+  // step labels on the curve, Acaia-style: name each phase at its start time
+  let labels='';
+  if(steps&&steps.length){
+    let lastX=-99;
+    for(const st of steps){
+      const x=X(st.start);
+      if(x-lastX<26)continue;                 // avoid label pileup
+      lastX=x;
+      const short=st.label.split('·')[0].trim().slice(0,12);
+      labels+=`<line x1="${x.toFixed(1)}" x2="${x.toFixed(1)}" y1="16" y2="${H-18}" stroke="#1B0B2E" stroke-width="0.6" opacity="0.25"/>
+      <text x="${(x+2).toFixed(1)}" y="${(20+((labels.match(/<text/g)||[]).length%3)*10).toFixed(1)}" font-size="7.5" font-weight="700" fill="#1B0B2E" opacity="0.75">${ICONS[st.type]||''}${short}</text>`;
+    }
+  }
+  const tgt=(targets&&targets.length)?`<text x="${W-10}" y="${(Y(targets[targets.length-1])-4).toFixed(1)}" font-size="8.5" font-weight="800" fill="#7A2EFF" text-anchor="end">target ${Math.round(targets[targets.length-1])} g</text>`:'';
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;background:#fff;border:3px solid #1B0B2E;border-radius:12px">
+    <text x="${P}" y="12" font-size="9" font-weight="700" fill="#7A2EFF">g</text>
+    <text x="${W-30}" y="${H-4}" font-size="9" font-weight="700" fill="#7A2EFF">${fmtT(tMax)}</text>
+    ${guides}${bars}${labels}${tgt}
+    <polyline points="${line}" fill="none" stroke="#FF2E93" stroke-width="2.5" stroke-linejoin="round"/>
+    <text x="${P+4}" y="${H-4}" font-size="8.5" font-weight="700" fill="#1B0B2E">— weight&#160;&#160;▮ flow</text>
+  </svg>`;
+}
+/* ============================ 8. RATING + LOG ============================ */
+function loadLog(){return Store.get(KEYS.log,[]);}
+function saveLog(list){Store.set(KEYS.log,list);}
+function renderLog(){
+  const log=loadLog();
+  $('logCard').style.display=log.length?'block':'none';
+  $('logList').innerHTML=log.slice(0,8).map((e,i)=>
+    `<div class="log-row"><span>${e.date}</span><span style="flex:1">${e.beans||e.recipe}${e.beanAge!=null?` (${e.beanAge}d)`:''}${e.tags&&e.tags.length?` · <i>${e.tags.join(', ')}</i>`:''}</span><span>${fmtW(e.dose)}${e.grindSetting?` @${e.grindSetting}`:''}</span><span class="log-stars">${'★'.repeat(e.rating)}${'☆'.repeat(5-e.rating)}</span><button class="btn-sm" data-again="${i}" style="padding:4px 8px;font-size:11px">↻</button></div>`
+    +(e.note?`<div class="log-row" style="opacity:.7;font-weight:500;padding-top:0">↳ ${e.note}</div>`:'')
+  ).join('');
+  document.querySelectorAll('[data-again]').forEach(b=>{b.onclick=()=>brewAgain(loadLog()[+b.dataset.again]);});
+}
+/* One tap restores everything from a past brew: tool, method, ratio, dose,
+   water. Falls back gracefully for entries logged before ids were stored. */
+function brewAgain(e){
+  if(!e)return;
+  if(e.tool&&TOOLS.some(t=>t.id===e.tool)){tool=e.tool;renderChips();populateRecipes();}
+  const r=e.recipeId?allRecipes().find(x=>x.id===e.recipeId):allRecipes().find(x=>x.name===e.recipe);
+  if(r&&[...$('recipeSel').options].some(o=>o.value===r.id))loadRecipe(r.id);
+  if(e.dose)$('dose').value=e.dose;
+  if(e.ratio){$('ratioInput').value=e.ratio;$('water').value=Math.round(e.dose*e.ratio);}
+  if(e.grindSetting!=null)$('grindSetting').value=e.grindSetting;
+  else if(e.water)$('water').value=e.water;
+  computeSchedule();syncCustomized();saveSettings();
+  if(typeof window!=='undefined'&&window.scrollTo)window.scrollTo({top:0,behavior:'smooth'});
+}
+function showRating(){
+  const dose=parseFloat($('dose').value)||recipe.defaultDose;
+  const aDays=beanAgeDays();
+  const early=brewIdx<schedule.length?' · ⚠ ended early':'';
+  const gs=$('grindSetting').value?` · grind ${$('grindSetting').value}`:'';
+  $('ratingSummary').innerHTML=`<b>${recipe.name}</b> · ${fmtW(dose)} → ${fmtW(totalWater)}${gs} · ${fmtT(finishedAt||elapsed())}${early}${$('beanName').value?` · ${$('beanName').value}`:''}${aDays!==null?` · ${aDays}d off roast`:''}`;
+  const guides=schedule.filter(x=>x.type==='pour').map(x=>x.target);
+  $('brewPrint').innerHTML=brewTrace.length>2?brewPrintSVG(brewTrace,guides,undefined,undefined,schedule):'';
+  curRating=0;$('brewNote').value='';curTags=new Set();$('brewReport').innerHTML='';
+  document.querySelectorAll('.star').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.tagc').forEach(x=>x.classList.remove('on'));
+  $('brew').style.display='none';$('rating').style.display='block';
+}
+function wireRating(){
+  document.querySelectorAll('.star').forEach(st=>{
+    st.onclick=()=>{curRating=+st.dataset.v;
+      document.querySelectorAll('.star').forEach(x=>x.classList.toggle('on',+x.dataset.v<=curRating));};
+  });
+  document.querySelectorAll('.tagc').forEach(tg=>{
+    tg.onclick=()=>{
+      const t=tg.dataset.t;
+      if(t==='balanced'){curTags.clear();curTags.add('balanced');
+        document.querySelectorAll('.tagc').forEach(x=>x.classList.toggle('on',x.dataset.t==='balanced'));}
+      else{curTags.delete('balanced');document.querySelector('[data-t=balanced]').classList.remove('on');
+        curTags.has(t)?curTags.delete(t):curTags.add(t);tg.classList.toggle('on');}
+      $('brewReport').innerHTML=buildInsights().map(i=>`<div class="insight ${i.cls}"><b>${i.title}</b>${i.body}</div>`).join('');
+    };
+  });
+  $('btnSaveRating').onclick=()=>{
+    const dose=parseFloat($('dose').value)||recipe.defaultDose;
+    const log=loadLog();
+    log.unshift({date:new Date().toLocaleDateString(undefined,{month:'short',day:'numeric'}),
+      recipe:recipe.name,recipeId:recipe.id,ratio:curRatio(),tool,grindSetting:$('grindSetting').value,
+      beans:$('beanName').value,roast:$('roast').value,dose,water:Math.round(totalWater),
+      time:fmtT(finishedAt||0),rating:curRating||3,note:$('brewNote').value,
+      tags:[...curTags],insights:buildInsights().map(i=>i.title),beanAge:beanAgeDays(),
+      trace:brewTrace.filter((_,i)=>i%3===0).slice(0,120)});   // compact brew print
+    saveLog(log.slice(0,50));
+    saveSettings();
+    renderLog();
+    $('rating').style.display='none';$('setup').style.display='block';
+  };
+  $('btnSkipRating').onclick=()=>{$('rating').style.display='none';$('setup').style.display='block';};
+}
+
+/* ============================ 8b. RECIPE EDITOR ============================ */
+let edSteps=[];
+function editorMode(base){
+  // Built-in champion/house methods: ratio-only. Full step editing is for the
+  // Custom canvas and for the user's own saved customs.
+  return (base.custom||base.id==='custom')?'full':'ratio';
+}
+function openEditor(){
+  const base=recipe;
+  const mode=editorMode(base);
+  $('edName').value=base.custom?base.name:`My ${base.name.split('—').pop().trim()}`;
+  $('edRatio').value=base.ratio;
+  $('edGrind').value=['Coarse','Medium-coarse','Medium','Medium-fine','Fine'].includes(base.grind)?base.grind:'Medium';
+  $('edTiming').value=base.timing;
+  edSteps=base.steps.map(st=>({type:st.type,label:st.label,frac:st.frac||0,dur:st.dur,note:st.note||''}));
+  $('editor').dataset.baseId=base.custom?(base.baseId||base.id):base.id;
+  $('editor').dataset.editingId=base.custom?base.id:'';
+  $('editor').dataset.mode=mode;
+  $('edFull').style.display=mode==='full'?'block':'none';
+  $('edLocked').style.display=mode==='ratio'?'block':'none';
+  if(mode==='full')renderEdRows();
+  $('editor').style.display='block';
+  $('editor').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function renderEdRows(){
+  $('edRows').innerHTML=edSteps.map((st,i)=>`
+    <div class="ed-row">
+      <select data-i="${i}" data-f="type">${['pour','wait','stir','swirl'].map(t=>`<option ${t===st.type?'selected':''}>${t}</option>`).join('')}</select>
+      <input type="text" data-i="${i}" data-f="label" value="${st.label.replace(/"/g,'&quot;')}">
+      <input type="number" data-i="${i}" data-f="frac" value="${st.type==='pour'?Math.round(st.frac*1000)/10:''}" ${st.type==='pour'?'':'disabled'} step="0.5" min="1" max="100">
+      <input type="number" data-i="${i}" data-f="dur" value="${st.dur}" step="1" min="2" max="300">
+      <div class="ed-del" data-del="${i}" role="button" tabindex="0">✕</div>
+    </div>
+    <div class="ed-note"><input type="text" data-i="${i}" data-f="note" placeholder="note (optional)" value="${(st.note||'').replace(/"/g,'&quot;')}"></div>
+  `).join('');
+  $('edRows').querySelectorAll('select,input').forEach(el=>{
+    el.onchange=el.oninput=()=>{
+      const i=+el.dataset.i,f=el.dataset.f,st=edSteps[i];
+      if(f==='type'){st.type=el.value;if(st.type!=='pour')st.frac=0;renderEdRows();return;}
+      if(f==='frac')st.frac=(parseFloat(el.value)||0)/100;
+      else if(f==='dur')st.dur=Math.max(2,parseInt(el.value)||10);
+      else st[f]=el.value;
+      renderFracSum();
+    };
+  });
+  $('edRows').querySelectorAll('[data-del]').forEach(d=>{
+    d.onclick=()=>{edSteps.splice(+d.dataset.del,1);renderEdRows();};
+  });
+  renderFracSum();
+}
+function renderFracSum(){
+  const sum=edSteps.filter(s=>s.type==='pour').reduce((a,s)=>a+s.frac,0)*100;
+  const el=$('fracSum');
+  el.textContent=`pours = ${sum.toFixed(1)}%`+(Math.abs(sum-100)>0.6?' → will normalize to 100%':'');
+  el.className='fracsum '+(Math.abs(sum-100)>0.6?'bad':'ok');
+}
+function addEdStep(type){
+  const defaults={pour:{label:'Pour',frac:.2,dur:12},wait:{label:'Pause',frac:0,dur:25},stir:{label:'Stir',frac:0,dur:8},swirl:{label:'Swirl',frac:0,dur:5}};
+  edSteps.push({type,note:'',...defaults[type]});
+  renderEdRows();
+}
+function saveCustom(){
+  const mode=$('editor').dataset.mode||'full';
+  const baseId=$('editor').dataset.baseId;
+  const base=allRecipes().find(r=>r.id===baseId)||recipe;
+  const editingId=$('editor').dataset.editingId;
+  if(mode==='ratio'){
+    // ratio-only: keep the champion's steps, grind, and timing verbatim
+    edSteps=base.steps.map(st=>({type:st.type,label:st.label,frac:st.frac||0,dur:st.dur,note:st.note||''}));
+    $('edGrind').value=['Coarse','Medium-coarse','Medium','Medium-fine','Fine'].includes(base.grind)?base.grind:'Medium';
+    $('edTiming').value=base.timing;
+  }
+  const pours=edSteps.filter(s=>s.type==='pour');
+  if(!pours.length){alert('A method needs at least one pour.');return;}
+  const sum=pours.reduce((a,s)=>a+s.frac,0);
+  if(sum<=0){alert('Pour percentages must be above zero.');return;}
+  pours.forEach(s=>s.frac=s.frac/sum);            // normalize to exactly 100%
+  const cust={
+    id:editingId||('cust-'+Date.now()),
+    custom:true, baseId,
+    tool:[...new Set([...base.tool,'any'])],
+    champ:`Your custom · based on ${base.name.split('—')[0].trim()}`,
+    timing:mode==='ratio'?base.timing:$('edTiming').value,
+    name:($('edName').value||'My method').trim(),
+    ratio:Math.min(20,Math.max(10,parseFloat($('edRatio').value)||base.ratio)),
+    defaultDose:base.defaultDose,
+    grind:mode==='ratio'?base.grind:$('edGrind').value,
+    tempC:base.tempC, roastRec:base.roastRec, roastNote:base.roastNote,
+    desc:`Custom method based on ${base.name}. Ratio 1:${parseFloat($('edRatio').value)||base.ratio}, ${edSteps.length} steps.`,
+    steps:edSteps.map(s=>s.type==='pour'?{type:'pour',frac:s.frac,dur:s.dur,label:s.label,...(s.note?{note:s.note}:{})}:{type:s.type,dur:s.dur,label:s.label,...(s.note?{note:s.note}:{})})
+  };
+  const customs=customRecipes().filter(c=>c.id!==cust.id);
+  customs.push(cust);
+  Store.set(KEYS.customs,customs);
+  $('editor').style.display='none';
+  populateRecipes();
+  loadRecipe(cust.id);
+}
+function deleteCustom(){
+  if(!recipe.custom)return;
+  Store.set(KEYS.customs,customRecipes().filter(c=>c.id!==recipe.id));
+  $('editor').style.display='none';
+  populateRecipes();
+}
+function wireEditor(){
+  $('btnCustomize').onclick=openEditor;
+  $('btnEdCancel').onclick=()=>{$('editor').style.display='none';};
+  $('btnEdSave').onclick=saveCustom;
+  $('btnDeleteCustom').onclick=deleteCustom;
+  $('edAddPour').onclick=()=>addEdStep('pour');
+  $('edAddWait').onclick=()=>addEdStep('wait');
+  $('edAddStir').onclick=()=>addEdStep('stir');
+  $('edAddSwirl').onclick=()=>addEdStep('swirl');
+}
+
+/* ============================ 9. INIT ============================ */
+let methodOpen=false;
+function wireMethodToggle(){
+  $('btnMethodToggle').onclick=()=>{
+    methodOpen=!methodOpen;
+    $('stepList').style.display=methodOpen?'block':'none';
+    $('btnMethodToggle').textContent=methodOpen?'Hide full method ▴':'Show full method ▾';
+    if(methodOpen&&brewing)renderLiveMethod(elapsed(),Math.max(0,displayedWeight()));
+  };
+}
+function wireSetup(){
+  $('recipeSel').onchange=e=>loadRecipe(e.target.value);
+  $('dose').oninput=()=>{const d=parseFloat($('dose').value),r=curRatio();if(d)$('water').value=Math.round(d*r);computeSchedule();syncCustomized();renderOzHint();saveSettings();};
+  $('ratioInput').oninput=()=>{const d=parseFloat($('dose').value),r=curRatio();if(d)$('water').value=Math.round(d*r);computeSchedule();syncCustomized();saveSettings();};
+  $('water').oninput=()=>{const d=parseFloat($('dose').value),w=parseFloat($('water').value);if(d&&w)$('ratioInput').value=Math.round(w/d*10)/10;computeSchedule();syncCustomized();saveSettings();};
+  $('btnRatioReset').onclick=()=>{
+    $('ratioInput').value=recipe.ratio;
+    const d=parseFloat($('dose').value);if(d)$('water').value=Math.round(d*recipe.ratio);
+    computeSchedule();syncCustomized();saveSettings();
+  };
+  $('grindSetting').oninput=saveSettings;
+  $('roasterSel').onchange=()=>{
+    if($('roasterSel').value==='__newR'){showLibAdd('roaster');return;}
+    $('libAddRow').style.display='none';
+    ensureRoasterInstalled($('roasterSel').value);
+    renderBeans(null);saveSettings();
+  };
+  $('beanSel').onchange=()=>{
+    if($('beanSel').value==='__newB'){showLibAdd('bean');return;}
+    $('libAddRow').style.display='none';
+    applyBeanSelection();saveSettings();
+  };
+  $('libAddBtn').onclick=commitLibAdd;
+  $('roast').addEventListener('change',()=>{renderTempAdvice();renderAge();computeSchedule();saveSettings();});
+  $('roastDate').onchange=()=>{renderAge();saveSettings();};
+  $('unitC').onclick=()=>setUnit(false);
+  $('unitFbtn').onclick=()=>setUnit(true);
+  $('wG').onclick=()=>setWeightUnit(false);
+  $('wOz').onclick=()=>setWeightUnit(true);
+  $('themeMax').onclick=()=>setTheme('max');
+  $('themeCalm').onclick=()=>setTheme('calm');
+  $('themeBurnt').onclick=()=>setTheme('burnt');
+  $('btnSettings').onclick=()=>{
+    const c=$('settingsCard');
+    c.style.display=c.style.display==='none'?'block':'none';
+  };
+  $('btnConnect').onclick=connectScale;
+  $('btnSim').onclick=simToggle;
+  $('scaleStatus').onclick=()=>{
+    const el=$('bleDebug');
+    el.style.display=el.style.display==='none'?'block':'none';
+    el.textContent=bleLog.length?bleLog.join('\n'):'(no Bluetooth events yet — tap Connect scale)';
+  };
+  $('btnStart').onclick=startCountdown;
+  $('btnNext').onclick=advance;
+  $('btnPause').onclick=togglePause;
+
+  $('btnBack').onclick=confirmExit;
+}
+wireSetup();
+wireRating();
+wireEditor();
+wireMethodToggle();
+restoreSettings();   // builds chips + recipes, then overlays saved values
+renderLog();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Node (test harnesses / future PWA tooling)
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# Build & dev artifacts (source assembles into index.html)
+shell.html
+app*.js
+func*.js
+smoke*.js
+pourover-v*.html
+*.png
+*.heic
+*.HEIC
+
+# Env / secrets (never commit these)
+.env
+.env.*
+*.pem
+*.key
