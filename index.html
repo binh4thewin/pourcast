@@ -408,6 +408,7 @@ body.burnt #countdown .cd-first{background:#FBF7EE;border:2px solid #201914;colo
       <div class="scale-status" id="scaleStatus" style="cursor:pointer" title="Tap for connection log">Not connected — works fine without one</div>
     <pre id="bleDebug" style="display:none;font-size:10.5px;line-height:1.5;background:#1B0B2E;color:#B8F5C0;padding:10px;border-radius:10px;white-space:pre-wrap;margin-top:8px"></pre>
       <button class="btn-sm btn-teal" id="btnConnect">Connect</button>
+      <button class="btn-sm" id="btnConnectAll" title="Show every Bluetooth device, for scales we don't recognize by name">All devices</button>
       <button class="btn-sm btn-acid" id="btnSim">Simulator</button>
     </div>
   </div>
@@ -1481,12 +1482,19 @@ function setScaleUI(state,msg,tag){
     else{sum.innerHTML=`<span class="mdot off"></span>Not connected`;setCollapsed('scaleCard',false);}
   }
 }
-async function connectScale(){
+async function connectScale(showAll=false){
   if(!navigator.bluetooth){setScaleUI('off','Web Bluetooth unavailable — use Chrome/Edge, or Simulator.');return;}
   try{
     setScaleUI('off','Choosing device…');
-    const device=await navigator.bluetooth.requestDevice({acceptAllDevices:true,
-      optionalServices:[WSS.svc,0x181B,ACAIA.svc,ACAIA_LEGACY.svc,FELICITA.svc,'0000fff0-0000-1000-8000-00805f9b34fb','0000ff12-0000-1000-8000-00805f9b34fb']});
+    const OPT=[WSS.svc,0x181B,ACAIA.svc,ACAIA_LEGACY.svc,FELICITA.svc,'0000fff0-0000-1000-8000-00805f9b34fb','0000ff12-0000-1000-8000-00805f9b34fb'];
+    // Filtered picker: show ONLY things that look like coffee scales, not every
+    // gadget in the house. Known name prefixes + known scale services.
+    const SCALE_NAMES=['PEARL','ACAIA','LUNAR','PYXIS','CINCO','FELICITA','TIMEMORE','BOOKOO','THEMIS','DIFLUID','TALLY','FELLOW','SKALE','DECENT','VARIA','SMARTCHEF'];
+    const req=showAll
+      ?{acceptAllDevices:true,optionalServices:OPT}
+      :{filters:[...SCALE_NAMES.map(n=>({namePrefix:n})),{services:[WSS.svc]},{services:[ACAIA.svc]},{services:[ACAIA_LEGACY.svc]},{services:[FELICITA.svc]}],optionalServices:OPT};
+    blog(showAll?'picker: showing ALL devices':'picker: filtered to scales only');
+    const device=await navigator.bluetooth.requestDevice(req);
     ble.device=device;
     device.addEventListener('gattserverdisconnected',()=>{ble.connected=false;blog('scale disconnected');setScaleUI('off','Scale disconnected');});
     blog('chose device: '+(device.name||'(unnamed)'));
@@ -1502,7 +1510,10 @@ async function connectScale(){
     if(!proto){blog('falling back to generic sniffer…');if(await genericSniffer(server)){proto='auto-detected';blog('✓ sniffer found a weight-like stream');}}
     if(proto){ble.connected=true;simStop();setScaleUI('on',`Connected: ${device.name||'scale'} (${proto})`,`${device.name||'scale'} · ${proto}`);}
     else setScaleUI('off','Connected but no weight stream found — try Simulator.');
-  }catch(e){blog('✗ '+e.name+': '+e.message);setScaleUI('off',e.name==='NotFoundError'?'No device chosen':'Connect failed: '+e.message);}
+  }catch(e){blog('✗ '+e.name+': '+e.message);
+    setScaleUI('off',e.name==='NotFoundError'
+      ?(showAll?'No device chosen':'Scale not in the list? Tap "All devices" to widen the search.')
+      :'Connect failed: '+e.message);}
 }
 async function tryStandard(server){
   try{
@@ -2284,7 +2295,8 @@ function wireSetup(){
     const c=$('settingsCard');
     c.style.display=c.style.display==='none'?'block':'none';
   };
-  $('btnConnect').onclick=connectScale;
+  $('btnConnect').onclick=()=>connectScale(false);
+  $('btnConnectAll').onclick=()=>connectScale(true);
   $('btnSim').onclick=simToggle;
   $('scaleStatus').onclick=()=>{
     const el=$('bleDebug');
