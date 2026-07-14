@@ -29,7 +29,8 @@ h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;l
   -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1.5px var(--ink);}
 .tag{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-top:8px;line-height:1.45;overflow-wrap:break-word}
 .tag b{background:var(--acid);border:2px solid var(--ink);padding:2px 8px;border-radius:99px;
-  box-decoration-break:clone;-webkit-box-decoration-break:clone}   /* pill wraps cleanly across lines */
+  display:inline-block;white-space:nowrap;   /* keep the pill on one line, never split it */
+  box-decoration-break:clone;-webkit-box-decoration-break:clone}
 @media (max-width:420px){.tag{font-size:10.5px;letter-spacing:.08em}}
 .card{background:#fff;border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:18px}
 .card.pink{background:linear-gradient(160deg,#FFD9EC,#FFE9F5)}
