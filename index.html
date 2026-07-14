@@ -333,6 +333,25 @@ body.burnt #countdown{background:rgba(245,240,230,.97)}
 body.burnt #countdown .cd-num{text-shadow:none;-webkit-text-stroke:0;color:#201914;font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:900}
 body.burnt #countdown .cd-lbl{background:#201914;border:none;color:#F5F0E6;border-radius:12px}
 body.burnt #countdown .cd-first{background:#FBF7EE;border:2px solid #201914;color:#201914;border-radius:12px}
+/* ================= BASIC MODE + MODE PICKER ================= */
+#modePick{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;background:var(--paper);padding:24px;overflow-y:auto}
+#modePick #settingsCard{width:min(420px,92vw);max-height:60vh;overflow-y:auto;text-align:left}
+h1{cursor:pointer}
+#modePick .mp-btn{width:min(340px,90vw);padding:22px 18px;font-size:19px;text-align:center}
+#modePick .mp-sub{font-size:12.5px;font-weight:600;opacity:.75;margin-top:6px;text-transform:none;letter-spacing:0;font-family:'Space Grotesk'}
+#basic{display:none;max-width:480px;margin:0 auto}
+#basic .b-dose{font-family:'Bricolage Grotesque';font-weight:800;font-size:40px;text-align:center;padding:14px}
+#basic .b-sum{font-size:14px;font-weight:700;text-align:center;margin:12px 0;line-height:1.6}
+/* Basic brew screen = three things: what step, the number, the water bar. */
+body.basic #pace,body.basic #flow,body.basic .tl-times,body.basic #methodCard{display:none!important}
+body.basic .stepbar-wrap{display:none!important}
+/* Top segmented timeline is redundant with the step bar — hide it in both modes */
+.timeline,.tl-times{display:none!important}
+.timer small{font-size:13px;font-weight:700;opacity:.65}
+/* While brewing, the header (logo, tagline, settings) is a distraction — hide it. */
+body.brewing header{display:none}
+body.basic .instr-main{font-size:56px;line-height:1.05}
+@media (min-width:760px){body.basic .instr-main{font-size:72px}}
 /* ================= RESPONSIVE LAYOUT ================= */
 /* Tablet & small desktop: widen, and let setup cards flow into two columns */
 @media (min-width:760px){
@@ -369,50 +388,47 @@ body.burnt #countdown .cd-first{background:#FBF7EE;border:2px solid #201914;colo
 <header>
   <div style="display:flex;justify-content:space-between;align-items:flex-start">
     <h1>Pourcast</h1>
-    <button class="btn-sm" id="btnSettings" aria-label="Settings" title="Settings">⚙</button>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+      <div class="unitseg" role="group" aria-label="Mode">
+        <button class="btn-sm useg" id="hdrBasic">Just Brew</button><button class="btn-sm useg" id="hdrPrint">Brew Print</button>
+      </div>
+      <span class="mdot off" id="hdrDot" title="Scale status — connect in Settings (start screen)"></span>
+    </div>
   </div>
   <div class="tag">MAKE THE PERFECT POUR OVER COFFEE — <b>POUR OVER RATIOS MADE EASY</b></div>
 </header>
 
+<div id="basic">
+  <div class="card pink" id="againCard" style="display:none">
+    <button class="btn-primary" id="btnAgain">☕ Brew Again</button>
+    <div class="b-sum" id="againSum"></div>
+    <button class="btn-sm" id="btnBasicChange" style="width:100%">Change beans or amount</button>
+  </div>
+  <div class="card yellow" id="basicCard">
+    <div class="row">
+      <div><label for="bCups">Cups</label><input type="number" id="bCups" step="0.5" min="0.5" max="6" value="1"></div>
+      <div><label for="bDose">Beans (g)</label><input type="number" id="bDose" step="1" min="10" max="80" value="20"></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--violet);margin-top:6px">Fill in either one — the other adjusts automatically</div>
+    <label style="margin-top:12px">Strength</label>
+    <div class="chips" id="bStr">
+      <span class="chip" data-s="lighter">Mild</span>
+      <span class="chip on" data-s="regular">Regular</span>
+      <span class="chip" data-s="strong">Strong</span>
+    </div>
+    <label style="margin-top:12px">Roast</label>
+    <div class="chips" id="bRoast">
+      <span class="chip" data-r="Light">Light</span>
+      <span class="chip on" data-r="Medium">Medium</span>
+      <span class="chip" data-r="Dark">Dark</span>
+    </div>
+    <div class="b-sum" id="bSum"></div>
+    <button class="btn-primary" id="btnBasicBrew">Brew ☕</button>
+  </div>
+</div>
+
 <div id="setup">
-  <div class="card" id="settingsCard" style="display:none">
-    <h2>Settings</h2>
-    <div class="row" style="align-items:center">
-      <div><label>Temperature units</label>
-        <div class="unitseg" role="group" aria-label="Temperature units">
-          <button class="btn-sm useg on" id="unitC">°C</button><button class="btn-sm useg" id="unitFbtn">°F</button>
-        </div>
-      </div>
-      <div><label>Sound effects</label>
-        <div class="unitseg" role="group" aria-label="Sound effects">
-          <button class="btn-sm useg on" id="sndOn">On</button><button class="btn-sm useg" id="sndOff">Off</button>
-        </div>
-      </div>
-      <div><label>Weight unit</label>
-        <div class="unitseg" role="group" aria-label="Weight units">
-          <button class="btn-sm useg on" id="wG">g</button><button class="btn-sm useg" id="wOz">oz</button>
-        </div>
-      </div>
-      <div><label>Look</label>
-        <div class="unitseg" role="group" aria-label="Theme">
-          <button class="btn-sm useg on" id="themeMax">Max</button><button class="btn-sm useg" id="themeCalm">Cactus</button><button class="btn-sm useg" id="themeBurnt">Burnt</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card teal" id="scaleCard">
-    <h2 class="ctoggle">Scale <span class="csum" id="scaleSum"><span class="mdot off"></span>Not connected</span></h2>
-    <div class="scale-bar">
-      <div class="dot" id="scaleDot"></div>
-      <div class="scale-status" id="scaleStatus" style="cursor:pointer" title="Tap for connection log">Not connected — works fine without one</div>
-    <pre id="bleDebug" style="display:none;font-size:10.5px;line-height:1.5;background:#1B0B2E;color:#B8F5C0;padding:10px;border-radius:10px;white-space:pre-wrap;margin-top:8px"></pre>
-      <button class="btn-sm btn-teal" id="btnConnect">Connect</button>
-      <button class="btn-sm" id="btnConnectAll" title="Show every Bluetooth device, for scales we don't recognize by name">All devices</button>
-      <button class="btn-sm btn-acid" id="btnSim">Simulator</button>
-    </div>
-  </div>
-
+  <button class="btn-sm" id="btnChangeSetup" style="display:none;width:100%;margin-bottom:12px;text-align:left"></button>
   <div class="card" id="beansCard">
     <h2 class="ctoggle">Beans <span class="csum" id="beansSum"></span></h2>
     <div class="row">
@@ -454,17 +470,29 @@ body.burnt #countdown .cd-first{background:#FBF7EE;border:2px solid #201914;colo
 
   <div class="card yellow" id="doseCard">
     <h2>Your dose</h2>
-    <div class="row dose-row">
-      <div><label for="dose">Coffee g</label><input type="number" id="dose" step="0.1" min="5" max="80"></div>
-      <div><label for="ratioInput">Ratio 1:</label><input type="number" id="ratioInput" step="0.1" min="2" max="20"></div>
-      <div><label for="water">Water g</label><input type="number" id="water" step="1" min="80" max="1500"></div>
-      <div><label for="grindSetting">Grind</label><input type="number" id="grindSetting" step="0.1" min="0" max="99" placeholder="6.7"></div>
+    <div class="row">
+      <div><label for="doseCups">Cups</label><input type="number" id="doseCups" step="0.5" min="0.5" max="12" value="1"></div>
+      <div><label for="dose">Beans (g)</label><input type="number" id="dose" step="1" min="5" max="150"></div>
     </div>
-    <div style="font-size:11px;font-weight:700;color:var(--violet);margin-top:6px" id="ozHint"></div>
-    <div class="mini"><button class="btn-sm" id="btnRatioReset" style="display:none">↺ Recipe default (1:<span id="defRatio"></span>)</button></div>
+    <div style="font-size:11px;font-weight:700;color:var(--violet);margin-top:6px">Fill in either one — the other adjusts to your method's ratio</div>
+    <div class="b-sum" id="doseSum"></div>
 
-    <div class="recipe-meta" id="ratioMeta"></div>
-    <div class="steps" id="stepPreview"></div>
+    <details id="doseAdv" style="margin-top:12px">
+      <summary style="cursor:pointer;font-size:12px;font-weight:800;color:var(--violet)">Fine-tune ratio & grind</summary>
+      <div class="row dose-row" style="margin-top:10px">
+        <div><label for="ratioInput">Ratio 1:</label><input type="number" id="ratioInput" step="0.1" min="2" max="20"></div>
+        <div><label for="water">Water g</label><input type="number" id="water" step="1" min="80" max="1500"></div>
+        <div><label for="grindSetting">Grind</label><input type="number" id="grindSetting" step="0.1" min="0" max="99" placeholder="6.7"></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--violet);margin-top:6px" id="ozHint"></div>
+      <div class="mini"><button class="btn-sm" id="btnRatioReset" style="display:none">↺ Recipe default (1:<span id="defRatio"></span>)</button></div>
+    </details>
+
+    <details id="dosePreview" style="margin-top:10px">
+      <summary style="cursor:pointer;font-size:12px;font-weight:800;color:var(--violet)">Pour schedule preview</summary>
+      <div class="recipe-meta" id="ratioMeta" style="margin-top:8px"></div>
+      <div class="steps" id="stepPreview"></div>
+    </details>
   </div>
 
   <div class="card violet" id="editor">
@@ -510,6 +538,48 @@ body.burnt #countdown .cd-first{background:#FBF7EE;border:2px solid #201914;colo
     Fellow Tally included on most firmware). Chrome / Edge / Android for Bluetooth — iOS Safari doesn't support Web Bluetooth.
     No scale? The app runs fully guided on timers.
   </p>
+</div>
+
+<div id="modePick">
+  <h1 style="font-size:34px">Pourcast</h1>
+  <button class="btn-primary mp-btn" id="mpBasic">Just Brew</button>
+  <button class="mp-btn" id="mpPrint">Brew Print<div class="mp-sub">For people who want more control</div></button>
+  <button class="btn-sm" id="btnSettings" aria-label="Settings" title="Settings" style="position:absolute;top:18px;right:18px">⚙</button>
+  <div class="card" id="settingsCard" style="display:none">
+    <h2>Settings</h2>
+    <div class="row" style="align-items:center">
+      <div><label>Temperature units</label>
+        <div class="unitseg" role="group" aria-label="Temperature units">
+          <button class="btn-sm useg on" id="unitC">°C</button><button class="btn-sm useg" id="unitFbtn">°F</button>
+        </div>
+      </div>
+      <div><label>Sound effects</label>
+        <div class="unitseg" role="group" aria-label="Sound effects">
+          <button class="btn-sm useg on" id="sndOn">On</button><button class="btn-sm useg" id="sndOff">Off</button>
+        </div>
+      </div>
+      <div><label>Weight unit</label>
+        <div class="unitseg" role="group" aria-label="Weight units">
+          <button class="btn-sm useg on" id="wG">g</button><button class="btn-sm useg" id="wOz">oz</button>
+        </div>
+      </div>
+      <div><label>Look</label>
+        <div class="unitseg" role="group" aria-label="Theme">
+          <button class="btn-sm useg on" id="themeMax">Max</button><button class="btn-sm useg" id="themeCalm">Cactus</button><button class="btn-sm useg" id="themeBurnt">Burnt</button>
+        </div>
+      </div>
+    </div>
+    <div id="scaleCard" style="margin-top:14px;border-top:3px dashed var(--ink);padding-top:12px">
+      <label>Scale <span class="csum" id="scaleSum" style="margin-left:6px"><span class="mdot off"></span>Not connected</span></label>
+      <div class="scale-bar">
+        <div class="dot" id="scaleDot"></div>
+        <div class="scale-status" id="scaleStatus" style="cursor:pointer" title="Tap for connection log">Not connected — works fine without one</div>
+      <pre id="bleDebug" style="display:none;font-size:10.5px;line-height:1.5;background:#1B0B2E;color:#B8F5C0;padding:10px;border-radius:10px;white-space:pre-wrap;margin-top:8px"></pre>
+        <button class="btn-sm btn-teal" id="btnConnect">Connect</button>
+        <button class="btn-sm" id="btnConnectAll" title="Show every Bluetooth device, for scales we don't recognize by name">All devices</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="countdown" role="alert">
@@ -588,7 +658,7 @@ body.burnt #countdown .cd-first{background:#FBF7EE;border:2px solid #201914;colo
       <button class="btn-acid" id="btnNext">Next step ›</button>
     </div>
   </div>
-  <div class="card">
+  <div class="card" id="methodCard">
     <button class="btn-sm" id="btnMethodToggle" style="width:100%">Show full method ▾</button>
     <div id="stepList" style="display:none;margin-top:12px"></div>
   </div>
@@ -1062,8 +1132,7 @@ function restoreSettings(){
     renderLibrary(null,null);
   }
   updateToolSummary();updateBeansSummary();
-  if($('beanSel').value&&$('beanSel').value!=='__newB')setCollapsed('beansCard',true);
-  if(tool)setCollapsed('brewerCard',true);
+  updateSetupCards();
   wireCollapsibles();
   restoring=false;
   autoReconnectOnLoad();
@@ -1304,7 +1373,7 @@ function renderBeans(selBean){
 }
 function applyBeanSelectionAndFold(){
   applyBeanSelection();
-  if($('beanSel').value&&$('beanSel').value!=='__newB'){updateBeansSummary();setCollapsed('beansCard',true);}
+  if($('beanSel').value&&$('beanSel').value!=='__newB'){updateBeansSummary();setupEditing=false;updateSetupCards();}
 }
 function applyBeanSelection(){
   const r=libRoaster($('roasterSel').value);
@@ -1579,11 +1648,15 @@ function setScaleUI(state,msg,tag){
   const d=$('scaleDot');d.className='dot';
   if(state==='on')d.classList.add('on');if(state==='sim')d.classList.add('sim');
   $('scaleStatus').textContent=msg;
-  $('btnSim').classList.toggle('sim-on',state==='sim');
+  const bs=$('btnSim');if(bs)bs.classList.toggle('sim-on',state==='sim');
   const t=$('scaleTag');
   if(state==='on'){t.textContent='⚖ '+(tag||'scale');t.className='scaletag real';t.style.display='inline-block';}
   else if(state==='sim'){t.textContent='🧪 SIM';t.className='scaletag sim';t.style.display='inline-block';}
   else{t.style.display='none';}
+  // quiet header dot: the main screen's only scale indicator
+  const hd=$('hdrDot');
+  if(hd){hd.className='mdot '+(state==='on'?'on':state==='sim'?'sim':'off');
+    hd.title=state==='on'?'Scale connected':state==='sim'?'Simulator on':'Scale not connected — connect in Settings';}
   // header summary: color = truth; fold when settled, unfold when attention is needed
   const sum=$('scaleSum');
   if(sum){
@@ -1742,6 +1815,30 @@ const TOOL_IMGS={any:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGgAAABoCAYA
    the daily screen should be Method + Dose, with everything settled tucked
    into one-line summaries. Tap a folded header to reopen. */
 function setCollapsed(id,c){const el=$(id);if(el)el.classList.toggle('collapsed',c);}
+/* Beans + brewer rarely change: once both are picked, hide the two cards
+   entirely and leave a single "Change" bar to bring them back. */
+let setupEditing=false;
+function updateSetupCards(){
+  const beanOk=$('beanSel').value&&$('beanSel').value!=='__newB';
+  const toolOk=!!tool;
+  const done=beanOk&&toolOk&&!setupEditing;
+  if($('beansCard'))$('beansCard').style.display=done?'none':'';
+  if($('brewerCard'))$('brewerCard').style.display=done?'none':'';
+  const btn=$('btnChangeSetup');
+  if(btn){
+    btn.style.display=done?'block':'none';
+    if(done){
+      const t=TOOLS.find(x=>x.id===tool);
+      btn.innerHTML=`☕ <b>${$('beanSel').value}</b> · <b>${t?t.name:''}</b> &nbsp;·&nbsp; Change beans or brewer`;
+    }
+  }
+}
+/* Plain-language dose readout for Brew Print, mirroring Just Brew. */
+function renderDoseReadout(){
+  const dose=parseFloat($('dose').value)||0,r=curRatio(),water=Math.round(dose*r);
+  $('doseSum').innerHTML=dose?`makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${dose} g</b> beans · <b>${water} g</b> water`:'';
+  if(document.activeElement!==$('doseCups'))$('doseCups').value=Math.round(water/CUP_G*4)/4;
+}
 function updateBeansSummary(){
   const b=$('beanSel').value,r=$('roasterSel').value;
   if(!b||b==='__newB'||!r||r==='__newR'){$('beansSum').textContent='';return;}
@@ -1766,7 +1863,7 @@ function renderChips(){
     <div class="tool-name">${t.name}</div>
   </div>`).join('');
   document.querySelectorAll('#toolChips .tool-tile').forEach(c=>{
-    const pick=()=>{tool=c.dataset.t;renderChips();populateRecipes();updateToolSummary();setCollapsed('brewerCard',true);saveSettings();};
+    const pick=()=>{tool=c.dataset.t;renderChips();populateRecipes();updateToolSummary();setupEditing=false;updateSetupCards();saveSettings();};
     c.onclick=pick;c.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')pick()};
   });
 }
@@ -1812,6 +1909,7 @@ function computeSchedule(){
   $('ratioMeta').innerHTML=`Ratio <b>1:${(totalWater/dose).toFixed(1)}</b>${icedNote} · schedule <b>${fmtT(totalDur)}</b> ${modelNote}`
     +pred.warnings.map(w=>`<div class="timing-note" style="margin-top:8px;background:#FFE3E3">${w}</div>`).join('');
   $('stepPreview').innerHTML=schedule.map((st,i)=>stepRowHTML(st,i,-1)).join('');
+  renderDoseReadout();
 }
 function stepRowHTML(st,i,activeIdx){
   const cls=i<activeIdx?'done':i===activeIdx?'active':'';
@@ -1878,6 +1976,9 @@ function syncCustomized(){
    pause moment; on resume, brewStart shifts forward by the paused duration so
    every countdown, ETA, and pace calc continues exactly where it stopped. */
 const elapsed=()=>((paused?pauseStart:Date.now())-brewStart)/1000;
+/* Corner clock: actual vs. goal. The goal is the schedule end — fixed, known
+   up front. Finishing well past it is the "grind coarser" tell. */
+const timerHTML=t=>`${fmtT(t)}<small> / ${fmtT(totalDur)}</small>`;
 function togglePause(){
   if(!brewing||brewIdx>=schedule.length)return;
   paused=!paused;
@@ -1895,8 +1996,9 @@ function togglePause(){
 function startCountdown(){
   computeSchedule();
   const first=schedule[0];
-  $('cdFirst').textContent=first?`First up: ${ICONS[first.type]} ${first.label}${first.type==='pour'?` — ${first.amount} g over ${first.dur}s`:''}`:'';
-  $('setup').style.display='none';$('brew').style.display='block';
+  $('cdFirst').textContent=first?`First up: ${ICONS[first.type]} ${first.label}${first.type==='pour'?` — to ${fmtW(first.target)}`:''}`:'';
+  $('setup').style.display='none';$('basic').style.display='none';$('brew').style.display='block';
+  document.body.classList.add('brewing');$('settingsCard').style.display='none';
   buildTimeline();renderLiveMethodStatic();
   $('countdown').style.display='flex';
   audioInit();
@@ -1931,11 +2033,11 @@ function buildTimeline(){
 function tick(){
   if(!brewing){clearInterval(timerIv);timerIv=null;return;}   // stray intervals kill themselves
   if(brewIdx>=schedule.length){finishUI();return;}            // completed: frozen clock only
-  if(paused){$('timer').textContent=fmtT(elapsed());return;}  // world on hold
+  if(paused){$('timer').innerHTML=timerHTML(elapsed());return;}  // world on hold
   const el=elapsed();
   if(hasLiveWeight()&&(!brewTrace.length||el-brewTrace[brewTrace.length-1][0]>=1))
     brewTrace.push([Math.round(el*10)/10,Math.round(Math.max(0,displayedWeight())*10)/10]);
-  $('timer').textContent=fmtT(el);
+  $('timer').innerHTML=timerHTML(el);
   const st=schedule[brewIdx];
   if(st){
     const inStep=el-stepStart;
@@ -1987,12 +2089,18 @@ function updateBrewUI(){
   });
   renderWaterBar(w);
   if(!st){finishUI();return;}
-  $('instrKicker').textContent=`STEP ${brewIdx+1} OF ${schedule.length} · ${st.type.toUpperCase()}`;
+  $('instrKicker').textContent=isBasic()
+    ?(st.type==='pour'?'POUR UNTIL THE SCALE READS':st.type==='wait'?'WAIT — HANDS OFF':st.type.toUpperCase())
+    :`STEP ${brewIdx+1} OF ${schedule.length} · ${st.type.toUpperCase()}`;
+  // The number IS the instruction: cumulative target = what the scale should read.
+  // Tare happens once at GO, never mid-brew, so this always matches the scale face.
   $('instrMain').textContent=st.type==='pour'
-    ?(hasLiveWeight()?`Pour to ${fmtW(st.target)}`:`Pour ${fmtW(st.amount)} over ${st.dur}s`)
-    :st.label;
+    ?fmtW(st.target)
+    :(isBasic()?fmtT(Math.max(0,Math.ceil(st.dur-(el-stepStart)))):st.label);
   const nxt=schedule[brewIdx+1];
-  $('instrSub').textContent=(st.note?st.note+'  ·  ':'')+(nxt?`next: ${ICONS[nxt.type]} ${nxt.label}${nxt.type==='pour'?` (${fmtW(nxt.amount)})`:''}`:'last step!');
+  $('instrSub').textContent=isBasic()
+    ?(st.type==='pour'?`${fmtT(Math.max(0,Math.ceil(st.dur-(el-stepStart))))} to get there`:'')
+    :(st.note?st.note+'  ·  ':'')+(nxt?`next: ${ICONS[nxt.type]} ${nxt.label}${nxt.type==='pour'?` (→ ${fmtW(nxt.target)})`:''}`:'last step!');
   // flow gauge
   if(st.type==='pour'&&hasLiveWeight()){
     const fr=liveFlowRate(),target=st.amount/st.dur;
@@ -2028,16 +2136,6 @@ function renderWaterBar(w){
   
   $('waterbar').style.width=Math.max(0,Math.min(100,100*(totalWater?shown/totalWater:0)))+'%';
   $('waterbarLabel').textContent=`${weightOz?(shown*G2OZ).toFixed(2):Math.round(shown)} / ${fmtW(totalWater)}${hasLiveWeight()?'':' (est.)'}`;
-  if(!$('waterbarWrap').dataset.ticks){
-    schedule.filter(x=>x.type==='pour').forEach(x=>{
-      const t=document.createElement('div');
-      t.className='watertick';t.style.left=`calc(${x.target/totalWater*100}% - 1px)`;
-      t.dataset.target=x.target;
-      $('waterbarWrap').appendChild(t);
-    });
-    $('waterbarWrap').dataset.ticks='1';
-  }
-  document.querySelectorAll('.watertick').forEach(t=>t.classList.toggle('hit',shown>=+t.dataset.target-1));
   const st=schedule[brewIdx];
   const schedTime=st?Math.min(st.end,st.start+(elapsed()-stepStart)):totalDur;
   const sl=slurryAt(schedTime);
@@ -2093,7 +2191,7 @@ function finishUI(){
     clearInterval(timerIv);timerIv=null;      // brew is over: stop the clock
     if(navigator.vibrate)navigator.vibrate([80,60,160]);
   }
-  $('timer').textContent=fmtT(finishedAt);     // frozen, matches the total
+  $('timer').innerHTML=timerHTML(finishedAt);  // frozen: actual vs. goal at a glance
   $('instrKicker').textContent='BREW COMPLETE';
   $('instrMain').textContent='☕ Pull the dripper — enjoy';
   $('instrSub').textContent='';
@@ -2101,13 +2199,14 @@ function finishUI(){
   $('stepbarLabel').innerHTML=`${fmtT(finishedAt)}<small> total</small>`;
   $('flow').style.display='none';
   const n=$('btnNext');
-  n.textContent='⭐ Rate this brew';
+  n.textContent=isBasic()?'Done ✓':'⭐ Rate this brew';
   n.classList.add('pulse');
   n.onclick=finishToRating;
 }
 function finishToRating(){
   brewing=false;clearInterval(timerIv);
   cleanupBrewUI();
+  if(isBasic()){basicQuickLog();showFrontDoor();return;}   // mornings are autopilot — no rating
   showRating();
 }
 function resetNextBtn(){
@@ -2162,8 +2261,8 @@ function endBrew(){
   if(cdIv){clearInterval(cdIv);cdIv=null;}
   $('countdown').style.display='none';
   cleanupBrewUI();
-  if(madeProgress){showRating();}     // rate anything you actually poured — even cut short
-  else{$('brew').style.display='none';$('setup').style.display='block';}
+  if(madeProgress&&!isBasic()){showRating();}     // rate anything you actually poured — even cut short
+  else{if(madeProgress)basicQuickLog();showFrontDoor();}
 }
 
 /* ---- brew print: weight + flow graph, Filtru-style, pure SVG ---- */
@@ -2244,6 +2343,7 @@ function showRating(){
   curRating=0;$('brewNote').value='';curTags=new Set();$('brewReport').innerHTML='';
   document.querySelectorAll('.star').forEach(x=>x.classList.remove('on'));
   document.querySelectorAll('.tagc').forEach(x=>x.classList.remove('on'));
+  document.body.classList.remove('brewing');
   $('brew').style.display='none';$('rating').style.display='block';
 }
 function wireRating(){
@@ -2273,9 +2373,9 @@ function wireRating(){
     saveLog(log.slice(0,50));
     saveSettings();
     renderLog();
-    $('rating').style.display='none';$('setup').style.display='block';
+    showFrontDoor();
   };
-  $('btnSkipRating').onclick=()=>{$('rating').style.display='none';$('setup').style.display='block';};
+  $('btnSkipRating').onclick=showFrontDoor;
 }
 
 /* ============================ 8b. RECIPE EDITOR ============================ */
@@ -2393,6 +2493,129 @@ function wireEditor(){
   $('edAddSwirl').onclick=()=>addEdStep('swirl');
 }
 
+/* ============================ 8c. MODES + BASIC BREW ============================ */
+/* Two front doors, one engine. Basic = dose + roast, everything else derived:
+   1:16 V60 (bloom + two pours), temp from roast. No methods, no library, no rating. */
+const MODEKEY='pourfect-mode',BASICKEY='pourfect-basic';
+const BASIC_RECIPE='v60hario1cup';
+/* Strength in plain language → brew ratio. More water per gram = lighter cup. */
+const STRENGTH={lighter:{ratio:17,label:'Lighter'},regular:{ratio:16,label:'Regular'},strong:{ratio:14,label:'Strong'}};
+const CUP_G=240;   // one cup ≈ 240 g of brewed coffee
+const basicRatio=s=>(STRENGTH[s.strength]||STRENGTH.regular).ratio;
+const doseForCups=(cups,s)=>Math.round(cups*CUP_G/basicRatio(s));
+const isBasic=()=>document.body.classList.contains('basic');
+function setMode(m){
+  Store.set(MODEKEY,m);
+  document.body.classList.toggle('basic',m==='basic');
+  $('hdrBasic').classList.toggle('on',m==='basic');
+  $('hdrPrint').classList.toggle('on',m!=='basic');
+  showFrontDoor();
+}
+function showFrontDoor(){
+  document.body.classList.remove('brewing');
+  $('brew').style.display='none';$('rating').style.display='none';
+  if(isBasic()){$('setup').style.display='none';$('basic').style.display='block';renderBasic();}
+  else{$('basic').style.display='none';$('setup').style.display='';}
+}
+function basicState(){return Store.get(BASICKEY,null)||{dose:20,roast:'Medium',strength:'regular',brewed:false};}
+function setBasicState(s){Store.set(BASICKEY,s);}
+function basicTemp(roast){
+  const r=RECIPES.find(x=>x.id===BASIC_RECIPE);
+  const diff=(ROAST_IDX[roast]??2)-(ROAST_IDX[r.roastRec]??2);
+  const d=Math.round(diff>0?-2*diff:-1.5*diff);
+  const clamp=c=>Math.min(100,Math.max(80,c+d));
+  return fmtTemp(clamp(r.tempC[0]),clamp(r.tempC[1]));
+}
+function cupsTxt(cups){
+  // nearest quarter cup, in plain words: 1, 1¼, 1½, 1¾ …
+  const q=Math.max(1,Math.round(cups*4)),whole=Math.floor(q/4),frac=['','¼','½','¾'][q%4];
+  const n=(whole||'')+frac||'¼';
+  return `${n} cup${q>4?'s':''}`;
+}
+function basicSummary(s){
+  const water=Math.round(s.dose*basicRatio(s));
+  return `makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${s.dose} g</b> beans · <b>${water} g</b> water · kettle at <b>${basicTemp(s.roast)}</b>`;
+}
+function syncCupsField(s){
+  $('bCups').value=Math.round(s.dose*basicRatio(s)/CUP_G*4)/4;   // beans → cups, quarter steps
+}
+function renderBasic(){
+  const s=basicState();
+  $('bDose').value=s.dose;
+  syncCupsField(s);
+  document.querySelectorAll('#bRoast .chip').forEach(c=>c.classList.toggle('on',c.dataset.r===s.roast));
+  document.querySelectorAll('#bStr .chip').forEach(c=>c.classList.toggle('on',c.dataset.s===(s.strength||'regular')));
+  $('bSum').innerHTML=basicSummary(s);
+  $('againCard').style.display=s.brewed?'block':'none';
+  $('basicCard').style.display=s.brewed?'none':'block';
+  if(s.brewed)$('againSum').innerHTML=`${s.roast} roast · ${STRENGTH[s.strength||'regular'].label} · ${basicSummary(s)}`;
+}
+function readBasicInputs(){
+  const s=basicState();
+  s.dose=Math.min(80,Math.max(10,parseFloat($('bDose').value)||20));
+  const on=document.querySelector('#bRoast .chip.on');
+  s.roast=on?on.dataset.r:'Medium';
+  const st=document.querySelector('#bStr .chip.on');
+  s.strength=st?st.dataset.s:'regular';
+  return s;
+}
+function startBasic(fromAgain){
+  const s=fromAgain?basicState():readBasicInputs();
+  s.brewed=true;setBasicState(s);
+  tool='v60';renderChips();populateRecipes();
+  loadRecipe(BASIC_RECIPE);
+  $('roast').value=s.roast;
+  $('dose').value=s.dose;
+  $('ratioInput').value=basicRatio(s);
+  $('water').value=Math.round(s.dose*basicRatio(s));
+  computeSchedule();
+  startCountdown();
+}
+function basicQuickLog(){
+  const s=basicState();
+  const log=loadLog();
+  log.unshift({date:new Date().toLocaleDateString(undefined,{month:'short',day:'numeric'}),
+    recipe:recipe?recipe.name:'Basic brew',recipeId:recipe?recipe.id:BASIC_RECIPE,ratio:basicRatio(s),tool:'v60',
+    grindSetting:'',beans:'',roast:s.roast,dose:s.dose,water:Math.round(s.dose*basicRatio(s)),
+    time:fmtT(finishedAt||0),rating:3,note:'',tags:[],insights:[],beanAge:null,
+    trace:brewTrace.filter((_,i)=>i%3===0).slice(0,120)});
+  saveLog(log.slice(0,50));
+  renderLog();
+}
+function wireModes(){
+  $('mpBasic').onclick=()=>{$('modePick').style.display='none';setMode('basic');};
+  $('mpPrint').onclick=()=>{$('modePick').style.display='none';setMode('print');};
+  $('btnBasicBrew').onclick=()=>startBasic(false);
+  $('btnAgain').onclick=()=>startBasic(true);
+  $('btnBasicChange').onclick=()=>{$('againCard').style.display='none';$('basicCard').style.display='block';};
+  $('hdrBasic').onclick=()=>setMode('basic');
+  $('hdrPrint').onclick=()=>setMode('print');
+  // tap the logo anywhere → back to the start screen
+  document.querySelector('header h1').onclick=()=>{$('modePick').style.display='flex';};
+  // Cups and beans are two views of the same brew: edit either, the other follows.
+  const refresh=(fromCups)=>{
+    const s=readBasicInputs();
+    if(fromCups){
+      const cups=Math.min(6,Math.max(0.25,parseFloat($('bCups').value)||1));
+      s.dose=doseForCups(cups,s);$('bDose').value=s.dose;
+    }else{syncCupsField(s);}
+    setBasicState(s);$('bSum').innerHTML=basicSummary(s);
+  };
+  document.querySelectorAll('#bRoast .chip').forEach(c=>{
+    c.onclick=()=>{document.querySelectorAll('#bRoast .chip').forEach(x=>x.classList.toggle('on',x===c));refresh(false);};
+  });
+  document.querySelectorAll('#bStr .chip').forEach(c=>{
+    c.onclick=()=>{document.querySelectorAll('#bStr .chip').forEach(x=>x.classList.toggle('on',x===c));
+      refresh(true);};   // strength changes the ratio; hold the cups steady, re-derive the beans
+  });
+  $('bCups').oninput=()=>refresh(true);
+  $('bDose').oninput=()=>refresh(false);
+}
+function initMode(){
+  const m=Store.get(MODEKEY,null);
+  if(m===null){$('modePick').style.display='flex';return;}   // first run: pick once
+  setMode(m);
+}
 /* ============================ 9. INIT ============================ */
 let methodOpen=false;
 function wireMethodToggle(){
@@ -2406,6 +2629,8 @@ function wireMethodToggle(){
 function wireSetup(){
   $('recipeSel').onchange=e=>loadRecipe(e.target.value);
   $('dose').oninput=()=>{const d=parseFloat($('dose').value),r=curRatio();if(d)$('water').value=Math.round(d*r);computeSchedule();syncCustomized();renderOzHint();saveSettings();};
+  $('doseCups').oninput=()=>{const cups=parseFloat($('doseCups').value)||1,r=curRatio(),d=Math.max(5,Math.round(cups*CUP_G/r));$('dose').value=d;$('water').value=Math.round(d*r);computeSchedule();syncCustomized();renderOzHint();saveSettings();};
+  $('btnChangeSetup').onclick=()=>{setupEditing=true;updateSetupCards();$('beansCard').scrollIntoView({behavior:'smooth',block:'start'});};
   $('ratioInput').oninput=()=>{const d=parseFloat($('dose').value),r=curRatio();if(d)$('water').value=Math.round(d*r);computeSchedule();syncCustomized();saveSettings();};
   $('water').oninput=()=>{const d=parseFloat($('dose').value),w=parseFloat($('water').value);if(d&&w)$('ratioInput').value=Math.round(w/d*10)/10;computeSchedule();syncCustomized();saveSettings();};
   $('btnRatioReset').onclick=()=>{
@@ -2445,7 +2670,8 @@ function wireSetup(){
   };
   $('btnConnect').onclick=()=>connectScale(false);
   $('btnConnectAll').onclick=()=>connectScale(true);
-  $('btnSim').onclick=simToggle;
+  // Simulator stays available for testing via console: simToggle()
+  window.simToggle=simToggle;
   $('scaleStatus').onclick=()=>{
     const el=$('bleDebug');
     el.style.display=el.style.display==='none'?'block':'none';
@@ -2461,8 +2687,10 @@ wireSetup();
 wireRating();
 wireEditor();
 wireMethodToggle();
+wireModes();
 restoreSettings();   // builds chips + recipes, then overlays saved values
 renderLog();
+initMode();          // basic vs brew print — first run shows the picker
 
 </script>
 </body>
