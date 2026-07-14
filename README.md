@@ -19,10 +19,15 @@ feedback afterward on what went wrong and what to change next time.
 - **Any dose, any ratio** — change coffee, ratio, or water and every pour target and
   step recalculates. Drainage physics warns you when a dose won't drain in a
   method's fixed windows.
-- **Bluetooth scales** — connects directly to Acaia and Felicita scales (with a
-  generic auto-detect fallback for many others) over Web Bluetooth. Live weight,
-  pour-pace coaching, and a recorded **brew print** (weight + flow graph) for every
-  brew. No scale? A built-in simulator runs the full experience.
+- **Bluetooth scales** — connects directly to **Acaia** (Pearl, Lunar, Pyxis —
+  both protocol generations), **Bookoo** (Themis Mini, via their official
+  published protocol, checksummed), **Timemore** (Black Mirror family),
+  **Felicita**, and any scale using the standard Bluetooth weight service —
+  plus a generic auto-detect fallback for the rest. Live weight, pour-pace
+  coaching, battery level where the scale reports it (Acaia, Bookoo), automatic
+  reconnect on page load and after the scale naps, and a recorded **brew
+  print** (weight + flow graph) for every brew. No scale? A built-in simulator
+  runs the full experience.
 - **A brew log that's yours** — unlimited, on your device, with ratings, taste tags,
   grinder settings, and data-aware insights ("drawdown ran long *and* you tagged
   bitter — grind coarser"). One-tap **Brew Again** restores any past setup.
@@ -53,13 +58,19 @@ Web Bluetooth. A native iOS app is on the roadmap for exactly this reason.
 1. Turn the Pearl on and set it on the counter near your computer.
 2. In the app, the **Scale** card shows a red dot ("Not connected"). Tap
    **Connect**.
-3. A device picker pops up. Select your scale — it appears as
-   **PEARL-xxxx** or **ACAIA-xxxx** — and confirm.
+3. A device picker pops up. Select your scale and confirm. **Heads up:** the
+   name may not be what you expect — Acaia Pearls often advertise as their
+   Bluetooth chip, e.g. **PROCHBT001**, rather than "PEARL." If only one
+   device shows in the (scale-filtered) list, it's almost certainly yours.
+   Don't see it at all? Tap **All devices** to widen the search.
 4. Success: the dot turns **green**, the status names your scale and protocol
    (e.g. "Connected: PEARL (Acaia)" or "(Acaia (Pearl/legacy))" for older
    firmware — both are supported), and the card folds itself to a green
    one-line summary. Put a mug on the scale: the app's live weight should
    track it.
+
+After the first successful connection the app remembers your scale and
+reconnects automatically the next time you open it — no picker, no taps.
 
 **If it doesn't connect:** tap the folded Scale header to reopen the card,
 then tap the status line — a step-by-step Bluetooth debug log opens showing
