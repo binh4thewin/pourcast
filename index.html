@@ -1370,35 +1370,81 @@ const FELICITA={svc:'0000ffe0-0000-1000-8000-00805f9b34fb',chr:'0000ffe1-0000-10
 /* Acaia protocol (pyacaia/Beanconqueror lineage): every message EF DD <type> <payload> <cksum>.
    We send ident + notification-config, heartbeat every 2.75s, decode type-12 event
    packets whose payload[0]===5 as weight. */
+/* Acaia protocol, corrected against pyacaia + Beanconqueror (protocol facts
+   re-expressed, no code copied — theirs is GPL, ours is not):
+   frame: EF DD <cmd> <len> <payload:len-1> <ck1> <ck2>
+   ident: cmd 0x0B — Pyxis-era payload = ASCII digits; LEGACY Pearl/Lunar = 15×0x2D
+   config: cmd 0x0C event-request; heartbeat cmd 0x00 [2,0] every ~2.75s
+   weight arrives as cmd 5 (direct, old), 8 (event, old), 11 (heartbeat reply,
+   old) or 12 (event, new) — old format: 2-byte value+unit@4+sign@5;
+   new format: 3-byte value+exp@5+sign@6. Notifications fragment, so frames
+   are reassembled from a rolling buffer. */
 function acaiaEncode(msgType,payload){
-  const buf=[0xEF,0xDD,msgType];
-  let c1=msgType,c2=0;   // pyacaia checksums start from type? spec: sums over payload only
-  c1=0;c2=0;
+  let c1=0,c2=0;
   for(let i=0;i<payload.length;i++){ if(i%2===0)c1+=payload[i];else c2+=payload[i]; }
   return new Uint8Array([0xEF,0xDD,msgType,...payload,c1&0xFF,c2&0xFF]);
 }
+const ACAIA_IDENT_NEW=[0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x30,0x31,0x32,0x33,0x34];
+const ACAIA_IDENT_LEGACY=[0x2D,0x2D,0x2D,0x2D,0x2D,0x2D,0x2D,0x2D,0x2D,0x2D,0x2D,0x2D,0x2D,0x2D,0x2D];
+const ACAIA_CONFIG=[9,0,1,1,2,2,5,3,4];
+function acaiaWeightOld(p){          // [v_lo, v_hi, ?, ?, unit, flags]
+  if(p.length<6)return null;
+  let v=((p[1]&0xFF)<<8)|(p[0]&0xFF);
+  const unit=p[4]&0xFF;
+  if(unit<1||unit>4)return null;
+  v/=Math.pow(10,unit);
+  if(p[5]&0x02)v=-v;
+  return v;
+}
+function acaiaWeightNew(p){          // [v0,v1,v2, ?, exp, flags]
+  if(p.length<6)return null;
+  let v=((p[2]&0xFF)<<16)|((p[1]&0xFF)<<8)|(p[0]&0xFF);
+  v/=Math.pow(10,p[4]&0xFF);
+  if(p[5]&0x02)v=-v;
+  return v;
+}
+/* kept for tests + type-12 packets arriving in a single notification */
 function acaiaDecodeWeight(dv){
-  // scan for EF DD 0C ... event payload with id 5 (weight)
   const b=new Uint8Array(dv.buffer,dv.byteOffset,dv.byteLength);
   for(let i=0;i+9<b.length;i++){
     if(b[i]===0xEF&&b[i+1]===0xDD&&b[i+2]===0x0C){
-      const p=b.slice(i+4);            // skip length byte
-      if(p[0]===5&&p.length>=7){
-        let w=(p[1]|(p[2]<<8)|(p[3]<<16))/Math.pow(10,p[5]);
-        if(p[6]&0x02)w=-w;
-        return w;
-      }
+      const p=b.slice(i+4);
+      if(p[0]===5&&p.length>=7)return acaiaWeightNew(p.slice(1));
     }
   }
   return null;
 }
-function felicitaDecode(dv){
-  // 18-byte frames; ASCII signed grams*100 at bytes 2..8
-  if(dv.byteLength<9)return null;
-  let s='';
-  for(let i=2;i<9;i++)s+=String.fromCharCode(dv.getUint8(i));
-  const v=parseInt(s,10);
-  return Number.isFinite(v)?v/100:null;
+function makeAcaiaParser(){
+  let buf=[];
+  return function(dv){
+    const b=new Uint8Array(dv.buffer,dv.byteOffset,dv.byteLength);
+    for(const x of b)buf.push(x);
+    if(buf.length>512)buf=buf.slice(-256);           // never grow unbounded
+    for(;;){
+      let s=-1;
+      for(let i=0;i+1<buf.length;i++)if(buf[i]===0xEF&&buf[i+1]===0xDD){s=i;break;}
+      if(s<0){buf=buf.slice(-1);return;}
+      if(buf.length-s<6)return;                       // wait for more bytes
+      const cmd=buf[s+2],len=buf[s+3],end=s+4+(len-1)+2;
+      if(len<1||len>60){buf=buf.slice(s+2);continue;} // garbage length: resync
+      if(buf.length<end)return;                       // frame not complete yet
+      const p=buf.slice(s+4,s+4+(len-1));
+      buf=buf.slice(end);
+      let w=null;
+      if(cmd===5)w=acaiaWeightOld(p);
+      else if(cmd===8&&p.length>=8&&p[0]===5)w=acaiaWeightOld(p.slice(2))??acaiaWeightOld(p.slice(1));
+      else if(cmd===11&&p.length>=9&&p[2]===5)w=acaiaWeightOld(p.slice(3));
+      else if(cmd===12&&p[0]===5)w=acaiaWeightNew(p.slice(1));
+      if(w!==null&&Number.isFinite(w))pushWeight(w);
+    }
+  };
+}
+async function acaiaHandshake(writeChr,identBytes,label){
+  blog(label+': ident + event config');
+  await writeChr.writeValue(acaiaEncode(0x0B,identBytes));
+  await writeChr.writeValue(acaiaEncode(0x0C,ACAIA_CONFIG));
+  const hb=acaiaEncode(0x00,[0x02,0x00]);
+  setInterval(()=>{if(ble.connected)writeChr.writeValue(hb).catch(()=>{});},2750);
 }
 async function tryAcaia(server){
   try{
@@ -1406,16 +1452,9 @@ async function tryAcaia(server){
     const rx=await svc.getCharacteristic(ACAIA.rx);
     const tx=await svc.getCharacteristic(ACAIA.tx);
     await rx.startNotifications();
-    rx.addEventListener('characteristicvaluechanged',e=>{
-      const w=acaiaDecodeWeight(e.target.value);
-      if(w!==null)pushWeight(w);
-    });
-    blog('Acaia service found; starting notifications + handshake');
-    const ident=acaiaEncode(0x0B,[0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x30,0x31,0x32,0x33,0x34]);
-    const config=acaiaEncode(0x0C,[9,0,1,1,2,2,5,3,4]);
-    await tx.writeValue(ident);await tx.writeValue(config);
-    const hb=acaiaEncode(0x00,[0x02,0x00]);
-    setInterval(()=>{if(ble.connected)tx.writeValue(hb).catch(()=>{});},2750);
+    const parse=makeAcaiaParser();
+    rx.addEventListener('characteristicvaluechanged',e=>parse(e.target.value));
+    await acaiaHandshake(tx,ACAIA_IDENT_NEW,'Acaia (Pyxis-era)');
     return'Acaia';
   }catch(_){return null;}
 }
@@ -1424,16 +1463,10 @@ async function tryAcaiaLegacy(server){
     const svc=await server.getPrimaryService(ACAIA_LEGACY.svc);
     const chr=await svc.getCharacteristic(ACAIA_LEGACY.chr);
     await chr.startNotifications();
-    chr.addEventListener('characteristicvaluechanged',e=>{
-      const w=acaiaDecodeWeight(e.target.value);
-      if(w!==null)pushWeight(w);
-    });
-    blog('Acaia legacy service found; handshake');
-    const ident=acaiaEncode(0x0B,[0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x30,0x31,0x32,0x33,0x34]);
-    const config=acaiaEncode(0x0C,[9,0,1,1,2,2,5,3,4]);
-    await chr.writeValue(ident);await chr.writeValue(config);
-    const hb=acaiaEncode(0x00,[0x02,0x00]);
-    setInterval(()=>{if(ble.connected)chr.writeValue(hb).catch(()=>{});},2750);
+    const parse=makeAcaiaParser();
+    chr.addEventListener('characteristicvaluechanged',e=>parse(e.target.value));
+    blog('Acaia legacy service found');
+    await acaiaHandshake(chr,ACAIA_IDENT_LEGACY,'Acaia (Pearl/legacy)');
     return'Acaia (Pearl/legacy)';
   }catch(_){return null;}
 }
