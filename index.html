@@ -1368,6 +1368,15 @@ const ACAIA_LEGACY={   // original Pearl / older Lunar firmware: same protocol, 
   svc:'00001820-0000-1000-8000-00805f9b34fb',
   chr:'00002a80-0000-1000-8000-00805f9b34fb'   // single characteristic: notify + write
 };
+const BOOKOO={   // official protocol: github.com/BooKooCode/OpenSource
+  svc:'00000ffe-0000-1000-8000-00805f9b34fb',
+  weight:'0000ff11-0000-1000-8000-00805f9b34fb',
+  cmd:'0000ff12-0000-1000-8000-00805f9b34fb'
+};
+const TIMEMORE={ // standard 181D service, custom payload: int16 LE grams*10 at byte 1
+  svc:'0000181d-0000-1000-8000-00805f9b34fb',
+  chr:'00002a9d-0000-1000-8000-00805f9b34fb'
+};
 const FELICITA={svc:'0000ffe0-0000-1000-8000-00805f9b34fb',chr:'0000ffe1-0000-1000-8000-00805f9b34fb'};
 /* Acaia protocol (pyacaia/Beanconqueror lineage): every message EF DD <type> <payload> <cksum>.
    We send ident + notification-config, heartbeat every 2.75s, decode type-12 event
@@ -1494,6 +1503,48 @@ async function tryAcaiaLegacy(server){
     return'Acaia (Pearl/legacy)';
   }catch(_){return null;}
 }
+function bookooDecode(dv){
+  const b=new Uint8Array(dv.buffer,dv.byteOffset,dv.byteLength);
+  if(b.length<20||b[0]!==0x03||b[1]!==0x0B)return null;
+  let x=0;for(let i=0;i<19;i++)x^=b[i];
+  if(x!==b[19])return null;                       // official XOR checksum
+  let w=((b[7]&0xFF)<<16|(b[8]&0xFF)<<8|(b[9]&0xFF))/100;
+  if(b[6]===0x2D||b[6]===1)w=-w;                  // sign byte
+  return {w,battery:b[13]&0xFF};
+}
+async function tryBookoo(server){
+  try{
+    const svc=await server.getPrimaryService(BOOKOO.svc);
+    const wchr=await svc.getCharacteristic(BOOKOO.weight);
+    await wchr.startNotifications();
+    wchr.addEventListener('characteristicvaluechanged',e=>{
+      const d=bookooDecode(e.target.value);
+      if(d){pushWeight(d.w);
+        if(ble.battery!==d.battery){ble.battery=d.battery;refreshScaleBattery();}}
+    });
+    try{ble.bookooCmd=await svc.getCharacteristic(BOOKOO.cmd);}catch(_){}
+    blog('Bookoo protocol matched (official spec)');
+    return'Bookoo';
+  }catch(_){return null;}
+}
+function timemoreDecode(dv){
+  if(dv.byteLength<3)return null;
+  return dv.getInt16(1,true)/10;                  // grams*10, little-endian, at byte 1
+}
+async function tryTimemore(server){
+  try{
+    if(!(ble.device&&/^TIMEMORE/i.test(ble.device.name||'')))return null;  // shares 181D: name-gate it
+    const svc=await server.getPrimaryService(TIMEMORE.svc);
+    const chr=await svc.getCharacteristic(TIMEMORE.chr);
+    await chr.startNotifications();
+    chr.addEventListener('characteristicvaluechanged',e=>{
+      const w=timemoreDecode(e.target.value);
+      if(w!==null&&Number.isFinite(w))pushWeight(w);
+    });
+    blog('Timemore protocol matched');
+    return'Timemore';
+  }catch(_){return null;}
+}
 async function tryFelicita(server){
   try{
     const svc=await server.getPrimaryService(FELICITA.svc);
@@ -1512,6 +1563,8 @@ async function tryFelicita(server){
 const SCALE_ADAPTERS=[
   {name:'Acaia',try:tryAcaia},
   {name:'Acaia legacy (Pearl)',try:tryAcaiaLegacy},
+  {name:'Bookoo',try:tryBookoo},
+  {name:'Timemore',try:tryTimemore},
   {name:'Felicita',try:tryFelicita},
   {name:'Standard BLE scale',try:async s=>await tryStandard(s)?'Standard BLE scale':null}
 ];
@@ -1593,13 +1646,13 @@ async function connectScale(showAll=false){
   if(!navigator.bluetooth){setScaleUI('off','Web Bluetooth unavailable — use Chrome/Edge, or Simulator.');return;}
   try{
     setScaleUI('off','Choosing device…');
-    const OPT=[WSS.svc,0x181B,ACAIA.svc,ACAIA_LEGACY.svc,FELICITA.svc,'0000fff0-0000-1000-8000-00805f9b34fb','0000ff12-0000-1000-8000-00805f9b34fb'];
+    const OPT=[WSS.svc,0x181B,ACAIA.svc,ACAIA_LEGACY.svc,BOOKOO.svc,FELICITA.svc,'0000fff0-0000-1000-8000-00805f9b34fb','0000ff12-0000-1000-8000-00805f9b34fb'];
     // Filtered picker: show ONLY things that look like coffee scales, not every
     // gadget in the house. Known name prefixes + known scale services.
     const SCALE_NAMES=['PROCHBT','PEARL','ACAIA','LUNAR','PYXIS','CINCO','FELICITA','TIMEMORE','BOOKOO','THEMIS','DIFLUID','TALLY','FELLOW','SKALE','DECENT','VARIA','SMARTCHEF'];
     const req=showAll
       ?{acceptAllDevices:true,optionalServices:OPT}
-      :{filters:[...SCALE_NAMES.map(n=>({namePrefix:n})),{services:[WSS.svc]},{services:[ACAIA.svc]},{services:[ACAIA_LEGACY.svc]},{services:[FELICITA.svc]}],optionalServices:OPT};
+      :{filters:[...SCALE_NAMES.map(n=>({namePrefix:n})),{services:[WSS.svc]},{services:[ACAIA.svc]},{services:[ACAIA_LEGACY.svc]},{services:[BOOKOO.svc]},{services:[FELICITA.svc]}],optionalServices:OPT};
     blog(showAll?'picker: showing ALL devices':'picker: filtered to scales only');
     const device=await navigator.bluetooth.requestDevice(req);
     blog('chose device: '+(device.name||'(unnamed)'));
