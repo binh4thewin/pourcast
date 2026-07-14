@@ -87,12 +87,24 @@ storage. No account, no server, no analytics, no data leaves your device.
 
 ## Roadmap
 
-- [ ] Wake-lock + audio step cues
-- [ ] Installable PWA (offline, home-screen)
-- [ ] Log & library export/import
-- [ ] More named scale protocols (Fellow Tally next)
-- [ ] Native iOS app (Capacitor) with scale support
-- [ ] Reserve tier: cloud sync, trends, per-bag dial-in memory
+The direction: **make the app better, take it offline, take it native.**
+
+**1. A better app** — continuous polish of the core brewing experience:
+   wake-lock (screen stays on through a brew), audio step cues, log & library
+   export/import, editing past log entries.
+
+**2. Offline, installable** — a PWA service worker so Pourcast loads with no
+   signal and installs to the home screen from the browser. Everything already
+   lives on-device (log, beans, settings); this makes the app itself do the same.
+
+**3. Native iOS & Android (Capacitor)** — the same app, wrapped natively:
+   App Store / Play Store presence, Bluetooth scales on iPhone (impossible in
+   any iOS browser today), true offline by default. The web app is the
+   development bench; the native apps are the product.
+
+Further out: more named scale protocols on request (the generic auto-detect
+covers most today), and a paid tier (cloud sync, trends, per-bag dial-in
+memory) once the native apps exist to carry it.
 
 ## Development
 
