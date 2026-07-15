@@ -80,6 +80,17 @@ button:focus-visible{outline:3px solid var(--blue)}
 .mdot.off{background:#FF5A5A}
 .mdot.on{background:#3ED97C}
 .mdot.sim{background:var(--acid)}
+.btstat{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9px;border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);background:#fff;flex:none;cursor:pointer;padding:0}
+.btstat svg{width:15px;height:15px;display:block}
+.btstat svg polyline{fill:none;stroke:#8a8a8a;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+.btstat svg .bt-slash{stroke:#FF5A5A;stroke-width:2.6;stroke-linecap:round;display:none}
+.btstat.on{background:#E6FBEF}
+.btstat.on svg polyline{stroke:#12A150}
+.btstat.sim{background:#FBF7DE}
+.btstat.sim svg polyline{stroke:#8A7A00}
+.btstat.off{background:#FFECEC}
+.btstat.off svg polyline{stroke:#C23B3B}
+.btstat.off svg .bt-slash{display:block}
 /* the main dot: not-connected reads RED, not neutral */
 .dot{background:#FF5A5A}
 .csum .dotsep{opacity:.5}
@@ -340,6 +351,14 @@ body.burnt #countdown .cd-first{background:#FBF7EE;border:2px solid #201914;colo
 h1{cursor:pointer}
 #modePick .mp-btn{width:min(340px,90vw);padding:22px 18px;font-size:19px;text-align:center}
 #modePick .mp-sub{font-size:12.5px;font-weight:600;opacity:.75;margin-top:6px;text-transform:none;letter-spacing:0;font-family:'Space Grotesk'}
+#modePick .mp-look-hint{font-family:'Space Grotesk';font-size:11.5px;font-weight:600;opacity:.55;letter-spacing:.04em;margin-top:-6px}
+#modePick .mp-value{font-family:'Space Grotesk';font-size:14.5px;font-weight:500;line-height:1.55;text-align:center;max-width:min(360px,90vw);margin-bottom:6px;opacity:.9}
+#startConfirm{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.35)}
+#startConfirm .sc-card{background:var(--paper);border:3px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:22px;max-width:min(380px,92vw);text-align:center}
+#startConfirm .sc-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:8px}
+#startConfirm .sc-line{font-family:'Space Grotesk';font-size:14px;font-weight:500;opacity:.85;margin-bottom:16px;line-height:1.5}
+#startConfirm .sc-btns{display:flex;gap:10px;justify-content:center}
+.ice-banner{margin-top:8px;padding:10px 12px;border:2px solid var(--ink);border-radius:12px;background:#E8F4FF;color:#1B2A3A;font-family:'Space Grotesk';font-size:13.5px;font-weight:600;line-height:1.45}
 #basic{display:none;max-width:480px;margin:0 auto}
 #basic .b-dose{font-family:'Bricolage Grotesque';font-weight:800;font-size:40px;text-align:center;padding:14px}
 #basic .b-sum{font-size:14px;font-weight:700;text-align:center;margin:12px 0;line-height:1.6}
@@ -390,10 +409,15 @@ body.basic .instr-main{font-size:56px;line-height:1.05}
   <div style="display:flex;justify-content:space-between;align-items:flex-start">
     <h1>Pourcast</h1>
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+      <div class="unitseg" role="group" aria-label="Temperature units">
+        <button class="btn-sm useg on" id="hdrUnitC">°C</button><button class="btn-sm useg" id="hdrUnitFbtn">°F</button>
+      </div>
       <div class="unitseg" role="group" aria-label="Mode">
         <button class="btn-sm useg" id="hdrBasic">Just Brew</button><button class="btn-sm useg" id="hdrPrint">Brew Print</button>
       </div>
-      <span class="mdot off" id="hdrDot" title="Scale status, connect in Settings (start screen)"></span>
+      <span class="btstat off" id="hdrDot" role="button" tabindex="0" title="Scale not connected — tap to connect">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="7,8 17,16 12,21 12,3 17,8 7,16"/><line class="bt-slash" x1="4" y1="20" x2="20" y2="4"/></svg>
+      </span>
     </div>
   </div>
   <div class="tag">MAKE THE PERFECT POUR OVER COFFEE · <b>POUR OVER RATIOS MADE EASY</b></div>
@@ -526,6 +550,7 @@ body.basic .instr-main{font-size:56px;line-height:1.05}
     </div>
   </div>
 
+  <div class="ice-banner" id="iceBanner" style="display:none"></div>
   <button class="btn-primary" id="btnStart">Start brewing ☕</button>
 
   <div class="card teal" id="logCard" style="display:none;margin-top:18px">
@@ -539,8 +564,10 @@ body.basic .instr-main{font-size:56px;line-height:1.05}
 </div>
 
 <div id="modePick">
-  <h1 style="font-size:34px">Pourcast</h1>
-  <div class="tag" style="text-align:center;margin-top:0;margin-bottom:6px;max-width:min(360px,90vw);line-height:2.2">MAKE THE PERFECT POUR OVER COFFEE · <b>POUR OVER RATIOS MADE EASY</b></div>
+  <h1 id="mpLogo" style="font-size:34px;cursor:pointer" title="Tap to change the look">Pourcast</h1>
+  <div class="mp-look-hint">tap the logo to switch look · <span id="mpLookName">Max</span></div>
+  <div class="tag" style="text-align:center;margin-top:0;margin-bottom:2px;max-width:min(360px,90vw);line-height:2.2">MAKE THE PERFECT POUR OVER COFFEE · <b>POUR OVER RATIOS MADE EASY</b></div>
+  <div class="mp-value">A live brew timer that <b>paces every pour in real time</b> — not just a ratio calculator. Guided pours, with or without a scale.</div>
   <button class="btn-primary mp-btn" id="mpBasic">Just Brew</button>
   <button class="mp-btn" id="mpPrint">Brew Print<div class="mp-sub">For people who want more control</div></button>
   <button class="btn-sm" id="btnSettings" aria-label="Settings" title="Settings" style="position:absolute;top:18px;right:18px">⚙</button>
@@ -585,6 +612,16 @@ body.basic .instr-main{font-size:56px;line-height:1.05}
   <div class="cd-lbl">Kettle up · scale zeroes at GO</div>
   <div class="cd-num" id="cdNum">3</div>
   <div class="cd-first" id="cdFirst"></div>
+</div>
+
+<div id="startConfirm" role="alertdialog" aria-modal="true" aria-labelledby="scTitle">
+  <div class="sc-card">
+    <div class="sc-title" id="scTitle">Ready to brew?</div>
+    <div class="sc-line" id="scLine">The timer starts right away and paces every pour — make sure your water's boiled and your gear is set.</div>
+    <div class="sc-btns">
+      <button class="btn-primary" id="scStart">Start brewing</button>
+    </div>
+  </div>
 </div>
 
 <div id="rating">
@@ -802,17 +839,16 @@ const RECIPES=[
   ]},
  {id:'v60hario1cup',tool:['v60'],champ:'Hario house method',timing:'adaptive',
   name:'V60 · Classic 1-Cup',ratio:15,defaultDose:15,grind:'Medium-fine',tempC:[92,94],roastRec:'Medium',
-  desc:'The straightforward daily single cup: bloom, then two easy pours. Fast, forgiving, done by 2:30. The recipe to reach for before caffeine.',
+  desc:'The straightforward daily single cup: bloom with 2x the coffee weight, let it rest, then two easy pours (to 60%, then 100%). Fast, forgiving, and the timing scales to your dose. The recipe to reach for before caffeine.',
   steps:[
-    {type:'pour',frac:.20,dur:8,label:'Bloom pour'},
-    {type:'swirl',dur:4,label:'Quick swirl'},
-    {type:'wait',dur:23,label:'Bloom rest'},
-    {type:'pour',frac:.40,dur:18,label:'Pour 2 · steady spiral'},
-    {type:'wait',dur:20,label:'Pause · water near bed'},
-    {type:'pour',frac:.40,dur:18,label:'Pour 3 · steady spiral'},
+    {type:'pour',frac:.125,dur:8,label:'Bloom · 2× coffee'},
+    {type:'wait',dur:40,label:'Bloom rest'},
+    {type:'pour',frac:.475,dur:22,label:'Pour 1 · to 60%'},
+    {type:'wait',dur:15,label:'Pause · let it settle'},
+    {type:'pour',frac:.40,dur:18,label:'Pour 2 · to 100%'},
     {type:'wait',dur:55,label:'Drawdown'}
   ]},
- {id:'v60iced',tool:['v60'],champ:'Japanese iced standard',timing:'adaptive',
+ {id:'v60iced',tool:['v60'],champ:'Japanese iced standard',timing:'adaptive',iced:true,
   name:'V60 · Japanese Iced (flash brew)',ratio:15,defaultDose:22,grind:'Medium-fine',tempC:[93,96],roastRec:'Light',
   desc:'Brew hot, directly onto ice. Set your total water as usual, then put 40% of it IN THE SERVER AS ICE, the app schedules only the hot 60% you actually pour. Grind a touch finer since less hot water passes through.',
   steps:[
@@ -863,7 +899,7 @@ const RECIPES=[
     {type:'pour',frac:.42,dur:26,label:'Pour 3 · slow spiral'},
     {type:'wait',dur:80,label:'Drawdown'}
   ]},
- {id:'chemexIced',tool:['chemex'],champ:'Japanese iced standard',timing:'adaptive',
+ {id:'chemexIced',tool:['chemex'],champ:'Japanese iced standard',timing:'adaptive',iced:true,
   name:'Chemex · Japanese Iced (flash brew)',ratio:15,defaultDose:34,grind:'Medium',tempC:[94,96],roastRec:'Light',
   desc:'Summer batch: set total water as usual, put 40% of it IN THE CHEMEX AS ICE, and the app schedules only the hot 60%. Grind finer than your hot Chemex, concentrated hot phase needs the extra extraction.',
   steps:[
@@ -1654,8 +1690,8 @@ function setScaleUI(state,msg,tag){
   else{t.style.display='none';}
   // quiet header dot: the main screen's only scale indicator
   const hd=$('hdrDot');
-  if(hd){hd.className='mdot '+(state==='on'?'on':state==='sim'?'sim':'off');
-    hd.title=state==='on'?'Scale connected':state==='sim'?'Simulator on':'Scale not connected, connect in Settings';}
+  if(hd){hd.className='btstat '+(state==='on'?'on':state==='sim'?'sim':'off');
+    hd.title=state==='on'?'Bluetooth scale connected':state==='sim'?'Simulator on (no scale)':'Scale not connected — tap to connect';}
   // header summary: color = truth; fold when settled, unfold when attention is needed
   const sum=$('scaleSum');
   if(sum){
@@ -1843,7 +1879,9 @@ function updateSetupCards(){
 /* Plain-language dose readout for Brew Print, mirroring Just Brew. */
 function renderDoseReadout(){
   const dose=parseFloat($('dose').value)||0,r=curRatio(),water=Math.round(dose*r);
-  $('doseSum').innerHTML=dose?`makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${dose} g</b> beans · <b>${water} g</b> water`:'';
+  const ice=dose?icedInfo():null;   // flash brew: show ice + hot water, not one lumped total
+  const waterPart=ice?`🧊 <b>${ice.iceG} g</b> ice + <b>${ice.hotG} g</b> hot water`:`<b>${water} g</b> water`;
+  $('doseSum').innerHTML=dose?`makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${dose} g</b> beans · ${waterPart}`:'';
   if(document.activeElement!==$('doseCups'))$('doseCups').value=Math.round(water/CUP_G*4)/4;
 }
 function updateBeansSummary(){
@@ -1910,10 +1948,16 @@ function computeSchedule(){
   totalDur=schedule[schedule.length-1].end;
   const pred=brewPrediction();
   const finishTxt=pred.sim.finish!==null?fmtT(pred.sim.finish):'';
-  const pourSum=recipe.steps.filter(x=>x.type==='pour').reduce((z,x)=>z+x.frac,0);
-  const icedNote=pourSum<0.95?` · 🧊 pour ${Math.round(pourSum*100)}% hot (${Math.round(totalWater*pourSum)} g) + ${Math.round((1-pourSum)*100)}% ice (${Math.round(totalWater*(1-pourSum))} g) in the vessel`:'';
+  // Flash-brew (Japanese iced): show the ice/hot split as its own clear banner.
+  const ib=$('iceBanner'),ice=icedInfo();
+  if(ib){
+    if(ice){
+      ib.innerHTML=`🧊 <b>Japanese iced:</b> put <b>${ice.iceG} g of ice</b> in the server first, then pour <b>${ice.hotG} g</b> of hot water over it (total ${ice.total} g). The app times only the hot pours.`;
+      ib.style.display='';
+    }else ib.style.display='none';
+  }
   const modelNote=pred.immersion?'<span style="font-weight:500">(immersion, steep time is the schedule)</span>':`· predicted finish <b>${finishTxt?'~'+finishTxt:'n/a'}</b> <span style="font-weight:500">(drainage model: ${recipe.grind.toLowerCase()} grind, ${dose} g bed)</span>`;
-  $('ratioMeta').innerHTML=`Ratio <b>1:${(totalWater/dose).toFixed(1)}</b>${icedNote} · schedule <b>${fmtT(totalDur)}</b> ${modelNote}`
+  $('ratioMeta').innerHTML=`Ratio <b>1:${(totalWater/dose).toFixed(1)}</b> · schedule <b>${fmtT(totalDur)}</b> ${modelNote}`
     +pred.warnings.map(w=>`<div class="timing-note" style="margin-top:8px;background:#FFE3E3">${w}</div>`).join('');
   $('stepPreview').innerHTML=schedule.map((st,i)=>stepRowHTML(st,i,-1)).join('');
   renderDoseReadout();
@@ -1948,6 +1992,8 @@ function renderAge(){
 }
 
 let theme='max';
+const THEME_ORDER=['max','calm','burnt'];
+const THEME_LABEL={max:'Max',calm:'Cactus',burnt:'Burnt'};
 function setTheme(t){
   theme=t;
   document.body.classList.toggle('calm',t==='calm');
@@ -1955,13 +2001,20 @@ function setTheme(t){
   $('themeMax').classList.toggle('on',t==='max');
   $('themeCalm').classList.toggle('on',t==='calm');
   $('themeBurnt').classList.toggle('on',t==='burnt');
+  const ln=$('mpLookName');if(ln)ln.textContent=THEME_LABEL[t]||t;
   saveSettings();
 }
+// Tapping the big logo on the start screen cycles the look for fun.
+function cycleTheme(){setTheme(THEME_ORDER[(THEME_ORDER.indexOf(theme)+1)%THEME_ORDER.length]);}
 function setUnit(f){
   unitF=f;
   $('unitC').classList.toggle('on',!f);
   $('unitFbtn').classList.toggle('on',f);
+  const hc=$('hdrUnitC'),hf=$('hdrUnitFbtn');
+  if(hc)hc.classList.toggle('on',!f);
+  if(hf)hf.classList.toggle('on',f);
   renderTempAdvice();
+  if(isBasic())renderBasic();   // keep the Just Brew summary's temp in the chosen unit
   saveSettings();
 }
 function curRatio(){
@@ -2000,6 +2053,34 @@ function togglePause(){
   if(navigator.vibrate)navigator.vibrate(40);
   updateBrewUI();
 }
+/* For flash-brew (Japanese iced) recipes, the ratio's water is split into the
+   hot water you pour and the ice you pre-load in the server. Do that math so
+   the brewer doesn't have to. Returns null for normal hot recipes. */
+function icedInfo(){
+  if(isBasic())return null;               // Just Brew is always the default hot V60, never iced
+  if(!recipe||!recipe.iced)return null;   // only the Japanese iced (flash brew) methods
+  const pourSum=recipe.steps.filter(s=>s.type==='pour').reduce((z,s)=>z+s.frac,0);
+  if(pourSum>=0.95)return null;
+  const dose=parseFloat($('dose').value)||recipe.defaultDose;
+  const total=parseFloat($('water').value)||Math.round(dose*curRatio());
+  return {iceG:Math.round(total*(1-pourSum)),hotG:Math.round(total*pourSum),total:Math.round(total)};
+}
+/* One-line "start now?" gate so the timer never fires by surprise. */
+let _startConfirmFn=null;
+function askStartConfirm(fn){
+  _startConfirmFn=fn;
+  const ice=icedInfo();
+  const base=ice
+    ?`🧊 <b>${ice.iceG} g ice</b> in the server, then <b>${ice.hotG} g</b> hot water.`
+    :`Water hot and gear ready?`;
+  // With a connected scale or the simulator, Pourcast zeroes at GO. Otherwise the
+  // brewer reads their own scale and must tare it themselves.
+  const tare=hasLiveWeight()?'':` Zero your scale first.`;
+  $('scLine').innerHTML=base+tare;
+  $('startConfirm').style.display='flex';
+}
+function closeStartConfirm(){$('startConfirm').style.display='none';_startConfirmFn=null;}
+function confirmStartProceed(){const fn=_startConfirmFn;closeStartConfirm();if(fn)fn();}
 function startCountdown(){
   computeSchedule();
   const first=schedule[0];
@@ -2539,9 +2620,18 @@ function cupsTxt(cups){
   const n=(whole||'')+frac||'¼';
   return `${n} cup${q>4?'s':''}`;
 }
+/* Total brew time for the basic recipe, scaled to the dose (pour durations
+   grow with water on adaptive recipes; waits are fixed). Keeps the on-screen
+   estimate honest instead of a hard-coded number. */
+function basicBrewTime(s){
+  const r=RECIPES.find(x=>x.id===BASIC_RECIPE);
+  const water=s.dose*basicRatio(s);
+  const scaleF=r.timing==='adaptive'?water/(r.defaultDose*r.ratio):1;
+  return r.steps.reduce((t,st)=>t+(st.type==='pour'?Math.max(4,Math.round(st.dur*scaleF)):st.dur),0);
+}
 function basicSummary(s){
   const water=Math.round(s.dose*basicRatio(s));
-  return `makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${s.dose} g</b> beans · <b>${water} g</b> water · kettle at <b>${basicTemp(s.roast)}</b>`;
+  return `makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${s.dose} g</b> beans · <b>${water} g</b> water · kettle at <b>${basicTemp(s.roast)}</b> · ready in ~<b>${fmtT(basicBrewTime(s))}</b>`;
 }
 function syncCupsField(s){
   $('bCups').value=Math.round(s.dose*basicRatio(s)/CUP_G*4)/4;   // beans → cups, quarter steps
@@ -2592,12 +2682,16 @@ function basicQuickLog(){
 function wireModes(){
   $('mpBasic').onclick=()=>{$('modePick').style.display='none';setMode('basic');};
   $('mpPrint').onclick=()=>{$('modePick').style.display='none';setMode('print');};
-  $('btnBasicBrew').onclick=()=>startBasic(false);
-  $('btnAgain').onclick=()=>startBasic(true);
+  $('btnBasicBrew').onclick=()=>askStartConfirm(()=>startBasic(false));
+  $('btnAgain').onclick=()=>askStartConfirm(()=>startBasic(true));
   $('btnBasicChange').onclick=()=>{$('againCard').style.display='none';$('basicCard').style.display='block';};
   $('hdrBasic').onclick=()=>setMode('basic');
   $('hdrPrint').onclick=()=>setMode('print');
-  // tap the logo anywhere → back to the start screen
+  $('hdrUnitC').onclick=()=>setUnit(false);
+  $('hdrUnitFbtn').onclick=()=>setUnit(true);
+  $('scStart').onclick=confirmStartProceed;
+  $('mpLogo').onclick=cycleTheme;   // start-screen logo cycles the look
+  // tap the in-app header logo → back to the start screen
   document.querySelector('header h1').onclick=()=>{$('modePick').style.display='flex';};
   // Cups and beans are two views of the same brew: edit either, the other follows.
   const refresh=(fromCups)=>{
@@ -2675,6 +2769,10 @@ function wireSetup(){
     const c=$('settingsCard');
     c.style.display=c.style.display==='none'?'block':'none';
   };
+  // Tap the header Bluetooth badge → jump to the start screen's scale settings.
+  const openScaleSettings=()=>{$('modePick').style.display='flex';$('settingsCard').style.display='block';setCollapsed('scaleCard',false);const sc=$('scaleCard');if(sc)sc.scrollIntoView({behavior:'smooth',block:'center'});};
+  $('hdrDot').onclick=openScaleSettings;
+  $('hdrDot').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openScaleSettings();}};
   $('btnConnect').onclick=()=>connectScale(false);
   $('btnConnectAll').onclick=()=>connectScale(true);
   // Simulator stays available for testing via console: simToggle()
@@ -2684,7 +2782,7 @@ function wireSetup(){
     el.style.display=el.style.display==='none'?'block':'none';
     el.textContent=bleLog.length?bleLog.join('\n'):'(no Bluetooth events yet, tap Connect scale)';
   };
-  $('btnStart').onclick=startCountdown;
+  $('btnStart').onclick=()=>askStartConfirm(startCountdown);
   $('btnNext').onclick=advance;
   $('btnPause').onclick=togglePause;
 
