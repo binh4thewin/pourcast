@@ -2565,7 +2565,7 @@ function saveCustom(){
     ?{type:'pour',frac:s.frac/sum,dur:s.dur,label:'Pour '+(++pn)}
     :{type:s.type,dur:s.dur,label:s.type[0].toUpperCase()+s.type.slice(1)});
   const waitIdx=steps.map((s,i)=>s.type==='wait'?i:-1).filter(i=>i>=0);
-  if(waitIdx.length){steps[waitIdx[0]].label='Bloom rest';steps[waitIdx[waitIdx.length-1]].label='Drawdown';}
+  if(waitIdx.length){steps[waitIdx[0]].label='Bloom';steps[waitIdx[waitIdx.length-1]].label='Drawdown';}
   const cust={
     id:editingId||('cust-'+Date.now()),
     custom:true, baseId:base.id, tool:[...new Set([...base.tool,'any'])], timing:'adaptive',
