@@ -224,6 +224,15 @@ input[type=date]:focus{outline:3px solid var(--magenta)}
 .useg.on{background:var(--violet);color:#fff}
 /* recipe editor */
 #editor{display:none}
+.edhint{font-size:12px;font-weight:600;opacity:.75;line-height:1.45}
+.ed-head2,.ed-row2{display:grid;grid-template-columns:1fr 70px 70px 34px;gap:6px;align-items:center}
+.ed-head2{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin-bottom:4px}
+.ed-row2{margin-bottom:6px}
+.ed-row2 select,.ed-row2 input{font-size:13px;padding:7px 8px;font-weight:600}
+.ed-row2 .ed-del{border:var(--border);border-radius:10px;background:#FFC2C2;font-weight:800;cursor:pointer;text-align:center;padding:6px 0}
+.edtotal{margin-top:10px;font-weight:800;font-size:12.5px;padding:8px 12px;border-radius:10px;border:2px solid var(--ink)}
+.edtotal.ok{background:#E6FBEF}
+.edtotal.warn{background:#FFE9D6}
 .ed-steps{margin-top:10px}
 .ed-row{display:grid;grid-template-columns:86px 1fr 64px 64px 34px;gap:6px;margin-bottom:6px;align-items:center}
 .ed-row select,.ed-row input{font-size:13px;padding:7px 8px;font-weight:600}
@@ -502,7 +511,6 @@ body.basic .instr-main{font-size:56px;line-height:1.05}
     <h2>Method</h2>
     <select id="recipeSel"></select>
     <div class="mini">
-      <button class="btn-sm btn-acid" id="btnCustomize">Customize ✎</button>
       <button class="btn-sm" id="btnDeleteCustom" style="display:none;background:#FFC2C2">Delete custom</button>
     </div>
     <div class="badges" id="recipeBadges"></div>
@@ -538,29 +546,26 @@ body.basic .instr-main{font-size:56px;line-height:1.05}
   </div>
 
   <div class="card violet" id="editor">
-    <h2>Custom method</h2>
+    <h2 id="edTitle">Custom method</h2>
     <div class="row">
       <div style="flex:2"><label for="edName">Name</label><input type="text" id="edName" placeholder="My 4:6, weekday edition"></div>
       <div><label for="edRatio">Ratio 1 : x</label><input type="number" id="edRatio" step="0.1" min="2" max="20"></div>
     </div>
-    <div class="timing-note" id="edLocked" style="display:none;margin-top:10px">🔒 <b>Championship steps are locked.</b> You're customizing the ratio only, every pour weight and (for adaptive methods) pour duration rescales automatically from your ratio × dose. The champion's structure stays intact.</div>
-    <div id="edFull">
     <div class="row" style="margin-top:10px">
       <div><label for="edGrind">Grind</label><select id="edGrind"><option>Coarse</option><option>Medium-coarse</option><option>Medium</option><option>Medium-fine</option><option>Fine</option></select></div>
-      <div><label for="edTiming">Timing</label><select id="edTiming"><option value="adaptive">Adaptive (scales)</option><option value="rigid">Rigid clock</option></select></div>
     </div>
-    <div class="ed-steps">
-      <div class="ed-head"><span>Type</span><span>Label</span><span>Water %</span><span>Secs</span><span></span></div>
+    <div id="edTemplate" style="margin-top:12px">
+      <div class="ed-head2"><span>Step</span><span>Pour %</span><span>Secs</span><span></span></div>
       <div id="edRows"></div>
-      <div class="mini">
+      <div class="mini" style="margin-top:8px">
         <button class="btn-sm" id="edAddPour">+ Pour</button>
         <button class="btn-sm" id="edAddWait">+ Wait</button>
-        <button class="btn-sm" id="edAddStir">+ Stir</button>
         <button class="btn-sm" id="edAddSwirl">+ Swirl</button>
-        <span class="fracsum ok" id="fracSum">pours = 100%</span>
+        <button class="btn-sm" id="edAddStir">+ Stir</button>
       </div>
+      <div id="edTotal" class="edtotal"></div>
+      <p class="edhint" style="margin-top:6px">Pour % is each pour's share of the water; we balance them to 100%. Aim to finish around 2:30 to 3:30 total.</p>
     </div>
-    </div><!-- /edFull -->
     <div class="brew-btns" style="margin-top:14px">
       <button id="btnEdCancel">Cancel</button>
       <button class="btn-acid" id="btnEdSave">Save as custom</button>
@@ -748,7 +753,7 @@ const TOOLS=[
    tempC is calibrated for roastRec. */
 const RECIPES=[
  {id:'kasuya46',tool:['v60','origami','any'],champ:'Competition-born classic',timing:'rigid',
-  name:'The 4:6 Method',ratio:15,defaultDose:20,grind:'Coarse',tempC:[92,96],roastRec:'Light',
+  name:'The 4:6 · World Champ Method',ratio:15,defaultDose:20,grind:'Coarse',tempC:[92,96],roastRec:'Light',
   desc:'Five equal pours on a fixed 45s clock, letting the bed fully drain between pours. First 40% of water tunes sweetness vs acidity, last 60% tunes strength.',
   steps:[
     {type:'pour',frac:.20,dur:10,label:'Pour 1 · flavor'},
@@ -763,7 +768,7 @@ const RECIPES=[
     {type:'wait',dur:45,label:'Final drawdown'}
   ]},
  {id:'winton5',tool:['v60','origami','any'],champ:'Modern competition style',timing:'rigid',
-  name:'Five Even Pours',ratio:16.7,defaultDose:30,grind:'Medium-coarse',tempC:[92,94],roastRec:'Light',
+  name:'Five Even Pours · World Champ Method',ratio:16.7,defaultDose:30,grind:'Medium-coarse',tempC:[92,94],roastRec:'Light',
   desc:'Five equal center pours on a 40s clock. No dedicated bloom (pour 1 acts as one), no stirs, no swirls, minimal agitation.',
   steps:[
     {type:'pour',frac:.20,dur:12,label:'Pour 1 · center'},{type:'wait',dur:28,label:'Settle'},
@@ -773,7 +778,7 @@ const RECIPES=[
     {type:'pour',frac:.20,dur:12,label:'Pour 5 · center'},{type:'wait',dur:50,label:'Final drawdown'}
   ]},
  {id:'hoffmann',tool:['v60','origami'],champ:'World-champion barista\'s method',timing:'adaptive',
-  name:'The Two-Speed V60',ratio:16.7,defaultDose:30,grind:'Medium-fine',tempC:[95,100],roastRec:'Light',roastNote:'the hotter end for the lightest roasts',
+  name:'The Two-Speed V60 · World Champ Method',ratio:16.7,defaultDose:30,grind:'Medium-fine',tempC:[95,100],roastRec:'Light',roastNote:'the hotter end for the lightest roasts',
   desc:'Big bloom with a swirl, then ONE continuous pour with a speed change: brisk to 60% by 1:15, then ease off ~20% slower to 100% by 1:45 (shown as two steps so each phase gets its own flow-rate target). Stir + final swirl for a flat bed; drawdown ~3:30.',
   steps:[
     {type:'pour',frac:.12,dur:10,label:'Bloom pour · 2x coffee'},
@@ -880,7 +885,7 @@ const RECIPES=[
     {type:'wait',dur:55,label:'Drawdown · swirl server to melt ice'}
   ],waterNote:0.6},
  {id:'kasuyaSweet',tool:['v60','origami','any'],champ:'4:6 system · sweetness setting',timing:'rigid',
-  name:'The 4:6 Method · Sweet Variant',ratio:15,defaultDose:20,grind:'Coarse',tempC:[92,96],roastRec:'Light',
+  name:'The 4:6 Sweet · World Champ Method',ratio:15,defaultDose:20,grind:'Coarse',tempC:[92,96],roastRec:'Light',
   desc:"The 4:6 system's own sweetness dial: shrink pour 1, grow pour 2 (same first-40% total), keep the strength pours identical. Compare against standard 4:6 on the same beans to taste what the dial does.",
   steps:[
     {type:'pour',frac:.14,dur:8,label:'Pour 1 · small = sweeter'},
@@ -895,7 +900,7 @@ const RECIPES=[
     {type:'wait',dur:45,label:'Final drawdown'}
   ]},
  {id:'chemexHoffmann',tool:['chemex'],champ:'Two-speed technique',timing:'adaptive',
-  name:'Chemex · Two-Speed',ratio:16.7,defaultDose:30,grind:'Medium-coarse',tempC:[95,100],roastRec:'Light',roastNote:'the hotter end for the lightest roasts',
+  name:'Chemex · Two-Speed · World Champ Method',ratio:16.7,defaultDose:30,grind:'Medium-coarse',tempC:[95,100],roastRec:'Light',roastNote:'the hotter end for the lightest roasts',
   desc:'His V60 logic adapted to thick Chemex paper: big stirred bloom, ONE continuous pour with a speed change at 60% (two steps = two flow-rate targets), then a gentle swirl. Patience on the drawdown, the filter is the brake.',
   steps:[
     {type:'pour',frac:.12,dur:10,label:'Bloom pour · 2x coffee'},
@@ -930,7 +935,7 @@ const RECIPES=[
     {type:'wait',dur:90,label:'Drawdown · swirl to melt ice'}
   ],waterNote:0.6},
  {id:'aeropressHoffmann',tool:['aeropress'],champ:'World-champion barista\'s AeroPress',timing:'adaptive',immersion:true,
-  name:'AeroPress · Sealed Steep',ratio:18.2,defaultDose:11,grind:'Fine',tempC:[95,99],roastRec:'Light',
+  name:'AeroPress · Sealed Steep · World Champ Method',ratio:18.2,defaultDose:11,grind:'Fine',tempC:[95,99],roastRec:'Light',
   desc:'Small dose, fine grind, very hot water. Pour everything, cap immediately (plunger seal holds heat and stops dripping), long undisturbed steep, gentle swirl, slow press. No bloom, no stir.',
   steps:[
     {type:'pour',frac:1.0,dur:15,label:'Pour all water'},
@@ -950,7 +955,7 @@ const RECIPES=[
     {type:'press',dur:25,label:'Press steadily · stop at the hiss'}
   ]},
  {id:'frenchHoffmann',tool:['frenchpress'],champ:'The patient method',timing:'adaptive',immersion:true,
-  name:'French Press · Patient Press',ratio:16.7,defaultDose:30,grind:'Medium',tempC:[95,100],roastRec:'Light',roastNote:'boiling is fine here',
+  name:'French Press · Patient · World Champ Method',ratio:16.7,defaultDose:30,grind:'Medium',tempC:[95,100],roastRec:'Light',roastNote:'boiling is fine here',
   desc:'The patient method: full steep, break and skim the crust, then a LONG settle so fines sink. Plunger barely submerged, it strains, never presses. Silty-free cups.',
   steps:[
     {type:'pour',frac:1.0,dur:20,label:'Pour all water'},
@@ -1930,8 +1935,9 @@ function renderChips(){
   });
 }
 function populateRecipes(){
-  const list=allRecipes().filter(r=>r.tool.includes(tool)||tool==='any');
-  $('recipeSel').innerHTML=list.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+  const list=allRecipes().filter(r=>r.id!=='custom'&&(r.tool.includes(tool)||tool==='any'));
+  $('recipeSel').innerHTML=list.map(r=>`<option value="${r.id}">${r.name}</option>`).join('')
+    +`<optgroup label="Make your own"><option value="__edit__">Customize this method</option><option value="__scratch__">Start from scratch</option></optgroup>`;
   loadRecipe(list[0].id);
 }
 function loadRecipe(id){
@@ -1942,15 +1948,15 @@ function loadRecipe(id){
     $('ratioInput').value=recipe.ratio;
     $('water').value=Math.round(recipe.defaultDose*recipe.ratio);
   }
-  const tBadge=recipe.timing==='rigid'
-    ?'<span class="badge rigid">⏱ CHAMPIONSHIP CLOCK</span>'
-    :'<span class="badge adaptive">〰 ADAPTIVE TIMING</span>';
+  // Adaptive timing is the default and built in, no need to flag it. Only the
+  // rigid championship clock is worth calling out, since its timing is fixed.
+  const tBadge=recipe.timing==='rigid'?'<span class="badge rigid">⏱ CHAMPIONSHIP CLOCK</span>':'';
   const roastBadge=recipe.roastRec==='Any'?'':`<span class="badge b2">☕ dialed on ${recipe.roastRec.toLowerCase()} roast</span>`;
-  $('recipeBadges').innerHTML=`<span class="badge">${recipe.champ}</span>${tBadge}<span class="badge b2">1:${recipe.ratio}</span><span class="badge b3">${recipe.grind}</span><span class="badge" id="tempBadge"></span>${roastBadge}`;
+  $('recipeBadges').innerHTML=`${tBadge}<span class="badge b3">${recipe.grind}</span><span class="badge" id="tempBadge"></span>${roastBadge}`;
   $('recipeMeta').innerHTML=recipe.desc+'<div style="margin-top:8px" id="tempAdvice"></div>';
-  $('timingNote').innerHTML=recipe.timing==='rigid'
-    ?'⏱ <b>Championship clock:</b> pour weights scale to your dose, but pour windows and rests stay exactly on the published clock, the timing structure is the method. Big dose changes may need a grind adjustment to keep drawdown on time.'
-    :'〰 <b>Adaptive timing:</b> pour durations stretch or shrink with your water amount (steady pour rate), while blooms, stirs, and rests stay fixed. The whole clock recomputes for your dose.';
+  const tn=$('timingNote');
+  if(recipe.timing==='rigid'){tn.style.display='';tn.innerHTML='⏱ <b>Championship clock:</b> pour weights scale to your dose, but pour windows and rests stay exactly on the published clock, the timing structure is the method. Big dose changes may need a grind adjustment to keep drawdown on time.';}
+  else{tn.style.display='none';tn.innerHTML='';}
   $('btnDeleteCustom').style.display=recipe.custom?'inline-block':'none';
   computeSchedule();
   renderTempAdvice();
@@ -2043,7 +2049,7 @@ function syncCustomized(){
   if(!recipe)return;
   const off=Math.abs(curRatio()-recipe.ratio)>0.05;
   const opt=[...$('recipeSel').options].find(o=>o.value===recipe.id);
-  if(opt)opt.textContent=(off?'Customized · ':'')+recipe.name;
+  if(opt&&recipe.id!=='custom')opt.textContent=(off?'Customized · ':'')+recipe.name;
   $('btnRatioReset').style.display=off?'inline-block':'none';
   $('defRatio').textContent=recipe.ratio;
 }
@@ -2492,95 +2498,82 @@ function wireRating(){
 }
 
 /* ============================ 8b. RECIPE EDITOR ============================ */
+const clampN=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));
+const GRINDS=['Coarse','Medium-coarse','Medium','Medium-fine','Fine'];
+/* Ideal total pour-over time. Beyond IDEAL_MAX the bed over-extracts and turns
+   bitter; below IDEAL_MIN the cup runs weak/sour. Used to warn in the editor. */
+const IDEAL_MIN=75, IDEAL_MAX=240;
 let edSteps=[];
-function editorMode(base){
-  // Built-in champion/house methods: ratio-only. Full step editing is for the
-  // Custom canvas and for the user's own saved customs.
-  return (base.custom||base.id==='custom')?'full':'ratio';
+const ED_ADD={pour:{frac:.2,dur:12},wait:{frac:0,dur:25},swirl:{frac:0,dur:5},stir:{frac:0,dur:8}};
+function renderEdRows(){
+  $('edRows').innerHTML=edSteps.map((st,i)=>`
+    <div class="ed-row2">
+      <select data-i="${i}" data-f="type">${['pour','wait','swirl','stir'].map(t=>`<option ${t===st.type?'selected':''}>${t}</option>`).join('')}</select>
+      <input type="number" data-i="${i}" data-f="pct" value="${st.type==='pour'?Math.round(st.frac*1000)/10:''}" ${st.type==='pour'?'':'disabled'} step="1" min="1" max="100">
+      <input type="number" data-i="${i}" data-f="dur" value="${st.dur}" step="1" min="2" max="300">
+      <div class="ed-del" data-del="${i}" role="button" tabindex="0" aria-label="Remove step">✕</div>
+    </div>`).join('');
+  $('edRows').querySelectorAll('select,input').forEach(el=>{el.onchange=el.oninput=()=>{
+    const i=+el.dataset.i,f=el.dataset.f,st=edSteps[i];
+    if(f==='type'){st.type=el.value;if(st.type!=='pour')st.frac=0;else if(!st.frac)st.frac=.2;renderEdRows();return;}
+    if(f==='pct')st.frac=(parseFloat(el.value)||0)/100;
+    else st.dur=clampN(parseInt(el.value)||10,2,300);
+    updateEdTotal();
+  };});
+  $('edRows').querySelectorAll('[data-del]').forEach(d=>{d.onclick=()=>{edSteps.splice(+d.dataset.del,1);renderEdRows();};});
+  updateEdTotal();
 }
-function openEditor(){
-  const base=recipe;
-  const mode=editorMode(base);
-  $('edName').value=base.custom?base.name:`My ${base.name.split('·').pop().trim()}`;
-  $('edRatio').value=base.ratio;
-  $('edGrind').value=['Coarse','Medium-coarse','Medium','Medium-fine','Fine'].includes(base.grind)?base.grind:'Medium';
-  $('edTiming').value=base.timing;
-  edSteps=base.steps.map(st=>({type:st.type,label:st.label,frac:st.frac||0,dur:st.dur,note:st.note||''}));
+function updateEdTotal(){
+  const total=edSteps.reduce((a,s)=>a+(s.dur||0),0);
+  const el=$('edTotal');if(!el)return;
+  const warn=total>IDEAL_MAX||total<IDEAL_MIN;
+  el.className='edtotal '+(warn?'warn':'ok');
+  el.textContent=`Total ≈ ${fmtT(total)}`+(total>IDEAL_MAX?' · long brews over ~4:00 can taste bitter':total<IDEAL_MIN?' · very short brews can taste weak':' · in the sweet spot');
+}
+function addEdStep(type){edSteps.push({type,frac:ED_ADD[type].frac,dur:ED_ADD[type].dur});renderEdRows();}
+const SCRATCH_STEPS=[
+  {type:'pour',frac:.15,dur:8},{type:'wait',dur:40},
+  {type:'pour',frac:.45,dur:30},{type:'wait',dur:15},
+  {type:'pour',frac:.40,dur:30},{type:'wait',dur:45}
+];
+/* mode 'edit' = customize this method: ratio, grind, and its full step list, all seeded
+   from the current recipe. mode 'scratch' = a blank bloom + two-pour skeleton. Both save a custom. */
+function openEditor(mode){
+  const base=recipe, scratch=mode==='scratch';
+  $('edTitle').textContent=scratch?'Start from scratch':'Customize this method';
+  $('edName').value=scratch?'My pour-over':(base.custom?base.name:`My ${base.name.split('·')[0].trim()}`);
+  $('edRatio').value=scratch?16:base.ratio;
+  $('edGrind').value=(!scratch&&GRINDS.includes(base.grind))?base.grind:'Medium';
   $('editor').dataset.baseId=base.custom?(base.baseId||base.id):base.id;
-  $('editor').dataset.editingId=base.custom?base.id:'';
-  $('editor').dataset.mode=mode;
-  $('edFull').style.display=mode==='full'?'block':'none';
-  $('edLocked').style.display=mode==='ratio'?'block':'none';
-  if(mode==='full')renderEdRows();
+  $('editor').dataset.editingId=(!scratch&&base.custom)?base.id:'';
+  edSteps=(scratch?SCRATCH_STEPS:base.steps).map(st=>({type:st.type,frac:st.frac||0,dur:st.dur}));
+  renderEdRows();
   $('editor').style.display='block';
   $('editor').scrollIntoView({behavior:'smooth',block:'start'});
 }
-function renderEdRows(){
-  $('edRows').innerHTML=edSteps.map((st,i)=>`
-    <div class="ed-row">
-      <select data-i="${i}" data-f="type">${['pour','wait','stir','swirl'].map(t=>`<option ${t===st.type?'selected':''}>${t}</option>`).join('')}</select>
-      <input type="text" data-i="${i}" data-f="label" value="${st.label.replace(/"/g,'&quot;')}">
-      <input type="number" data-i="${i}" data-f="frac" value="${st.type==='pour'?Math.round(st.frac*1000)/10:''}" ${st.type==='pour'?'':'disabled'} step="0.5" min="1" max="100">
-      <input type="number" data-i="${i}" data-f="dur" value="${st.dur}" step="1" min="2" max="300">
-      <div class="ed-del" data-del="${i}" role="button" tabindex="0">✕</div>
-    </div>
-    <div class="ed-note"><input type="text" data-i="${i}" data-f="note" placeholder="note (optional)" value="${(st.note||'').replace(/"/g,'&quot;')}"></div>
-  `).join('');
-  $('edRows').querySelectorAll('select,input').forEach(el=>{
-    el.onchange=el.oninput=()=>{
-      const i=+el.dataset.i,f=el.dataset.f,st=edSteps[i];
-      if(f==='type'){st.type=el.value;if(st.type!=='pour')st.frac=0;renderEdRows();return;}
-      if(f==='frac')st.frac=(parseFloat(el.value)||0)/100;
-      else if(f==='dur')st.dur=Math.max(2,parseInt(el.value)||10);
-      else st[f]=el.value;
-      renderFracSum();
-    };
-  });
-  $('edRows').querySelectorAll('[data-del]').forEach(d=>{
-    d.onclick=()=>{edSteps.splice(+d.dataset.del,1);renderEdRows();};
-  });
-  renderFracSum();
-}
-function renderFracSum(){
-  const sum=edSteps.filter(s=>s.type==='pour').reduce((a,s)=>a+s.frac,0)*100;
-  const el=$('fracSum');
-  el.textContent=`pours = ${sum.toFixed(1)}%`+(Math.abs(sum-100)>0.6?' → will normalize to 100%':'');
-  el.className='fracsum '+(Math.abs(sum-100)>0.6?'bad':'ok');
-}
-function addEdStep(type){
-  const defaults={pour:{label:'Pour',frac:.2,dur:12},wait:{label:'Pause',frac:0,dur:25},stir:{label:'Stir',frac:0,dur:8},swirl:{label:'Swirl',frac:0,dur:5}};
-  edSteps.push({type,note:'',...defaults[type]});
-  renderEdRows();
-}
 function saveCustom(){
-  const mode=$('editor').dataset.mode||'full';
-  const baseId=$('editor').dataset.baseId;
-  const base=allRecipes().find(r=>r.id===baseId)||recipe;
+  const base=allRecipes().find(r=>r.id===$('editor').dataset.baseId)||recipe;
   const editingId=$('editor').dataset.editingId;
-  if(mode==='ratio'){
-    // ratio-only: keep the champion's steps, grind, and timing verbatim
-    edSteps=base.steps.map(st=>({type:st.type,label:st.label,frac:st.frac||0,dur:st.dur,note:st.note||''}));
-    $('edGrind').value=['Coarse','Medium-coarse','Medium','Medium-fine','Fine'].includes(base.grind)?base.grind:'Medium';
-    $('edTiming').value=base.timing;
-  }
+  const ratio=clampN(parseFloat($('edRatio').value)||base.ratio,10,20);
+  const grind=$('edGrind').value;
   const pours=edSteps.filter(s=>s.type==='pour');
-  if(!pours.length){alert('A method needs at least one pour.');return;}
+  if(!pours.length){alert('Add at least one pour.');return;}
   const sum=pours.reduce((a,s)=>a+s.frac,0);
-  if(sum<=0){alert('Pour percentages must be above zero.');return;}
-  pours.forEach(s=>s.frac=s.frac/sum);            // normalize to exactly 100%
+  if(sum<=0){alert('Pour % must be above zero.');return;}
+  let pn=0;
+  const steps=edSteps.map(s=>s.type==='pour'
+    ?{type:'pour',frac:s.frac/sum,dur:s.dur,label:'Pour '+(++pn)}
+    :{type:s.type,dur:s.dur,label:s.type[0].toUpperCase()+s.type.slice(1)});
+  const waitIdx=steps.map((s,i)=>s.type==='wait'?i:-1).filter(i=>i>=0);
+  if(waitIdx.length){steps[waitIdx[0]].label='Bloom rest';steps[waitIdx[waitIdx.length-1]].label='Drawdown';}
   const cust={
     id:editingId||('cust-'+Date.now()),
-    custom:true, baseId,
-    tool:[...new Set([...base.tool,'any'])],
-    champ:`Your custom · based on ${base.name.split('·')[0].trim()}`,
-    timing:mode==='ratio'?base.timing:$('edTiming').value,
+    custom:true, baseId:base.id, tool:[...new Set([...base.tool,'any'])], timing:'adaptive',
     name:($('edName').value||'My method').trim(),
-    ratio:Math.min(20,Math.max(10,parseFloat($('edRatio').value)||base.ratio)),
-    defaultDose:base.defaultDose,
-    grind:mode==='ratio'?base.grind:$('edGrind').value,
+    ratio, defaultDose:base.defaultDose, grind,
     tempC:base.tempC, roastRec:base.roastRec, roastNote:base.roastNote,
-    desc:`Custom method based on ${base.name}. Ratio 1:${parseFloat($('edRatio').value)||base.ratio}, ${edSteps.length} steps.`,
-    steps:edSteps.map(s=>s.type==='pour'?{type:'pour',frac:s.frac,dur:s.dur,label:s.label,...(s.note?{note:s.note}:{})}:{type:s.type,dur:s.dur,label:s.label,...(s.note?{note:s.note}:{})})
+    desc:`Custom method: ${pours.length} pour${pours.length>1?'s':''} at 1:${ratio}, ${grind.toLowerCase()} grind.`,
+    steps
   };
   const customs=customRecipes().filter(c=>c.id!==cust.id);
   customs.push(cust);
@@ -2596,14 +2589,13 @@ function deleteCustom(){
   populateRecipes();
 }
 function wireEditor(){
-  $('btnCustomize').onclick=openEditor;
   $('btnEdCancel').onclick=()=>{$('editor').style.display='none';};
   $('btnEdSave').onclick=saveCustom;
   $('btnDeleteCustom').onclick=deleteCustom;
   $('edAddPour').onclick=()=>addEdStep('pour');
   $('edAddWait').onclick=()=>addEdStep('wait');
-  $('edAddStir').onclick=()=>addEdStep('stir');
   $('edAddSwirl').onclick=()=>addEdStep('swirl');
+  $('edAddStir').onclick=()=>addEdStep('stir');
 }
 
 /* ============================ 8c. MODES + BASIC BREW ============================ */
@@ -2752,7 +2744,12 @@ function wireMethodToggle(){
   };
 }
 function wireSetup(){
-  $('recipeSel').onchange=e=>loadRecipe(e.target.value);
+  $('recipeSel').onchange=e=>{
+    const v=e.target.value;
+    if(v==='__edit__'){e.target.value=recipe.id;openEditor('edit');return;}       // ratio, grind + steps, seeded from this method
+    if(v==='__scratch__'){e.target.value=recipe.id;openEditor('scratch');return;} // blank bloom + 2-pour skeleton
+    loadRecipe(v);
+  };
   $('dose').oninput=()=>{const d=parseFloat($('dose').value),r=curRatio();if(d)$('water').value=Math.round(d*r);computeSchedule();syncCustomized();renderOzHint();saveSettings();};
   $('doseCups').oninput=()=>{const cups=parseFloat($('doseCups').value)||1,r=curRatio(),d=Math.max(5,Math.round(cups*CUP_G/r));$('dose').value=d;$('water').value=Math.round(d*r);computeSchedule();syncCustomized();renderOzHint();saveSettings();};
   $('btnChangeSetup').onclick=()=>{setupEditing=true;updateSetupCards();$('beansCard').scrollIntoView({behavior:'smooth',block:'start'});};
