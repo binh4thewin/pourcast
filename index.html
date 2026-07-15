@@ -105,6 +105,8 @@ button:focus-visible{outline:3px solid var(--blue)}
 .btmini.off svg .bt-slash{display:block}
 .btmini.on svg polyline{stroke:#12A150}
 .btmini.sim svg polyline{stroke:#8A7A00}
+.scale-alt{margin-top:10px;font-size:11.5px;font-weight:600;opacity:.8}
+.linklike{color:var(--violet);text-decoration:underline;cursor:pointer;font-weight:700}
 /* the main dot: not-connected reads RED, not neutral */
 .dot{background:#FF5A5A}
 .csum .dotsep{opacity:.5}
@@ -576,7 +578,7 @@ body.basic .instr-main{font-size:56px;line-height:1.05}
 </div>
 
 <div id="modePick">
-  <h1 id="mpLogo" style="font-size:34px;cursor:pointer" title="Tap to change the look">Pourcast</h1>
+  <h1 id="mpLogo" style="font-size:clamp(44px,14vw,60px);cursor:pointer" title="Tap to change the look">Pourcast</h1>
   <div class="mp-look-hint">tap the logo to switch look · <span id="mpLookName">Max</span></div>
   <div class="tag" style="text-align:center;margin-top:0;margin-bottom:2px;max-width:min(360px,90vw);line-height:2.2">MAKE THE PERFECT POUR OVER COFFEE · <b>POUR OVER RATIOS MADE EASY</b></div>
   <div class="mp-value">A live brew timer that <b>paces every pour in real time</b>, not just a ratio calculator. Guided pours, with or without a scale.</div>
@@ -610,12 +612,11 @@ body.basic .instr-main{font-size:56px;line-height:1.05}
     <div id="scaleCard" style="margin-top:14px;border-top:3px dashed var(--ink);padding-top:12px">
       <label>Scale <span class="csum" id="scaleSum" style="margin-left:6px"><span class="btmini off"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="7,8 17,16 12,21 12,3 17,8 7,16"/><line class="bt-slash" x1="4" y1="20" x2="20" y2="4"/></svg></span>Not connected</span></label>
       <div class="scale-bar">
-        <span class="btstat off" id="scaleDot"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="7,8 17,16 12,21 12,3 17,8 7,16"/><line class="bt-slash" x1="4" y1="20" x2="20" y2="4"/></svg></span>
         <div class="scale-status" id="scaleStatus" style="cursor:pointer" title="Tap for connection log">Not connected, works fine without one</div>
-      <pre id="bleDebug" style="display:none;font-size:10.5px;line-height:1.5;background:#1B0B2E;color:#B8F5C0;padding:10px;border-radius:10px;white-space:pre-wrap;margin-top:8px"></pre>
-        <button class="btn-sm btn-teal" id="btnConnect">Connect</button>
-        <button class="btn-sm" id="btnConnectAll" title="Show every Bluetooth device, for scales we don't recognize by name">All devices</button>
+        <button class="btn-sm btn-teal" id="btnConnect">Connect scale</button>
       </div>
+      <pre id="bleDebug" style="display:none;font-size:10.5px;line-height:1.5;background:#1B0B2E;color:#B8F5C0;padding:10px;border-radius:10px;white-space:pre-wrap;margin-top:8px"></pre>
+      <div class="scale-alt">Scale not showing up? <span class="linklike" id="btnConnectAll" role="button" tabindex="0" title="Show every Bluetooth device, for scales we don't recognize by name">show all devices</span></div>
     </div>
   </div>
 </div>
@@ -1693,7 +1694,6 @@ function blog(m){
 }
 function setScaleUI(state,msg,tag){
   const stCls=state==='on'?'on':state==='sim'?'sim':'off';
-  const d=$('scaleDot');if(d)d.className='btstat '+stCls;   // bluetooth badge, not a bare dot
   $('scaleStatus').textContent=msg;
   const bs=$('btnSim');if(bs)bs.classList.toggle('sim-on',state==='sim');
   const t=$('scaleTag');
@@ -2785,6 +2785,7 @@ function wireSetup(){
   $('hdrDot').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openScaleSettings();}};
   $('btnConnect').onclick=()=>connectScale(false);
   $('btnConnectAll').onclick=()=>connectScale(true);
+  $('btnConnectAll').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();connectScale(true);}};
   // Simulator stays available for testing via console: simToggle()
   window.simToggle=simToggle;
   $('scaleStatus').onclick=()=>{
