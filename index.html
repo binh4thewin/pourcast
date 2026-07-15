@@ -2235,11 +2235,20 @@ function updateBrewUI(){
   }
   if(methodOpen)renderLiveMethod(el,w);
 }
+/* Water you actually pour. For flash-brew (iced) that's the hot water only,
+   not the full volume (which includes ice), so the bar completes when pouring does. */
+function pourTarget(){
+  if(recipe&&recipe.iced){
+    const ps=recipe.steps.filter(s=>s.type==='pour').reduce((z,s)=>z+s.frac,0);
+    return Math.round(totalWater*ps);
+  }
+  return totalWater;
+}
 function renderWaterBar(w){
   const shown=hasLiveWeight()?w:estimatedWater();
-  
-  $('waterbar').style.width=Math.max(0,Math.min(100,100*(totalWater?shown/totalWater:0)))+'%';
-  $('waterbarLabel').textContent=`${weightOz?(shown*G2OZ).toFixed(2):Math.round(shown)} / ${fmtW(totalWater)}${hasLiveWeight()?'':' (est.)'}`;
+  const tgt=pourTarget();
+  $('waterbar').style.width=Math.max(0,Math.min(100,100*(tgt?shown/tgt:0)))+'%';
+  $('waterbarLabel').textContent=`${weightOz?(shown*G2OZ).toFixed(2):Math.round(shown)} / ${fmtW(tgt)}${hasLiveWeight()?'':' (est.)'}`;
   const st=schedule[brewIdx];
   const schedTime=st?Math.min(st.end,st.start+(elapsed()-stepStart)):totalDur;
   const sl=slurryAt(schedTime);
