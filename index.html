@@ -1082,8 +1082,11 @@ let paused=false,pauseStart=0;
    looping filtered-noise "pouring water" bed during pour steps. ---- */
 let soundOn=true,actx=null,pourNode=null,lastTickSec=null;
 function audioInit(){ // must be called from a user gesture (browser autoplay policy)
-  if(actx||typeof AudioContext==='undefined'&&typeof webkitAudioContext==='undefined')return;
-  try{actx=new (window.AudioContext||window.webkitAudioContext)();loadPourSample();}catch(_){actx=null;}
+  if(typeof AudioContext==='undefined'&&typeof webkitAudioContext==='undefined')return;
+  try{
+    if(!actx){actx=new (window.AudioContext||window.webkitAudioContext)();loadPourSample();}
+    if(actx.state==='suspended')actx.resume();   // iOS starts contexts suspended; must resume inside a tap
+  }catch(_){actx=null;}
 }
 function beep(freq,dur,vol,type){
   if(!soundOn||!actx)return;
