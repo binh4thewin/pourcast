@@ -5,24 +5,32 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,900;1,9..144,700;1,9..144,900&display=swap" rel="stylesheet">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>POURCAST, how much water, exactly when</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#1B0B2E; --paper:#FFF3E4;
-  --magenta:#FF2E93; --orange:#FF7A00; --acid:#E8FF2E; --teal:#00D6C3; --violet:#7A2EFF; --blue:#2E7DFF;
+  --magenta:#FF2E93; --orange:#FF7A00; --acid:#E8FF2E; --teal:#00D6C3; --violet:#7A2EFF; --blue:#1F5FDB;
   --radius:18px; --border:3px solid var(--ink); --shadow:6px 6px 0 var(--ink);
+  /* Spacing scale (4px base) — use these instead of ad-hoc px for consistent rhythm */
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px; --space-6:32px;
+  /* Type scale */
+  --step-0:12px; --step-1:14px; --step-2:16px; --step-3:20px; --step-4:24px;
+  /* Safe-area insets (0 in browsers, real values inside the iOS/Android app shell) */
+  --sa-top:env(safe-area-inset-top,0px); --sa-right:env(safe-area-inset-right,0px);
+  --sa-bottom:env(safe-area-inset-bottom,0px); --sa-left:env(safe-area-inset-left,0px);
 }
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 *{overflow-wrap:break-word;min-width:0}
-body{font-family:'Space Grotesk',system-ui,sans-serif;color:var(--ink);min-height:100vh;
+body{font-family:'Space Grotesk',system-ui,sans-serif;color:var(--ink);min-height:100vh;min-height:100dvh;
+  -webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-y:none;
   background:radial-gradient(circle at 12% 8%,rgba(255,46,147,.35),transparent 34%),
   radial-gradient(circle at 88% 18%,rgba(0,214,195,.4),transparent 36%),
   radial-gradient(circle at 22% 92%,rgba(122,46,255,.3),transparent 40%),
   radial-gradient(circle at 80% 80%,rgba(255,122,0,.35),transparent 38%),var(--paper);}
-.wrap{max-width:560px;margin:0 auto;padding:22px 16px 70px}
+.wrap{max-width:560px;margin:0 auto;padding:calc(var(--space-5) + var(--sa-top)) calc(var(--space-4) + var(--sa-right)) calc(70px + var(--sa-bottom)) calc(var(--space-4) + var(--sa-left))}
 header{margin-bottom:14px}
 .hdr-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .hdr-top h1{white-space:nowrap}
@@ -38,7 +46,7 @@ h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;l
   display:inline-block;white-space:nowrap;   /* keep the pill on one line, never split it */
   box-decoration-break:clone;-webkit-box-decoration-break:clone}
 @media (max-width:420px){.tag{font-size:10.5px;letter-spacing:.08em}}
-.card{background:#fff;border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:18px}
+.card{background:#fff;border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:var(--space-4);margin-bottom:18px}
 .card.pink{background:linear-gradient(160deg,#FFD9EC,#FFE9F5)}
 .card.teal{background:linear-gradient(160deg,#CFFFF9,#EAFFFC)}
 .card.yellow{background:linear-gradient(160deg,#FBFFC8,#FFFDE6)}
@@ -225,7 +233,7 @@ input[type=date]:focus{outline:3px solid var(--magenta)}
 /* recipe editor */
 #editor{display:none}
 .edhint{font-size:12px;font-weight:600;opacity:.75;line-height:1.45}
-.ed-head2,.ed-row2{display:grid;grid-template-columns:1fr 70px 70px 34px;gap:6px;align-items:center}
+.ed-head2,.ed-row2{display:grid;grid-template-columns:1fr 70px 70px 44px;gap:6px;align-items:center}
 .ed-head2{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin-bottom:4px}
 .ed-row2{margin-bottom:6px}
 .ed-row2 select,.ed-row2 input{font-size:13px;padding:7px 8px;font-weight:600}
@@ -234,10 +242,10 @@ input[type=date]:focus{outline:3px solid var(--magenta)}
 .edtotal.ok{background:#E6FBEF}
 .edtotal.warn{background:#FFE9D6}
 .ed-steps{margin-top:10px}
-.ed-row{display:grid;grid-template-columns:86px 1fr 64px 64px 34px;gap:6px;margin-bottom:6px;align-items:center}
+.ed-row{display:grid;grid-template-columns:86px 1fr 64px 64px 44px;gap:6px;margin-bottom:6px;align-items:center}
 .ed-row select,.ed-row input{font-size:13px;padding:7px 8px;font-weight:600}
 .ed-row .ed-del{border:var(--border);border-radius:10px;background:#FFC2C2;font-weight:800;cursor:pointer;padding:6px 0;box-shadow:2px 2px 0 var(--ink);text-align:center}
-.ed-head{display:grid;grid-template-columns:86px 1fr 64px 64px 34px;gap:6px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;color:var(--violet)}
+.ed-head{display:grid;grid-template-columns:86px 1fr 64px 64px 44px;gap:6px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;color:var(--violet)}
 .ed-note{width:100%;margin:-2px 0 8px 0}
 .ed-note input{font-size:12px;padding:6px 8px}
 .fracsum{font-size:12px;font-weight:800;margin-top:6px;padding:6px 10px;border:2px solid var(--ink);border-radius:10px;display:inline-block}
@@ -253,7 +261,7 @@ input[type=date]:focus{outline:3px solid var(--magenta)}
 .insight b{display:block;font-family:'Bricolage Grotesque';font-size:13px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
 .insight.grind{background:#FFE9F5}.insight.pour{background:#E9F3FF}.insight.ratio{background:#FBFFC8}.insight.temp{background:#E7D9FF}.insight.win{background:#D9FFE4}
 /* Countdown overlay */
-#countdown{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;
+#countdown{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:calc(var(--space-5) + var(--sa-top)) var(--space-5) calc(var(--space-5) + var(--sa-bottom));
   background:radial-gradient(circle at 50% 40%,rgba(255,46,147,.92),rgba(122,46,255,.95));}
 #countdown .cd-num{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:160px;line-height:1;color:#fff;
   text-shadow:6px 6px 0 var(--ink);-webkit-text-stroke:3px var(--ink);animation:pop .9s ease-out infinite}
@@ -272,16 +280,19 @@ body.calm{
 }
 body.calm h1{background:none;color:#615D4C;-webkit-text-stroke:0;font-weight:600;letter-spacing:0;font-size:34px}
 body.calm .tag{color:#969268}
-body.calm .tag b{background:transparent;border:1px solid #D9C2B0;color:#D19277}
+body.calm .tag b{background:transparent;border:1px solid #D9C2B0;color:#8A5230}
 body.calm .card,body.calm .card.pink,body.calm .card.teal,body.calm .card.yellow,body.calm .card.violet{background:#FCF7F1;border:1px solid #E3CDBC;box-shadow:none}
-body.calm .card h2{background:transparent;color:#969268;padding:0;transform:none;letter-spacing:.12em;font-size:12px}
+body.calm .card h2{background:transparent;color:#6E6A50;padding:0;transform:none;letter-spacing:.12em;font-size:12px}
 body.calm input,body.calm select{background:#FCF7F1;border:1px solid #E3CDBC;color:#4A473A;font-weight:600}
 body.calm button{background:#FCF7F1;color:#4A473A;border:1px solid #D9C2B0;box-shadow:none;font-weight:600;text-transform:none;letter-spacing:0}
 body.calm button:hover,body.calm button:active{transform:none;box-shadow:none;background:#F3E4D6}
+/* colored buttons carry light text, so they must stay dark on hover (not the light neutral above) */
+body.calm .btn-primary:hover,body.calm .btn-primary:active{background:#4E4B3D;color:#F6EAE0}
+body.calm .btn-acid:hover,body.calm .btn-acid:active{background:#8A5230;color:#FCF7F1}
 body.calm .btn-primary{background:#615D4C;color:#F6EAE0;text-shadow:none}
 body.calm .btn-acid{background:#D19277;color:#FCF7F1}
 body.calm .btn-teal{background:#DDE0CE;color:#4A473A}
-body.calm .chip{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none;color:#7C7867}
+body.calm .chip{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none;color:#6B6656}
 body.calm .chip.on{background:#969268!important;color:#FCF7F1!important}
 body.calm .useg.on{background:#615D4C;color:#F6EAE0}
 body.calm .badge,body.calm .badge.b2,body.calm .badge.b3{background:#F0E4D6;border-color:#E3CDBC;color:#7C7867}
@@ -291,6 +302,7 @@ body.calm .timing-note,body.calm .age{background:#F0E4D6;border:1px dashed #D9C2
 body.calm .age.stale{background:#F0D5C7}body.calm .age.peak{background:#DDE0CE}body.calm .age.fresh{background:#E9E4D2}body.calm .age.fading{background:#F0DFC6}
 body.calm .step-row.active{background:#F0E4D6;border:1px solid #D9C2B0}
 body.calm .step-row .fill{background:#EBDCC9}
+body.calm .step-row .t,body.calm .eta,body.calm .step-row .cum{color:#6E6A52}
 body.calm .step-row.expanded{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none}
 body.calm .instruction{background:#615D4C;border:none;color:#F6EAE0}
 body.calm .instr-kicker{color:#EFCBB5}body.calm .instr-sub{color:#C9C4AE}
@@ -305,7 +317,7 @@ body.calm .pace.behind{background:#F0D5C7}body.calm .pace.ahead{background:#E9E4
 body.calm .flow,body.calm .fr-verdict{border-color:#D9C2B0;background:#FCF7F1}
 body.calm .fr-verdict.fast{background:#F0D5C7}body.calm .fr-verdict.slow{background:#E9E4D2}
 body.calm .insight{background:#F0E4D6!important;border:1px solid #D9C2B0}
-body.calm .tagc{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none;color:#7C7867}
+body.calm .tagc{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none;color:#6B6656}
 body.calm .tagc.on{background:#969268;color:#FCF7F1}
 body.calm .log-row:nth-child(odd){background:#F0E4D6}
 body.calm .dot{border-color:#D9C2B0}
@@ -334,6 +346,9 @@ body.burnt .card h2{background:transparent;color:#201914;padding:0;transform:non
 body.burnt input,body.burnt select{background:#F0E9DA;border:2px solid #201914;border-radius:10px;color:#201914;font-weight:700}
 body.burnt button{background:#F5F0E6;color:#201914;border:2px solid #201914;border-radius:10px;box-shadow:none;font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:12.5px}
 body.burnt button:hover,body.burnt button:active{transform:none;box-shadow:none;background:#EDE3CE}
+/* colored buttons carry light text, so they must stay dark on hover (not the light neutral above) */
+body.burnt .btn-primary:hover,body.burnt .btn-primary:active{background:#100C0A;color:#F5F0E6}
+body.burnt .btn-acid:hover,body.burnt .btn-acid:active{background:#984E1F;color:#F5F0E6}
 body.burnt .btn-primary{background:#201914;color:#F5F0E6;text-shadow:none}
 body.burnt .btn-acid{background:#C0642B;color:#F5F0E6}
 body.burnt .btn-teal{background:#F0DFC8;color:#201914}
@@ -348,6 +363,7 @@ body.burnt .timing-note,body.burnt .age{background:#F0E9DA;border:1.5px dashed #
 body.burnt .age.stale{background:#EFD0C4}body.burnt .age.peak{background:#E4E3CE}body.burnt .age.fresh{background:#EDE2D4}body.burnt .age.fading{background:#F0DDC2}
 body.burnt .step-row.active{background:#F0E9DA;border:1.5px solid #201914;border-radius:10px}
 body.burnt .step-row .fill{background:#EBDCC2}
+body.burnt .step-row .t,body.burnt .eta{color:#6E4A30}
 body.burnt .step-row.expanded{background:#FBF7EE;border:2px solid #201914;border-radius:12px;box-shadow:none}
 body.burnt .instruction{background:#201914;border:none;border-radius:14px;color:#F5F0E6}
 body.burnt .instr-kicker{color:#E0A472;font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:700;letter-spacing:.02em;text-transform:none;font-size:14px}
@@ -374,14 +390,14 @@ body.burnt #countdown .cd-num{text-shadow:none;-webkit-text-stroke:0;color:#2019
 body.burnt #countdown .cd-lbl{background:#201914;border:none;color:#F5F0E6;border-radius:12px}
 body.burnt #countdown .cd-first{background:#FBF7EE;border:2px solid #201914;color:#201914;border-radius:12px}
 /* ================= BASIC MODE + MODE PICKER ================= */
-#modePick{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;background:var(--paper);padding:24px;overflow-y:auto}
+#modePick{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;background:var(--paper);padding:calc(var(--space-5) + var(--sa-top)) calc(var(--space-5) + var(--sa-right)) calc(var(--space-5) + var(--sa-bottom)) calc(var(--space-5) + var(--sa-left));overflow-y:auto}
 #modePick #settingsCard{width:min(420px,92vw);max-height:60vh;overflow-y:auto;text-align:left}
 h1{cursor:pointer}
 #modePick .mp-btn{width:min(340px,90vw);padding:22px 18px;font-size:19px;text-align:center}
 #modePick .mp-sub{font-size:12.5px;font-weight:600;opacity:.75;margin-top:6px;text-transform:none;letter-spacing:0;font-family:'Space Grotesk'}
 #modePick .mp-look-hint{font-family:'Space Grotesk';font-size:11.5px;font-weight:600;opacity:.55;letter-spacing:.04em;margin-top:-6px}
 #modePick .mp-value{font-family:'Space Grotesk';font-size:14.5px;font-weight:500;line-height:1.55;text-align:center;max-width:min(360px,90vw);margin-bottom:6px;opacity:.9}
-#startConfirm{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.35)}
+#startConfirm{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:calc(var(--space-5) + var(--sa-top)) var(--space-5) calc(var(--space-5) + var(--sa-bottom));background:rgba(0,0,0,.35)}
 #startConfirm .sc-card{background:var(--paper);border:3px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:22px;max-width:min(380px,92vw);text-align:center}
 #startConfirm .sc-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:8px}
 #startConfirm .sc-line{font-family:'Space Grotesk';font-size:14px;font-weight:500;opacity:.85;margin-bottom:16px;line-height:1.5}
@@ -429,6 +445,29 @@ body.basic .instr-main{font-size:56px;line-height:1.05}
   .card{padding:12px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* ================= iOS HIG: 44pt minimum tap targets =================
+   Apple's Human Interface Guidelines call for a >=44x44pt hit area on every
+   interactive control. Short controls are grown to 44; tiny header glyphs keep
+   their look and expand their touch area with an invisible overlay so nothing
+   in the visual layout shifts. Non-interactive elements (badges, status dots)
+   are intentionally excluded. */
+button,.chip,.tagc,.useg,input,select,textarea{min-height:44px}
+.chip,.tagc{display:inline-flex;align-items:center}
+.btn-sm{display:inline-flex;align-items:center;justify-content:center}
+.iconbtn{width:44px;height:44px}
+.star{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+.ed-del{min-height:44px}
+/* tiny status glyph: keep its 28px look, give it a full 44x44 touch target */
+.btstat{position:relative}
+.btstat::after{content:'';position:absolute;top:50%;left:50%;width:44px;height:44px;transform:translate(-50%,-50%)}
+/* ================= Validation feedback ================= */
+/* Theme-aware toast: --ink/--paper are always a contrasting pair, so it stays legible in every look */
+.toast{position:fixed;left:50%;bottom:calc(24px + var(--sa-bottom));transform:translateX(-50%) translateY(8px);
+  z-index:120;background:var(--ink);color:var(--paper);border:var(--border);border-radius:12px;box-shadow:var(--shadow);
+  padding:12px 16px;font-weight:700;font-size:13.5px;line-height:1.35;max-width:min(420px,92vw);text-align:center;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A5A!important}
 </style>
 </head>
 <body>
@@ -2089,7 +2128,32 @@ function icedInfo(){
 }
 /* One-line "start now?" gate so the timer never fires by surprise. */
 let _startConfirmFn=null;
+function toast(msg){
+  let t=$('toast');
+  if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t);}
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toast._iv);toast._iv=setTimeout(()=>t.classList.remove('show'),2800);
+}
+/* Guard: never start a brew on a zero / empty / invalid coffee (or water) amount. */
+function brewInputError(){
+  if(isBasic()){
+    // beans and cups are two views of the same brew; block if EITHER was zeroed/cleared
+    if(!(parseFloat($('bDose').value)>0))return{msg:'Enter how much coffee to brew (grams) before starting.',field:'bDose'};
+    if(!(parseFloat($('bCups').value)>0))return{msg:'Enter how many cups you want (more than 0) before starting.',field:'bCups'};
+  }else{
+    if(!(parseFloat($('dose').value)>0))return{msg:'Enter a coffee amount greater than 0 g to start.',field:'dose'};
+    if(!(parseFloat($('water').value)>0))return{msg:'Enter a water amount greater than 0 g to start.',field:'water'};
+  }
+  return null;
+}
 function askStartConfirm(fn){
+  const err=brewInputError();
+  if(err){
+    toast(err.msg);
+    const f=$(err.field);
+    if(f){f.focus();f.classList.add('bad');setTimeout(()=>f.classList.remove('bad'),1800);}
+    return;
+  }
   _startConfirmFn=fn;
   const ice=icedInfo();
   const base=ice
@@ -2711,12 +2775,19 @@ function wireModes(){
   document.querySelector('header h1').onclick=()=>{$('modePick').style.display='flex';};
   // Cups and beans are two views of the same brew: edit either, the other follows.
   const refresh=(fromCups)=>{
-    const s=readBasicInputs();
     if(fromCups){
-      const cups=Math.min(6,Math.max(0.25,parseFloat($('bCups').value)||1));
+      const raw=parseFloat($('bCups').value);
+      if(!(raw>0)){$('bDose').value=0;$('bSum').innerHTML=basicSummary({...basicState(),dose:0});return;}
+      const s=readBasicInputs();
+      const cups=Math.min(6,Math.max(0.25,raw));
       s.dose=doseForCups(cups,s);$('bDose').value=s.dose;
-    }else{syncCupsField(s);}
-    setBasicState(s);$('bSum').innerHTML=basicSummary(s);
+      setBasicState(s);$('bSum').innerHTML=basicSummary(s);
+    }else{
+      const raw=parseFloat($('bDose').value);
+      if(!(raw>0)){$('bCups').value=0;$('bSum').innerHTML=basicSummary({...basicState(),dose:0});return;}
+      const s=readBasicInputs();syncCupsField(s);
+      setBasicState(s);$('bSum').innerHTML=basicSummary(s);
+    }
   };
   document.querySelectorAll('#bRoast .chip').forEach(c=>{
     c.onclick=()=>{document.querySelectorAll('#bRoast .chip').forEach(x=>x.classList.toggle('on',x===c));refresh(false);};
@@ -2751,7 +2822,7 @@ function wireSetup(){
     loadRecipe(v);
   };
   $('dose').oninput=()=>{const d=parseFloat($('dose').value),r=curRatio();if(d)$('water').value=Math.round(d*r);computeSchedule();syncCustomized();renderOzHint();saveSettings();};
-  $('doseCups').oninput=()=>{const cups=parseFloat($('doseCups').value)||1,r=curRatio(),d=Math.max(5,Math.round(cups*CUP_G/r));$('dose').value=d;$('water').value=Math.round(d*r);computeSchedule();syncCustomized();renderOzHint();saveSettings();};
+  $('doseCups').oninput=()=>{const raw=parseFloat($('doseCups').value),r=curRatio();if(!(raw>0)){$('dose').value=0;$('water').value=0;computeSchedule();syncCustomized();renderOzHint();saveSettings();return;}const d=Math.max(5,Math.round(raw*CUP_G/r));$('dose').value=d;$('water').value=Math.round(d*r);computeSchedule();syncCustomized();renderOzHint();saveSettings();};
   $('btnChangeSetup').onclick=()=>{setupEditing=true;updateSetupCards();$('beansCard').scrollIntoView({behavior:'smooth',block:'start'});};
   $('ratioInput').oninput=()=>{const d=parseFloat($('dose').value),r=curRatio();if(d)$('water').value=Math.round(d*r);computeSchedule();syncCustomized();saveSettings();};
   $('water').oninput=()=>{const d=parseFloat($('dose').value),w=parseFloat($('water').value);if(d&&w)$('ratioInput').value=Math.round(w/d*10)/10;computeSchedule();syncCustomized();saveSettings();};
