@@ -402,6 +402,12 @@ h1{cursor:pointer}
 #startConfirm .sc-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:8px}
 #startConfirm .sc-line{font-family:'Space Grotesk';font-size:14px;font-weight:500;opacity:.85;margin-bottom:16px;line-height:1.5}
 #startConfirm .sc-btns{display:flex;gap:10px;justify-content:center}
+#scaleModal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:calc(var(--space-5) + var(--sa-top)) var(--space-5) calc(var(--space-5) + var(--sa-bottom));background:rgba(0,0,0,.35)}
+#scaleModal .sc-card{background:var(--paper);border:3px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:22px;max-width:min(380px,92vw);width:100%;text-align:center}
+#scaleModal .sc-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:8px}
+#scaleModal .sc-line{font-family:'Space Grotesk';font-size:14px;font-weight:500;opacity:.85;margin-bottom:16px;line-height:1.5}
+#scaleModal .sc-btns{display:flex;flex-direction:column;gap:10px}
+#scaleModal .scale-alt{margin-top:12px}
 .ice-banner{margin-top:8px;padding:10px 12px;border:2px solid var(--ink);border-radius:12px;background:#E8F4FF;color:#1B2A3A;font-family:'Space Grotesk';font-size:13.5px;font-weight:600;line-height:1.45}
 #basic{display:none;max-width:480px;margin:0 auto}
 #basic .b-dose{font-family:'Bricolage Grotesque';font-weight:800;font-size:40px;text-align:center;padding:14px}
@@ -683,6 +689,18 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
     <div class="sc-btns">
       <button class="btn-primary" id="scStart">Start brewing</button>
     </div>
+  </div>
+</div>
+
+<div id="scaleModal" role="alertdialog" aria-modal="true" aria-labelledby="smTitle">
+  <div class="sc-card">
+    <div class="sc-title" id="smTitle">Bluetooth scale</div>
+    <div class="sc-line" id="smStatus">Not connected, works fine without one</div>
+    <div class="sc-btns">
+      <button class="btn-primary btn-teal" id="smConnect">Connect scale</button>
+      <button class="btn-sm" id="smClose">Close</button>
+    </div>
+    <div class="scale-alt">Scale not showing up? <span class="linklike" id="smConnectAll" role="button" tabindex="0" title="Show every Bluetooth device, for scales we don't recognize by name">show all devices</span></div>
   </div>
 </div>
 
@@ -1086,10 +1104,24 @@ function audioInit(){ // must be called from a user gesture (browser autoplay po
   try{
     if(!actx){actx=new (window.AudioContext||window.webkitAudioContext)();loadPourSample();}
     if(actx.state==='suspended')actx.resume();   // iOS starts contexts suspended; must resume inside a tap
+    primeAudio();                                 // iOS: fully unlock by firing one silent buffer inside the gesture
   }catch(_){actx=null;}
+}
+// iOS Safari/WKWebView keep the context "half-locked" until an actual buffer
+// plays inside a user gesture. Fire one silent 1-sample buffer, once.
+let audioPrimed=false;
+function primeAudio(){
+  if(audioPrimed||!actx)return;
+  try{
+    const b=actx.createBuffer(1,1,actx.sampleRate||22050);
+    const s=actx.createBufferSource();s.buffer=b;s.connect(actx.destination);
+    (s.start||s.noteOn).call(s,0);
+    audioPrimed=true;
+  }catch(_){}
 }
 function beep(freq,dur,vol,type){
   if(!soundOn||!actx)return;
+  if(actx.state==='suspended'){try{actx.resume();}catch(_){}}  // context may nap between steps
   try{
     const o=actx.createOscillator(),g=actx.createGain();
     o.type=type||'sine';o.frequency.value=freq;
@@ -1763,6 +1795,20 @@ function setScaleUI(state,msg,tag){
     sum.innerHTML=`<span class="btmini ${stCls}"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="7,8 17,16 12,21 12,3 17,8 7,16"/><line class="bt-slash" x1="4" y1="20" x2="20" y2="4"/></svg></span>${label}`;
     setCollapsed('scaleCard',state!=='off');
   }
+  // keep the in-place badge panel in sync if it's open
+  const sm=$('smStatus');if(sm)sm.textContent=msg;
+  const smb=$('smConnect');if(smb)smb.textContent=state==='on'?'Done':'Connect scale';
+}
+// Fill the badge's scale panel with the current status before showing it.
+function refreshScaleModal(){
+  const smb=$('smConnect'),sm=$('smStatus');
+  if(!navigator.bluetooth){
+    if(sm)sm.textContent='Bluetooth scales aren’t supported on this device (iPhone/iPad). The app runs fully guided on timers, no scale needed.';
+    if(smb){smb.disabled=true;smb.style.opacity='.4';smb.style.cursor='not-allowed';smb.textContent='Connect scale';}
+    return;
+  }
+  if(smb){smb.disabled=false;smb.style.opacity='';smb.style.cursor='';smb.textContent=ble.connected?'Done':'Connect scale';}
+  if(sm)sm.textContent=ble.connected?(`Connected: ${(ble.device&&ble.device.name)||'scale'}`):(simMode?'Simulator on (no scale)':'Not connected, works fine without one');
 }
 async function attachAndNegotiate(device){
   ble.device=device;ble.battery=null;
@@ -2855,6 +2901,11 @@ function wireSetup(){
   $('unitFbtn').onclick=()=>setUnit(true);
   $('sndOn').onclick=()=>{audioInit();setSound(true);sfxTick();}   // audible confirmation
   $('sndOff').onclick=()=>setSound(false);
+  // iOS: unlock audio on the very first interaction anywhere, so the countdown
+  // isn't the first time we touch Web Audio (which iOS can swallow).
+  const firstGestureUnlock=()=>{audioInit();
+    ['touchend','pointerdown','click'].forEach(ev=>document.removeEventListener(ev,firstGestureUnlock));};
+  ['touchend','pointerdown','click'].forEach(ev=>document.addEventListener(ev,firstGestureUnlock,{once:false,passive:true}));
   $('wG').onclick=()=>setWeightUnit(false);
   $('wOz').onclick=()=>setWeightUnit(true);
   $('themeMax').onclick=()=>setTheme('max');
@@ -2864,10 +2915,17 @@ function wireSetup(){
     const c=$('settingsCard');
     c.style.display=c.style.display==='none'?'block':'none';
   };
-  // Tap the header Bluetooth badge → jump to the start screen's scale settings.
-  const openScaleSettings=()=>{$('modePick').style.display='flex';$('settingsCard').style.display='block';setCollapsed('scaleCard',false);const sc=$('scaleCard');if(sc)sc.scrollIntoView({behavior:'smooth',block:'center'});};
+  // Tap the header Bluetooth badge → open the scale panel over the CURRENT screen,
+  // so you can connect without being kicked back to the start screen.
+  const openScaleSettings=()=>{refreshScaleModal();$('scaleModal').style.display='flex';};
+  const closeScaleModal=()=>{$('scaleModal').style.display='none';};
   $('hdrDot').onclick=openScaleSettings;
   $('hdrDot').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openScaleSettings();}};
+  $('smConnect').onclick=()=>{if(ble.connected)closeScaleModal();else connectScale(false);};
+  $('smConnectAll').onclick=()=>connectScale(true);
+  $('smConnectAll').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();connectScale(true);}};
+  $('smClose').onclick=closeScaleModal;
+  $('scaleModal').onclick=e=>{if(e.target===$('scaleModal'))closeScaleModal();};
   $('btnConnect').onclick=()=>connectScale(false);
   $('btnConnectAll').onclick=()=>connectScale(true);
   $('btnConnectAll').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();connectScale(true);}};
