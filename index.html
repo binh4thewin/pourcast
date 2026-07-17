@@ -72,12 +72,21 @@ button:focus-visible{outline:3px solid var(--blue)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 /* Filtru-style brewer tiles: dark icon circles (the artwork is white line work),
    selection pops with a colored ring + lift, never shadow-on-dark */
-#toolChips{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:14px 8px}
-.tool-tile{text-align:center;cursor:pointer;user-select:none}
-.tool-circle{width:70px;height:70px;border-radius:50%;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;
+.chips-scroll{position:relative}
+/* evenly spaced, fixed-width brewer tiles in one swipeable/scrollable row */
+#toolChips{display:flex;flex-wrap:nowrap;gap:18px;overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none;padding:10px 2px;justify-content:start}
+#toolChips::-webkit-scrollbar{display:none}
+.tool-tile{flex:0 0 76px;scroll-snap-align:start;text-align:center;cursor:pointer;user-select:none}
+/* slim scroll indicator UNDER the strip; shown only when the icons overflow */
+.chips-ind{height:4px;border-radius:99px;background:rgba(27,11,46,.12);margin:4px 4px 0;position:relative;overflow:hidden}
+.chips-ind[hidden]{display:none}
+.chips-thumb{position:absolute;top:0;bottom:0;left:0;width:30%;border-radius:99px;background:var(--magenta)}
+body.calm .chips-thumb{background:#B08968}
+body.burnt .chips-thumb{background:#C0642B}
+.tool-circle{width:70px;height:70px;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;
   background:#fff;color:#261C2E;border:3px solid var(--ink);transition:transform .1s,border-color .1s,box-shadow .1s}
 .tool-tile:active .tool-circle{transform:scale(.94)}
-.timg{width:44px;height:44px;display:block}
+.timg{width:46px;height:46px;display:block;object-fit:contain}
 /* collapsible cards: pick once, then it folds to a one-line summary */
 .card.collapsed>*:not(h2){display:none!important}
 .ctoggle{cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px}
@@ -122,7 +131,7 @@ button:focus-visible{outline:3px solid var(--blue)}
 .csum .dotsep{opacity:.5}
 .ticon{width:44px;height:44px;display:block;color:#261C2E}
 .ticon .acc{stroke:#EEA636;stroke-width:2}
-.tool-name{font-size:11px;font-weight:800;letter-spacing:.02em;line-height:1.2;opacity:.75}
+.tool-name{font-size:11px;font-weight:800;letter-spacing:.02em;line-height:1.2;opacity:.75;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.4em}
 /* SELECTED: bright ring + glow + lift, unmistakable on any background */
 .tool-tile.on .tool-circle{border-color:var(--magenta);box-shadow:0 0 0 3px var(--acid),0 6px 14px rgba(255,46,147,.35);transform:translateY(-2px)}
 .tool-tile.on .tool-name{opacity:1;color:var(--magenta)}
@@ -429,7 +438,7 @@ body.basic .instr-main{font-size:56px;line-height:1.05}
   #setup>*{min-width:0}
   #setup .card{margin:0}
   /* full-width rows in the grid: settings, recipe/method, dose, and the log read better wide */
-  #settingsCard,#beansCard,#recipeCard,#doseCard,#logCard,#editor,#btnChangeSetup,#btnStart,.footer-note{grid-column:1/-1}
+  #settingsCard,#beansCard,#brewerCard,#recipeCard,#doseCard,#logCard,#editor,#btnChangeSetup,#btnStart,.footer-note{grid-column:1/-1}
   /* Scale + Brewer share a row: similar heights, no canyon */
   /* brew + rating stay a focused single column, centered like a recipe card on a counter */
   #brew,#rating{max-width:640px;margin:0 auto}
@@ -523,7 +532,7 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
 </div>
 
 <div id="setup">
-  <button class="btn-sm" id="btnChangeSetup" style="display:none;width:100%;margin-bottom:12px;text-align:left"></button>
+  <button class="linklike" id="btnChangeSetup" style="display:none;margin:0 0 12px;background:none;border:none;box-shadow:none;text-transform:none;letter-spacing:0;font-size:12.5px;padding:0;width:auto;text-align:left"></button>
   <div class="card" id="beansCard">
     <h2 class="ctoggle">Beans <span class="csum" id="beansSum"></span></h2>
     <div class="row">
@@ -536,19 +545,23 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
       <div style="flex:0 0 auto;display:flex;align-items:flex-end"><button class="btn-sm btn-acid" id="libAddBtn">Add</button></div>
     </div>
     <div class="row" style="margin-top:10px">
-      <div><label for="roast">Roast (from bean)</label><select id="roast"><option>Light</option><option>Light-Medium</option><option selected>Medium</option><option>Medium-Dark</option><option>Dark</option></select></div>
+      <div><label for="roast">Roast (from bean)</label><select id="roast"><option value="">Choose roast…</option><option>Light</option><option>Light-Medium</option><option selected>Medium</option><option>Medium-Dark</option><option>Dark</option></select></div>
     </div>
     <input type="hidden" id="beanName">
     <div class="row" style="margin-top:10px">
       <div style="flex:0 1 180px"><label for="roastDate">Roast date</label><input type="date" id="roastDate"></div>
       <div style="flex:1 1 200px;display:flex;align-items:flex-end"><div class="age" id="ageChip" style="display:none;width:100%;margin-top:0;box-sizing:border-box"></div></div>
     </div>
+    <button class="btn-sm btn-acid" id="btnConfirmBeans" style="width:100%;margin-top:14px">Confirm beans ✓</button>
   </div>
 
 
   <div class="card violet" id="brewerCard">
     <h2 class="ctoggle">Your brewer <span class="csum" id="toolSum"></span></h2>
-    <div class="chips" id="toolChips"></div>
+    <div class="chips-scroll">
+      <div class="chips" id="toolChips"></div>
+      <div class="chips-ind" id="toolInd" aria-hidden="true" hidden><span class="chips-thumb" id="toolThumb"></span></div>
+    </div>
   </div>
 
   <div class="card pink" id="recipeCard">
@@ -1262,6 +1275,8 @@ function restoreSettings(){
     renderChips();populateRecipes();
     renderLibrary(null,null);
   }
+  // a returning user with a saved bean is already "confirmed" → keep setup folded
+  beansConfirmed=!!($('beanSel').value&&$('beanSel').value!=='__newB');
   updateToolSummary();updateBeansSummary();
   updateSetupCards();
   wireCollapsibles();
@@ -1446,17 +1461,93 @@ yourself as a roaster. */
 /* Preset catalogs: stable blend lineups with roast levels pre-filled.
    Planned as a Reserve (paid) feature, free preview for now. Single
    origins rotate seasonally, so those stay manual. */
+/* Curated starter catalog of respected US SPECIALTY coffee roasters — the kind
+   people actually reach for when brewing pour-over. Selection sourced from
+   published "best specialty roaster" rankings (Coffee Bros. 2026, Sprudge,
+   Chowhound), not mass-market/grocery brands. Only name + roast level are
+   stored (the factual bits); roast levels are approximate and editable.
+   Specialty roasters mostly sell rotating single origins, so we seed each
+   roaster's confirmed signature blends and leave a neutral "Rotating single
+   origin" entry for the single-origin-focused houses. Users add their own
+   roasters/beans; the long tail is meant to be user-added. */
 const PRESET_ROASTERS=[
- {name:'Stumptown',beans:[
+ {name:'Onyx Coffee Lab',beans:[
+   {name:'Southern Weather',roast:'Medium'},
+   {name:'Monarch',roast:'Medium-Dark'},
+   {name:'Geometry',roast:'Medium'},
+   {name:'Rotating single origin',roast:'Light',rotating:true}
+ ]},
+ {name:'Stumptown Coffee Roasters',beans:[
    {name:'Hair Bender',roast:'Medium'},
    {name:'Holler Mountain',roast:'Medium'},
    {name:"Founder's Blend",roast:'Medium'},
-   {name:'Homestead Blend',roast:'Medium'},
-   {name:'Hundred Mile',roast:'Medium'},
-   {name:'French Roast',roast:'Dark'},
-   {name:'Trapper Creek Decaf',roast:'Medium-Dark'},
-   {name:'Echo Canyon Half-Caff',roast:'Medium'},
-   {name:'Guatemala El Injerto Bourbon (seasonal)',roast:'Light'}
+   {name:'Hundred Mile',roast:'Medium'}
+ ]},
+ {name:'Counter Culture Coffee',beans:[
+   {name:'Hologram',roast:'Medium'},
+   {name:'Big Trouble',roast:'Medium'},
+   {name:'Fast Forward',roast:'Medium'},
+   {name:'Apollo',roast:'Light'},
+   {name:'Forty-Six',roast:'Medium-Dark'}
+ ]},
+ {name:'Intelligentsia Coffee',beans:[
+   {name:'Black Cat Classic Espresso',roast:'Medium-Dark'},
+   {name:'House Blend',roast:'Medium'},
+   {name:'Frequency Blend',roast:'Medium'},
+   {name:'Rotating single origin',roast:'Light',rotating:true}
+ ]},
+ {name:'Blue Bottle Coffee',beans:[
+   {name:'Bella Donovan',roast:'Medium-Dark'},
+   {name:'Three Africas',roast:'Medium'},
+   {name:'Giant Steps',roast:'Dark'},
+   {name:'Hayes Valley Espresso',roast:'Medium-Dark'}
+ ]},
+ {name:'Verve Coffee Roasters',beans:[
+   {name:'Streetlevel',roast:'Medium'},
+   {name:'Sermon',roast:'Medium'},
+   {name:'1950',roast:'Medium-Dark'},
+   {name:'Rotating single origin',roast:'Light',rotating:true}
+ ]},
+ {name:'Sightglass Coffee',beans:[
+   {name:'Blueboon',roast:'Medium'},
+   {name:"Owl's Howl Espresso",roast:'Medium-Dark'}
+ ]},
+ {name:'Equator Coffees',beans:[
+   {name:'Tigerwalk Espresso',roast:'Medium-Dark'},
+   {name:'Rotating single origin',roast:'Light',rotating:true}
+ ]},
+ {name:'Heart Coffee Roasters',beans:[
+   {name:'Rotating single origin',roast:'Light',rotating:true}
+ ]},
+ {name:'Sey Coffee',beans:[
+   {name:'Rotating single origin',roast:'Light',rotating:true}
+ ]},
+ {name:'Prodigal Coffee',beans:[
+   {name:'Rotating single origin',roast:'Light',rotating:true}
+ ]},
+ {name:'Proud Mary Coffee',beans:[
+   {name:'Rotating single origin',roast:'Light',rotating:true}
+ ]},
+ {name:'JBC Coffee Roasters',beans:[
+   {name:'Rotating single origin',roast:'Light',rotating:true}
+ ]},
+ {name:'Madcap Coffee',beans:[
+   {name:'Third Coast',roast:'Medium'},
+   {name:'Rotating single origin',roast:'Light',rotating:true}
+ ]},
+ {name:'Sweet Bloom Coffee Roasters',beans:[
+   {name:'Hometown Blend',roast:'Medium'},
+   {name:'Rotating single origin',roast:'Light',rotating:true}
+ ]},
+ {name:'George Howell Coffee',beans:[
+   {name:'Alchemy',roast:'Medium'},
+   {name:'Rotating single origin',roast:'Light',rotating:true}
+ ]},
+ {name:'Bird Rock Coffee Roasters',beans:[
+   {name:'Rotating single origin',roast:'Light',rotating:true}
+ ]},
+ {name:'Passenger Coffee',beans:[
+   {name:'Rotating single origin',roast:'Light',rotating:true}
  ]}
 ];
 function addPresetRoaster(name){
@@ -1497,20 +1588,23 @@ function renderBeans(selBean){
   const r=libRoaster($('roasterSel').value);
   const bs=$('beanSel');
   const beans=r?r.beans:[];
-  bs.innerHTML=beans.map(b=>`<option value="${b.name.replace(/"/g,'&quot;')}">${b.name} · ${b.roast}</option>`).join('')+'<option value="__newB">＋ Add bean…</option>';
+  bs.innerHTML=beans.map(b=>`<option value="${b.name.replace(/"/g,'&quot;')}">${b.name}${b.rotating?'':` · ${b.roast}`}</option>`).join('')+'<option value="__newB">＋ Add bean…</option>';
   if(selBean&&beans.some(b=>b.name===selBean))bs.value=selBean;
   else if(beans.length)bs.value=beans[0].name;
   applyBeanSelection();
 }
 function applyBeanSelectionAndFold(){
   applyBeanSelection();
-  if($('beanSel').value&&$('beanSel').value!=='__newB'){updateBeansSummary();setupEditing=false;updateSetupCards();}
+  beansConfirmed=false;   // a fresh bean pick needs confirming; don't collapse yet
+  if($('beanSel').value&&$('beanSel').value!=='__newB')updateBeansSummary();
+  updateSetupCards();     // keeps the card open so roast + roast date can be set
 }
 function applyBeanSelection(){
   const r=libRoaster($('roasterSel').value);
   const b=r&&r.beans.find(x=>x.name===$('beanSel').value);
   if(b){
-    $('roast').value=b.roast;                 // roast follows the bean
+    // fixed blends carry their roast; rotating single origins force an explicit pick
+    $('roast').value=b.rotating?'':b.roast;
     $('beanName').value=`${b.name}, ${r.name}`;
     renderTempAdvice();renderAge();
   }else{
@@ -1970,19 +2064,20 @@ function setCollapsed(id,c){const el=$(id);if(el)el.classList.toggle('collapsed'
 /* Beans + brewer rarely change: once both are picked, hide the two cards
    entirely and leave a single "Change" bar to bring them back. */
 let setupEditing=false;
+let beansConfirmed=false;   // beans card collapses only after the user confirms
 function updateSetupCards(){
   const beanOk=$('beanSel').value&&$('beanSel').value!=='__newB';
-  const toolOk=!!tool;
-  const done=beanOk&&toolOk&&!setupEditing;
-  if($('beansCard'))$('beansCard').style.display=done?'none':'';
-  if($('brewerCard'))$('brewerCard').style.display=done?'none':'';
+  const beansDone=beanOk&&beansConfirmed&&!setupEditing;  // gated on Confirm beans
+  // Beans and brewer are independent now: confirming beans collapses ONLY the
+  // beans card. The brewer card always stays open so you can switch brewers
+  // (which drives the method) without disturbing your bean selection.
+  if($('beansCard'))$('beansCard').style.display=beansDone?'none':'';
+  if($('brewerCard'))$('brewerCard').style.display='';
   const btn=$('btnChangeSetup');
   if(btn){
-    btn.style.display=done?'block':'none';
-    if(done){
-      const t=TOOLS.find(x=>x.id===tool);
-      btn.innerHTML=`☕ <b>${$('beanSel').value}</b> · <b>${t?t.name:''}</b> &nbsp;·&nbsp; Change beans or brewer`;
-    }
+    // once beans are confirmed there's always a way back to change them
+    btn.style.display=beansDone?'block':'none';
+    if(beansDone)btn.innerHTML=`✎ Change beans <span style="opacity:.55;text-decoration:none;font-weight:600">· ${$('beanSel').value}</span>`;
   }
 }
 /* Plain-language dose readout for Brew Print, mirroring Just Brew. */
@@ -1997,7 +2092,7 @@ function updateBeansSummary(){
   const b=$('beanSel').value,r=$('roasterSel').value;
   if(!b||b==='__newB'||!r||r==='__newR'){$('beansSum').textContent='';return;}
   const age=beanAgeDays();
-  $('beansSum').innerHTML=`${b} <span class="dotsep">·</span> ${$('roast').value}${age!=null?` <span class="dotsep">·</span> ${age}d`:''}`;
+  $('beansSum').innerHTML=`${b}${$('roast').value?` <span class="dotsep">·</span> ${$('roast').value}`:''}${age!=null?` <span class="dotsep">·</span> ${age}d`:''}`;
 }
 function updateToolSummary(){
   const t=TOOLS.find(x=>x.id===tool);
@@ -2020,6 +2115,26 @@ function renderChips(){
     const pick=()=>{tool=c.dataset.t;renderChips();populateRecipes();updateToolSummary();setupEditing=false;updateSetupCards();saveSettings();};
     c.onclick=pick;c.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')pick()};
   });
+  updateToolArrows();
+}
+// Show a slim scroll indicator ONLY when the brewer strip overflows (e.g. mobile).
+// When every icon fits (desktop), it hides — no arrows, nothing over the icons.
+function updateToolArrows(){
+  const el=$('toolChips');if(!el)return;
+  const ind=$('toolInd'),thumb=$('toolThumb');
+  const range=el.scrollWidth-el.clientWidth;
+  const overflow=range>2;
+  if(ind)ind.hidden=!overflow;
+  if(overflow&&thumb){
+    const w=Math.max(14,(el.clientWidth/el.scrollWidth)*100);
+    thumb.style.width=w+'%';
+    thumb.style.left=((el.scrollLeft/range)*(100-w))+'%';
+  }
+}
+function wireToolScroll(){
+  const el=$('toolChips');if(!el)return;
+  el.addEventListener('scroll',updateToolArrows,{passive:true});
+  window.addEventListener('resize',updateToolArrows);
 }
 function populateRecipes(){
   const list=allRecipes().filter(r=>r.id!=='custom'&&(r.tool.includes(tool)||tool==='any'));
@@ -2191,6 +2306,8 @@ function brewInputError(){
   }else{
     if(!(parseFloat($('dose').value)>0))return{msg:'Enter a coffee amount greater than 0 g to start.',field:'dose'};
     if(!(parseFloat($('water').value)>0))return{msg:'Enter a water amount greater than 0 g to start.',field:'water'};
+    if($('beanSel').value&&$('beanSel').value!=='__newB'&&!$('roast').value)
+      return{msg:'Choose a roast level for this bean before starting.',field:'roast'};
   }
   return null;
 }
@@ -2732,7 +2849,7 @@ function showFrontDoor(){
   document.body.classList.remove('brewing');
   $('brew').style.display='none';$('rating').style.display='none';
   if(isBasic()){$('setup').style.display='none';$('basic').style.display='block';renderBasic();}
-  else{$('basic').style.display='none';$('setup').style.display='';}
+  else{$('basic').style.display='none';$('setup').style.display='';requestAnimationFrame(updateToolArrows);}
 }
 function basicState(){return Store.get(BASICKEY,null)||{dose:20,roast:'Medium',strength:'regular',brewed:false};}
 function setBasicState(s){Store.set(BASICKEY,s);}
@@ -2885,13 +3002,27 @@ function wireSetup(){
   $('roasterSel').onchange=()=>{
     if($('roasterSel').value==='__newR'){showLibAdd('roaster');return;}
     $('libAddRow').style.display='none';
+    beansConfirmed=false;   // new roaster → beans need re-confirming
     ensureRoasterInstalled($('roasterSel').value);
-    renderBeans(null);saveSettings();
+    renderBeans(null);updateSetupCards();saveSettings();
   };
   $('beanSel').onchange=()=>{
     if($('beanSel').value==='__newB'){showLibAdd('bean');return;}
     $('libAddRow').style.display='none';
     applyBeanSelectionAndFold();saveSettings();
+  };
+  $('btnConfirmBeans').onclick=()=>{
+    const beanOk=$('beanSel').value&&$('beanSel').value!=='__newB';
+    if(!beanOk){toast('Pick a bean first');return;}
+    if(!$('roast').value){                 // rotating beans start with no roast set
+      toast('Choose a roast level for this bean');
+      const rs=$('roast');rs.focus();rs.classList.add('bad');setTimeout(()=>rs.classList.remove('bad'),1800);
+      return;
+    }
+    beansConfirmed=true;setupEditing=false;
+    updateBeansSummary();updateSetupCards();saveSettings();
+    const bc=$('brewerCard');           // nudge toward the next step if it's still open
+    if(bc&&bc.style.display!=='none')bc.scrollIntoView({behavior:'smooth',block:'start'});
   };
   $('libAddBtn').onclick=commitLibAdd;
   $('roast').addEventListener('change',()=>{renderTempAdvice();renderAge();computeSchedule();saveSettings();});
@@ -2942,6 +3073,7 @@ function wireSetup(){
   $('btnBack').onclick=confirmExit;
 }
 wireSetup();
+wireToolScroll();    // brewer strip arrows
 wireRating();
 wireEditor();
 wireMethodToggle();
