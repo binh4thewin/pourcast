@@ -1579,7 +1579,8 @@ function favCount(){return getLibrary().reduce((n,r)=>n+r.beans.filter(b=>b.fav)
 function roasterOptionsHTML(){
   const lib=getLibrary();
   const presets=PRESET_ROASTERS.filter(p=>!lib.some(r=>r.name===p.name));
-  return (favCount()?`<option value="__favs">⭐ Favorited Beans</option>`:'')
+  return '<option value="">Select a roaster…</option>'
+    +(favCount()?`<option value="__favs">⭐ Favorited Beans</option>`:'')
     +lib.map(r=>`<option value="${r.name}">${r.name}</option>`).join('')
     +presets.map(p=>`<option value="${p.name}">${p.name}</option>`).join('')
     +'<option value="__newR">＋ Add roaster…</option>';
@@ -1596,8 +1597,7 @@ function renderLibrary(selRoaster,selBean){
   const rs=$('roasterSel');
   rs.innerHTML=roasterOptionsHTML();
   if(selRoaster&&(lib.some(r=>r.name===selRoaster)||presets.some(p=>p.name===selRoaster)))rs.value=selRoaster;
-  else if(lib.length)rs.value=lib[0].name;
-  else if(presets.length)rs.value=presets[0].name;
+  else rs.value='';   // first run / no saved choice → prompt "Select a roaster…"
   ensureRoasterInstalled(rs.value);
   renderBeans(selBean);
 }
@@ -1611,6 +1611,12 @@ function ensureRoasterInstalled(name){
 }
 function renderBeans(selBean){
   const bs=$('beanSel');
+  // no roaster chosen yet → prompt, no beans
+  if($('roasterSel').value===''){
+    bs.innerHTML='<option value="" disabled selected>Select a roaster first</option>';
+    applyBeanSelection();
+    return;
+  }
   // "⭐ Favorited Beans" view: list hearted beans from every roaster
   if($('roasterSel').value==='__favs'){
     const favs=[];
@@ -3087,6 +3093,7 @@ function wireSetup(){
     $('libAddRow').style.display='none';
     beansConfirmed=false;   // new roaster → beans need re-confirming
     if($('roasterSel').value==='__favs'){renderBeans(null);updateSetupCards();return;}  // transient view, don't save
+    if($('roasterSel').value===''){renderBeans(null);updateSetupCards();saveSettings();return;}  // back to prompt
     ensureRoasterInstalled($('roasterSel').value);
     renderBeans(null);updateSetupCards();saveSettings();
   };
