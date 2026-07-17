@@ -123,6 +123,12 @@ body.burnt .chips-thumb{background:#C0642B}
 .btmini.sim svg polyline{stroke:#8A7A00}
 .scale-alt{margin-top:10px;font-size:11.5px;font-weight:600;opacity:.8}
 .linklike{color:var(--violet);text-decoration:underline;cursor:pointer;font-weight:700}
+/* bean favorites: heart toggle + quick-pick chips */
+.bean-pick{display:flex;gap:8px;align-items:stretch}
+.bean-pick select{flex:1;min-width:0}
+.fav-heart{flex:0 0 auto;width:44px;padding:0;font-size:20px;line-height:1;color:var(--magenta);background:#fff;border:var(--border);border-radius:12px;box-shadow:2px 2px 0 var(--ink);cursor:pointer;text-transform:none}
+.fav-heart[aria-pressed="true"]{background:#FFE1EF}
+.fav-heart:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
 .iconbtn{width:40px;height:40px;padding:0;display:inline-flex;align-items:center;justify-content:center}
 .iconbtn svg{width:20px;height:20px}
 .iconbtn svg *{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -537,7 +543,12 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
     <h2 class="ctoggle">Beans <span class="csum" id="beansSum"></span></h2>
     <div class="row">
       <div><label for="roasterSel">Roaster</label><select id="roasterSel"></select></div>
-      <div><label for="beanSel">Bean</label><select id="beanSel"></select></div>
+      <div><label for="beanSel">Bean</label>
+        <div class="bean-pick">
+          <select id="beanSel"></select>
+          <button id="btnFavBean" type="button" class="fav-heart" aria-pressed="false" aria-label="Favorite this bean" title="Add to favorites">♡</button>
+        </div>
+      </div>
     </div>
     <div class="row" id="libAddRow" style="display:none;margin-top:8px">
       <div style="flex:2"><input type="text" id="libAddName" placeholder=""></div>
@@ -1229,7 +1240,7 @@ function currentSettings(){
     tool, recipeId:recipe?recipe.id:null,
     dose:$('dose').value, water:$('water').value, ratio:$('ratioInput').value,
     grindSetting:$('grindSetting').value,
-    theme, weightOz, soundOn, beanName:$('beanName').value, roaster:$('roasterSel').value, bean:$('beanSel').value,
+    theme, weightOz, soundOn, beanName:$('beanName').value, roaster:curRoasterName()||$('roasterSel').value, bean:$('beanSel').value,
     roast:$('roast').value, roastDate:$('roastDate').value,
     unitF
   };
@@ -1278,6 +1289,7 @@ function restoreSettings(){
   // a returning user with a saved bean is already "confirmed" → keep setup folded
   beansConfirmed=!!($('beanSel').value&&$('beanSel').value!=='__newB');
   updateToolSummary();updateBeansSummary();
+  updateFavHeart();
   updateSetupCards();
   wireCollapsibles();
   restoring=false;
@@ -1563,13 +1575,26 @@ function addPresetRoaster(name){
 function getLibrary(){return Store.get(KEYS.library,[]);}
 function setLibrary(lib){Store.set(KEYS.library,lib);}
 function libRoaster(name){return getLibrary().find(r=>r.name===name);}
-function renderLibrary(selRoaster,selBean){
+function favCount(){return getLibrary().reduce((n,r)=>n+r.beans.filter(b=>b.fav).length,0);}
+function roasterOptionsHTML(){
   const lib=getLibrary();
-  const rs=$('roasterSel');
   const presets=PRESET_ROASTERS.filter(p=>!lib.some(r=>r.name===p.name));
-  rs.innerHTML=lib.map(r=>`<option value="${r.name}">${r.name}</option>`).join('')
+  return (favCount()?`<option value="__favs">⭐ Favorited Beans</option>`:'')
+    +lib.map(r=>`<option value="${r.name}">${r.name}</option>`).join('')
     +presets.map(p=>`<option value="${p.name}">${p.name}</option>`).join('')
     +'<option value="__newR">＋ Add roaster…</option>';
+}
+// Rebuild the roaster <option>s (e.g. after favoriting) without disturbing selection.
+function refreshRoasterOptions(){
+  const rs=$('roasterSel'),cur=rs.value;
+  rs.innerHTML=roasterOptionsHTML();
+  if([...rs.options].some(o=>o.value===cur))rs.value=cur;
+}
+function renderLibrary(selRoaster,selBean){
+  const lib=getLibrary();
+  const presets=PRESET_ROASTERS.filter(p=>!lib.some(r=>r.name===p.name));
+  const rs=$('roasterSel');
+  rs.innerHTML=roasterOptionsHTML();
   if(selRoaster&&(lib.some(r=>r.name===selRoaster)||presets.some(p=>p.name===selRoaster)))rs.value=selRoaster;
   else if(lib.length)rs.value=lib[0].name;
   else if(presets.length)rs.value=presets[0].name;
@@ -1585,8 +1610,18 @@ function ensureRoasterInstalled(name){
   if(p){const lib=getLibrary();lib.push({name:p.name,beans:p.beans.map(b=>({...b}))});setLibrary(lib);}
 }
 function renderBeans(selBean){
-  const r=libRoaster($('roasterSel').value);
   const bs=$('beanSel');
+  // "⭐ Favorited Beans" view: list hearted beans from every roaster
+  if($('roasterSel').value==='__favs'){
+    const favs=[];
+    getLibrary().forEach(r=>r.beans.forEach(b=>{if(b.fav)favs.push({roaster:r.name,bean:b.name});}));
+    const esc=s=>s.replace(/"/g,'&quot;');
+    bs.innerHTML='<option value="" disabled'+(selBean?'':' selected')+'>Choose a favorite…</option>'
+      +favs.map(f=>`<option value="${esc(f.bean)}" data-roaster="${esc(f.roaster)}"${selBean===f.bean?' selected':''}>${f.bean} · ${f.roaster}</option>`).join('');
+    applyBeanSelection();   // resolves roast/name for the picked favorite (or clears)
+    return;
+  }
+  const r=libRoaster($('roasterSel').value);
   const beans=r?r.beans:[];
   bs.innerHTML=beans.map(b=>`<option value="${b.name.replace(/"/g,'&quot;')}">${b.name}${b.rotating?'':` · ${b.roast}`}</option>`).join('')+'<option value="__newB">＋ Add bean…</option>';
   if(selBean&&beans.some(b=>b.name===selBean))bs.value=selBean;
@@ -1599,8 +1634,17 @@ function applyBeanSelectionAndFold(){
   if($('beanSel').value&&$('beanSel').value!=='__newB')updateBeansSummary();
   updateSetupCards();     // keeps the card open so roast + roast date can be set
 }
+// The roaster a bean actually belongs to. In the "⭐ Favorited Beans" view the
+// roaster dropdown reads "__favs", so resolve the real roaster from the chosen
+// bean option's data-roaster; otherwise it's just the selected roaster.
+function curRoasterName(){
+  const rv=$('roasterSel').value;
+  if(rv==='__favs'){const opt=$('beanSel').selectedOptions[0];return(opt&&opt.dataset.roaster)||null;}
+  return rv;
+}
 function applyBeanSelection(){
-  const r=libRoaster($('roasterSel').value);
+  const rn=curRoasterName();
+  const r=rn?libRoaster(rn):null;
   const b=r&&r.beans.find(x=>x.name===$('beanSel').value);
   if(b){
     // fixed blends carry their roast; rotating single origins force an explicit pick
@@ -1610,6 +1654,45 @@ function applyBeanSelection(){
   }else{
     $('beanName').value='';
   }
+  updateFavHeart();
+}
+/* ---- Bean favorites: heart the current bean, browse them as a roaster ---- */
+function curLibBean(){
+  const rn=curRoasterName();if(!rn)return null;
+  const r=libRoaster(rn);
+  return r?r.beans.find(x=>x.name===$('beanSel').value)||null:null;
+}
+function updateFavHeart(){
+  const btn=$('btnFavBean');if(!btn)return;
+  const b=curLibBean(),on=!!(b&&b.fav);
+  btn.disabled=!b;
+  btn.textContent=on?'♥':'♡';
+  btn.setAttribute('aria-pressed',on?'true':'false');
+  btn.title=b?(on?'Remove from favorites':'Add to favorites'):'Pick a bean to favorite';
+}
+function toggleFavBean(){
+  const rn=curRoasterName();
+  const lib=getLibrary();
+  const r=rn&&lib.find(x=>x.name===rn);
+  const b=r&&r.beans.find(x=>x.name===$('beanSel').value);
+  if(!b)return;
+  b.fav=!b.fav;
+  setLibrary(lib);
+  if($('roasterSel').value==='__favs'){
+    if(favCount()===0){                  // just removed the last favorite
+      toast('That was your last favorite bean — showing all roasters.');
+      beansConfirmed=false;
+      renderLibrary(null,null);           // leave the favorites view
+      updateBeansSummary();updateSetupCards();saveSettings();
+      return;
+    }
+    beansConfirmed=false;
+    renderBeans('');                      // stay in favorites; dropped bean falls off the list
+    updateBeansSummary();updateSetupCards();
+    return;
+  }
+  updateFavHeart();
+  refreshRoasterOptions();                // add/remove the "⭐ Favorited Beans" entry
 }
 function showLibAdd(kind){
   $('libAddRow').style.display='flex';
@@ -3003,14 +3086,23 @@ function wireSetup(){
     if($('roasterSel').value==='__newR'){showLibAdd('roaster');return;}
     $('libAddRow').style.display='none';
     beansConfirmed=false;   // new roaster → beans need re-confirming
+    if($('roasterSel').value==='__favs'){renderBeans(null);updateSetupCards();return;}  // transient view, don't save
     ensureRoasterInstalled($('roasterSel').value);
     renderBeans(null);updateSetupCards();saveSettings();
   };
   $('beanSel').onchange=()=>{
     if($('beanSel').value==='__newB'){showLibAdd('bean');return;}
+    // in the Favorited Beans view, picking a favorite STAYS in the view
+    if($('roasterSel').value==='__favs'){
+      if(!$('beanSel').value)return;      // still on the placeholder
+      beansConfirmed=false;
+      applyBeanSelection();updateBeansSummary();updateSetupCards();saveSettings();
+      return;
+    }
     $('libAddRow').style.display='none';
     applyBeanSelectionAndFold();saveSettings();
   };
+  $('btnFavBean').onclick=toggleFavBean;
   $('btnConfirmBeans').onclick=()=>{
     const beanOk=$('beanSel').value&&$('beanSel').value!=='__newB';
     if(!beanOk){toast('Pick a bean first');return;}
