@@ -2963,6 +2963,10 @@ const BASIC_BREWERS=[
  {id:'any',        recipe:'hedrick',        baseRatio:16,  maxDose:40}
 ];
 const basicBrewer=s=>BASIC_BREWERS.find(b=>b.id===(s&&s.brewer))||BASIC_BREWERS[0];
+/* Once you've brewed, the front door is the Brew Again card. But while you're
+   actively changing beans/brewer/amount, any re-render must leave the setup card
+   open — otherwise tapping a brewer bounces you straight back out. */
+let basicEditing=false;
 /* Strength in plain language → brew ratio. More water per gram = lighter cup. */
 /* Strength shifts the brewer's base ratio rather than naming an absolute one —
    a Phin at 1:5 and a V60 at 1:16 both need 'stronger', just not the same number. */
@@ -2979,6 +2983,7 @@ function setMode(m){
   showFrontDoor();
 }
 function showFrontDoor(){
+  basicEditing=false;
   document.body.classList.remove('brewing');
   $('brew').style.display='none';$('rating').style.display='none';
   if(isBasic()){$('setup').style.display='none';$('basic').style.display='block';renderBasic();requestAnimationFrame(updateBrewerArrows);}
@@ -3049,8 +3054,9 @@ function renderBasic(){
   document.querySelectorAll('#bRoast .chip').forEach(c=>c.classList.toggle('on',c.dataset.r===s.roast));
   document.querySelectorAll('#bStr .chip').forEach(c=>c.classList.toggle('on',c.dataset.s===(s.strength||'regular')));
   $('bSum').innerHTML=basicSummary(s);
-  $('againCard').style.display=s.brewed?'block':'none';
-  $('basicCard').style.display=s.brewed?'none':'block';
+  const showAgain=s.brewed&&!basicEditing;
+  $('againCard').style.display=showAgain?'block':'none';
+  $('basicCard').style.display=showAgain?'none':'block';
   if(s.brewed){
     const tn=TOOLS.find(x=>x.id===s.brewer);
     $('againSum').innerHTML=`<b>${tn?tn.name:''}</b> · <b>${cupsTxt(s.dose*basicRatio(s)/CUP_G)}</b> · <b>${s.dose} g</b> · ${s.roast} roast · ${STRENGTH[s.strength||'regular'].label}`;
@@ -3066,6 +3072,7 @@ function readBasicInputs(){
   return s;
 }
 function startBasic(fromAgain){
+  basicEditing=false;
   const s=fromAgain?basicState():readBasicInputs();
   s.brewed=true;setBasicState(s);
   const brw=basicBrewer(s);
@@ -3094,7 +3101,7 @@ function wireModes(){
   $('mpPrint').onclick=()=>{$('modePick').style.display='none';setMode('print');};
   $('btnBasicBrew').onclick=()=>askStartConfirm(()=>startBasic(false));
   $('btnAgain').onclick=()=>askStartConfirm(()=>startBasic(true));
-  $('btnBasicChange').onclick=()=>{$('againCard').style.display='none';$('basicCard').style.display='block';};
+  $('btnBasicChange').onclick=()=>{basicEditing=true;renderBasic();};
   $('hdrBasic').onclick=()=>setMode('basic');
   $('hdrPrint').onclick=()=>setMode('print');
   $('hdrUnit').onclick=()=>setUnit(!unitF);
