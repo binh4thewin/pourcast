@@ -74,8 +74,8 @@ button:focus-visible{outline:3px solid var(--blue)}
    selection pops with a colored ring + lift, never shadow-on-dark */
 .chips-scroll{position:relative}
 /* evenly spaced, fixed-width brewer tiles in one swipeable/scrollable row */
-#toolChips{display:flex;flex-wrap:nowrap;gap:18px;overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none;padding:10px 2px;justify-content:start}
-#toolChips::-webkit-scrollbar{display:none}
+#toolChips,#bBrewers{display:flex;flex-wrap:nowrap;gap:18px;overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none;padding:10px 2px;justify-content:start}
+#toolChips::-webkit-scrollbar,#bBrewers::-webkit-scrollbar{display:none}
 .tool-tile{flex:0 0 76px;scroll-snap-align:start;text-align:center;cursor:pointer;user-select:none}
 /* slim scroll indicator UNDER the strip; shown only when the icons overflow */
 .chips-ind{height:4px;border-radius:99px;background:rgba(27,11,46,.12);margin:4px 4px 0;position:relative;overflow:hidden}
@@ -515,7 +515,9 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
     <button class="btn-sm" id="btnBasicChange" style="width:100%">Change beans or amount</button>
   </div>
   <div class="card yellow" id="basicCard">
-    <div class="row">
+    <label>Brewer</label>
+    <div id="bBrewers"></div>
+    <div class="row" style="margin-top:12px">
       <div><label for="bCups">Cups</label><input type="number" id="bCups" step="0.25" min="0.25" max="4" value="1"></div>
       <div><label for="bDose">Beans (g)</label><input type="number" id="bDose" step="1" min="10" max="60" value="20"></div>
     </div>
@@ -2938,11 +2940,28 @@ function wireEditor(){
 /* Two front doors, one engine. Basic = dose + roast, everything else derived:
    1:16 V60 (bloom + two pours), temp from roast. No methods, no library, no rating. */
 const MODEKEY='pourfect-mode',BASICKEY='pourfect-basic';
-const BASIC_RECIPE='v60hario1cup';
+/* Basic mode: one forgiving recipe per brewer, plus the volume that brewer can
+   physically hold. maxDose is the real constraint — a V60-02 brims around 400 ml,
+   so asking it for a 700 g pour schedules a brew nobody can pour. baseRatio is
+   the brewer's sensible default strength; the Strength chips shift it from there. */
+const BASIC_BREWERS=[
+ {id:'v60',        recipe:'v60hario1cup',   baseRatio:16,  maxDose:40},
+ {id:'kalita',     recipe:'kalitaPulse',    baseRatio:16,  maxDose:35},
+ {id:'chemex',     recipe:'chemexClassic',  baseRatio:16,  maxDose:60},
+ {id:'origami',    recipe:'hedrick',        baseRatio:16,  maxDose:40},
+ {id:'melitta',    recipe:'melitta1cup',    baseRatio:16,  maxDose:30},
+ {id:'aeropress',  recipe:'aeropressClassic',baseRatio:15, maxDose:20},
+ {id:'frenchpress',recipe:'frenchClassic',  baseRatio:15,  maxDose:60},
+ {id:'phin',       recipe:'phinClassic',    baseRatio:5,   maxDose:30},
+ {id:'any',        recipe:'hedrick',        baseRatio:16,  maxDose:40}
+];
+const basicBrewer=s=>BASIC_BREWERS.find(b=>b.id===(s&&s.brewer))||BASIC_BREWERS[0];
 /* Strength in plain language → brew ratio. More water per gram = lighter cup. */
-const STRENGTH={lighter:{ratio:17,label:'Mild'},regular:{ratio:16,label:'Regular'},strong:{ratio:14,label:'Strong'}};
+/* Strength shifts the brewer's base ratio rather than naming an absolute one —
+   a Phin at 1:5 and a V60 at 1:16 both need 'stronger', just not the same number. */
+const STRENGTH={lighter:{d:1,label:'Mild'},regular:{d:0,label:'Regular'},strong:{d:-2,label:'Strong'}};
 const CUP_G=240;   // one cup ≈ 240 g of brewed coffee
-const basicRatio=s=>(STRENGTH[s.strength]||STRENGTH.regular).ratio;
+const basicRatio=s=>Math.max(4,basicBrewer(s).baseRatio+(STRENGTH[s.strength]||STRENGTH.regular).d);
 const doseForCups=(cups,s)=>Math.round(cups*CUP_G/basicRatio(s));
 const isBasic=()=>document.body.classList.contains('basic');
 function setMode(m){
@@ -2958,10 +2977,14 @@ function showFrontDoor(){
   if(isBasic()){$('setup').style.display='none';$('basic').style.display='block';renderBasic();}
   else{$('basic').style.display='none';$('setup').style.display='';requestAnimationFrame(updateToolArrows);}
 }
-function basicState(){return Store.get(BASICKEY,null)||{dose:20,roast:'Medium',strength:'regular',brewed:false};}
+function basicState(){
+  const s=Store.get(BASICKEY,null)||{dose:20,roast:'Medium',strength:'regular',brewed:false};
+  if(!s.brewer||!BASIC_BREWERS.some(b=>b.id===s.brewer))s.brewer='v60';   // pre-brewer saves
+  return s;
+}
 function setBasicState(s){Store.set(BASICKEY,s);}
-function basicTemp(roast){
-  const r=RECIPES.find(x=>x.id===BASIC_RECIPE);
+function basicTemp(roast,st){
+  const r=RECIPES.find(x=>x.id===basicBrewer(st||basicState()).recipe);
   const diff=(ROAST_IDX[roast]??2)-(ROAST_IDX[r.roastRec]??2);
   const d=Math.round(diff>0?-2*diff:-1.5*diff);
   const clamp=c=>Math.min(100,Math.max(80,c+d));
@@ -2977,20 +3000,42 @@ function cupsTxt(cups){
    grow with water on adaptive recipes; waits are fixed). Keeps the on-screen
    estimate honest instead of a hard-coded number. */
 function basicBrewTime(s){
-  const r=RECIPES.find(x=>x.id===BASIC_RECIPE);
+  const r=RECIPES.find(x=>x.id===basicBrewer(s).recipe);
   const water=s.dose*basicRatio(s);
   const scaleF=r.timing==='adaptive'?water/(r.defaultDose*r.ratio):1;
   return r.steps.reduce((t,st)=>t+(st.type==='pour'?Math.max(4,Math.round(st.dur*scaleF)):st.dur),0);
 }
 function basicSummary(s){
   const water=Math.round(s.dose*basicRatio(s));
-  return `makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${s.dose} g</b> beans · <b>${water} g</b> water · kettle at <b>${basicTemp(s.roast)}</b> · ready in ~<b>${fmtT(basicBrewTime(s))}</b>`;
+  return `makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${s.dose} g</b> beans · <b>${water} g</b> water · kettle at <b>${basicTemp(s.roast,s)}</b> · ready in ~<b>${fmtT(basicBrewTime(s))}</b>`;
 }
 function syncCupsField(s){
   $('bCups').value=Math.round(s.dose*basicRatio(s)/CUP_G*4)/4;   // beans → cups, quarter steps
 }
+function renderBasicBrewers(){
+  const s=basicState();
+  $('bBrewers').innerHTML=BASIC_BREWERS.filter(b=>b.id!=='any').map(b=>{
+    const t=TOOLS.find(x=>x.id===b.id);
+    return `<div class="tool-tile ${b.id===s.brewer?'on':''}" data-b="${b.id}" role="button" tabindex="0" aria-pressed="${b.id===s.brewer}">
+      <div class="tool-circle">${TOOL_IMGS[b.id]?`<img class="timg" src="${TOOL_IMGS[b.id]}" alt="">`:(TOOL_ICONS[b.id]||'')}</div>
+      <div class="tool-name">${t?t.name:b.id}</div>
+    </div>`;}).join('');
+  $('bBrewers').querySelectorAll('.tool-tile').forEach(c=>{
+    const pick=()=>{
+      const st=readBasicInputs();
+      st.brewer=c.dataset.b;
+      st.dose=Math.min(basicBrewer(st).maxDose,st.dose);   // new brewer may hold less
+      setBasicState(st);renderBasic();
+    };
+    c.onclick=pick;c.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();pick();}};
+  });
+}
 function renderBasic(){
   const s=basicState();
+  const brw=basicBrewer(s);
+  renderBasicBrewers();
+  $('bDose').max=brw.maxDose;
+  $('bCups').max=Math.round(brw.maxDose*basicRatio(s)/CUP_G*4)/4;
   $('bDose').value=s.dose;
   syncCupsField(s);
   document.querySelectorAll('#bRoast .chip').forEach(c=>c.classList.toggle('on',c.dataset.r===s.roast));
@@ -2998,11 +3043,14 @@ function renderBasic(){
   $('bSum').innerHTML=basicSummary(s);
   $('againCard').style.display=s.brewed?'block':'none';
   $('basicCard').style.display=s.brewed?'none':'block';
-  if(s.brewed)$('againSum').innerHTML=`<b>${cupsTxt(s.dose*basicRatio(s)/CUP_G)}</b> · <b>${s.dose} g</b> · ${s.roast} roast · ${STRENGTH[s.strength||'regular'].label}`;
+  if(s.brewed){
+    const tn=TOOLS.find(x=>x.id===s.brewer);
+    $('againSum').innerHTML=`<b>${tn?tn.name:''}</b> · <b>${cupsTxt(s.dose*basicRatio(s)/CUP_G)}</b> · <b>${s.dose} g</b> · ${s.roast} roast · ${STRENGTH[s.strength||'regular'].label}`;
+  }
 }
 function readBasicInputs(){
   const s=basicState();
-  s.dose=Math.min(60,Math.max(10,parseFloat($('bDose').value)||20));
+  s.dose=Math.min(basicBrewer(s).maxDose,Math.max(10,parseFloat($('bDose').value)||20));
   const on=document.querySelector('#bRoast .chip.on');
   s.roast=on?on.dataset.r:'Medium';
   const st=document.querySelector('#bStr .chip.on');
@@ -3012,8 +3060,9 @@ function readBasicInputs(){
 function startBasic(fromAgain){
   const s=fromAgain?basicState():readBasicInputs();
   s.brewed=true;setBasicState(s);
-  tool='v60';renderChips();populateRecipes();
-  loadRecipe(BASIC_RECIPE);
+  const brw=basicBrewer(s);
+  tool=brw.id;renderChips();populateRecipes();
+  loadRecipe(brw.recipe);
   $('roast').value=s.roast;
   $('dose').value=s.dose;
   $('ratioInput').value=basicRatio(s);
@@ -3025,7 +3074,7 @@ function basicQuickLog(){
   const s=basicState();
   const log=loadLog();
   log.unshift({date:new Date().toLocaleDateString(undefined,{month:'short',day:'numeric'}),
-    recipe:recipe?recipe.name:'Basic brew',recipeId:recipe?recipe.id:BASIC_RECIPE,ratio:basicRatio(s),tool:'v60',
+    recipe:recipe?recipe.name:'Basic brew',recipeId:recipe?recipe.id:basicBrewer(s).recipe,ratio:basicRatio(s),tool:s.brewer||'v60',
     grindSetting:'',beans:'',roast:s.roast,dose:s.dose,water:Math.round(s.dose*basicRatio(s)),
     time:fmtT(finishedAt||0),rating:3,note:'',tags:[],insights:[],beanAge:null,
     trace:brewTrace.filter((_,i)=>i%3===0).slice(0,120)});
@@ -3053,7 +3102,7 @@ function wireModes(){
       // summary alone rather than flashing 0 g at someone who just hit backspace.
       if(!(raw>0))return;
       const s=readBasicInputs();
-      const cups=Math.min(4,Math.max(0.25,raw));
+      const cups=Math.min(basicBrewer(basicState()).maxDose*basicRatio(basicState())/CUP_G,Math.max(0.25,raw));
       s.dose=doseForCups(cups,s);$('bDose').value=s.dose;
       setBasicState(s);$('bSum').innerHTML=basicSummary(s);
     }else{
