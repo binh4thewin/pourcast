@@ -517,6 +517,7 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
   <div class="card yellow" id="basicCard">
     <label>Brewer</label>
     <div id="bBrewers"></div>
+    <div class="chips-ind" id="bInd" aria-hidden="true" hidden><span class="chips-thumb" id="bThumb"></span></div>
     <div class="row" style="margin-top:12px">
       <div><label for="bCups">Cups</label><input type="number" id="bCups" step="0.25" min="0.25" max="4" value="1"></div>
       <div><label for="bDose">Beans (g)</label><input type="number" id="bDose" step="1" min="10" max="60" value="20"></div>
@@ -2228,9 +2229,9 @@ function renderChips(){
 }
 // Show a slim scroll indicator ONLY when the brewer strip overflows (e.g. mobile).
 // When every icon fits (desktop), it hides — no arrows, nothing over the icons.
-function updateToolArrows(){
-  const el=$('toolChips');if(!el)return;
-  const ind=$('toolInd'),thumb=$('toolThumb');
+function updateStripInd(stripId,indId,thumbId){
+  const el=$(stripId);if(!el)return;
+  const ind=$(indId),thumb=$(thumbId);
   const range=el.scrollWidth-el.clientWidth;
   const overflow=range>2;
   if(ind)ind.hidden=!overflow;
@@ -2240,10 +2241,16 @@ function updateToolArrows(){
     thumb.style.left=((el.scrollLeft/range)*(100-w))+'%';
   }
 }
+function updateToolArrows(){updateStripInd('toolChips','toolInd','toolThumb');}
+function updateBrewerArrows(){updateStripInd('bBrewers','bInd','bThumb');}
+function wireStripScroll(stripId,fn){
+  const el=$(stripId);if(!el)return;
+  el.addEventListener('scroll',fn,{passive:true});
+  window.addEventListener('resize',fn);
+}
 function wireToolScroll(){
-  const el=$('toolChips');if(!el)return;
-  el.addEventListener('scroll',updateToolArrows,{passive:true});
-  window.addEventListener('resize',updateToolArrows);
+  wireStripScroll('toolChips',updateToolArrows);
+  wireStripScroll('bBrewers',updateBrewerArrows);   // Basic mode uses the same strip
 }
 function populateRecipes(){
   const list=allRecipes().filter(r=>r.id!=='custom'&&(r.tool.includes(tool)||tool==='any'));
@@ -2974,7 +2981,7 @@ function setMode(m){
 function showFrontDoor(){
   document.body.classList.remove('brewing');
   $('brew').style.display='none';$('rating').style.display='none';
-  if(isBasic()){$('setup').style.display='none';$('basic').style.display='block';renderBasic();}
+  if(isBasic()){$('setup').style.display='none';$('basic').style.display='block';renderBasic();requestAnimationFrame(updateBrewerArrows);}
   else{$('basic').style.display='none';$('setup').style.display='';requestAnimationFrame(updateToolArrows);}
 }
 function basicState(){
@@ -3029,6 +3036,7 @@ function renderBasicBrewers(){
     };
     c.onclick=pick;c.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();pick();}};
   });
+  requestAnimationFrame(updateBrewerArrows);   // needs layout before it can measure overflow
 }
 function renderBasic(){
   const s=basicState();
