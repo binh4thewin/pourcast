@@ -496,7 +496,7 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
   <div class="hdr-top">
     <h1>Pourcast</h1>
     <div class="hdr-right">
-      <button class="btn-sm" id="hdrUnit" title="Temperature units, tap to switch">°C</button>
+      <button class="btn-sm" id="hdrUnit" title="Temperature units, tap to switch">°F</button>
       <span class="btstat off" id="hdrDot" role="button" tabindex="0" title="Scale not connected, tap to connect">
         <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="7,8 17,16 12,21 12,3 17,8 7,16"/><line class="bt-slash" x1="4" y1="20" x2="20" y2="4"/></svg>
       </span>
@@ -516,8 +516,8 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
   </div>
   <div class="card yellow" id="basicCard">
     <div class="row">
-      <div><label for="bCups">Cups</label><input type="number" id="bCups" step="0.5" min="0.5" max="6" value="1"></div>
-      <div><label for="bDose">Beans (g)</label><input type="number" id="bDose" step="1" min="10" max="80" value="20"></div>
+      <div><label for="bCups">Cups</label><input type="number" id="bCups" step="0.25" min="0.25" max="4" value="1"></div>
+      <div><label for="bDose">Beans (g)</label><input type="number" id="bDose" step="1" min="10" max="60" value="20"></div>
     </div>
     <div style="font-size:11px;font-weight:700;color:var(--violet);margin-top:6px">Fill in either one, the other adjusts automatically</div>
     <label style="margin-top:12px">Strength</label>
@@ -668,7 +668,7 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
     <div class="row" style="align-items:center">
       <div><label>Temperature units</label>
         <div class="unitseg" role="group" aria-label="Temperature units">
-          <button class="btn-sm useg on" id="unitC">°C</button><button class="btn-sm useg" id="unitFbtn">°F</button>
+          <button class="btn-sm useg" id="unitC">°C</button><button class="btn-sm useg on" id="unitFbtn">°F</button>
         </div>
       </div>
       <div><label>Sound effects</label>
@@ -848,7 +848,7 @@ const RECIPES=[
     {type:'wait',dur:45,label:'Final drawdown'}
   ]},
  {id:'winton5',tool:['v60','origami','any'],champ:'Modern competition style',timing:'rigid',
-  name:'Five Even Pours · World Champ Method',ratio:16.7,defaultDose:30,grind:'Medium-coarse',tempC:[92,94],roastRec:'Light',
+  name:'Five Even Pours · World Champ Method',ratio:15,defaultDose:20,grind:'Medium-coarse',tempC:[92,94],roastRec:'Light',
   desc:'Five equal center pours on a 40s clock. No dedicated bloom (pour 1 acts as one), no stirs, no swirls, minimal agitation.',
   steps:[
     {type:'pour',frac:.20,dur:12,label:'Pour 1 · center'},{type:'wait',dur:28,label:'Settle'},
@@ -867,9 +867,9 @@ const RECIPES=[
     {type:'pour',frac:.48,dur:30,label:'Main pour → 60% · brisk spiral',note:'one continuous pour begins, checkpoint: 60% of water by 1:15'},
     {type:'pour',frac:.40,dur:30,label:'Final pour → 100% · ease off',note:'do NOT stop, same pour, ~20% slower and gentler to the end'},
     {type:'stir',dur:8,label:'Stir · 1x each way',note:'knock grounds off walls'},
-    {type:'wait',dur:15,label:'Let bed settle'},
+    {type:'wait',dur:2,label:'Let bed settle'},
     {type:'swirl',dur:5,label:'Final gentle swirl'},
-    {type:'wait',dur:60,label:'Drawdown to flat bed'}
+    {type:'wait',dur:90,label:'Drawdown to flat bed'}
   ]},
  {id:'rao',tool:['v60','any'],champ:'High-extraction school',timing:'adaptive',
   name:'Single Spiral & Spin',ratio:16.7,defaultDose:22,grind:'Medium-fine',tempC:[93,95],roastRec:'Light',
@@ -945,10 +945,12 @@ const RECIPES=[
   desc:'The straightforward daily single cup: bloom with 2x the coffee weight, let it rest, then two easy pours (to 60%, then 100%). Fast, forgiving, and the timing scales to your dose. The recipe to reach for before caffeine.',
   steps:[
     {type:'pour',frac:.125,dur:8,label:'Bloom · 2× coffee'},
+    {type:'agitate',dur:5,note:'until no dry clumps',swirlLabel:'Swirl the bloom',stirLabel:'Stir the bloom'},
     {type:'wait',dur:40,label:'Bloom rest'},
     {type:'pour',frac:.475,dur:22,label:'Pour 1 · to 60%'},
     {type:'wait',dur:15,label:'Pause · let it settle'},
     {type:'pour',frac:.40,dur:18,label:'Pour 2 · to 100%'},
+    {type:'swirl',dur:5,label:'Flattening swirl',note:'level the bed'},
     {type:'wait',dur:55,label:'Drawdown'}
   ]},
  {id:'v60iced',tool:['v60'],champ:'Japanese iced standard',timing:'adaptive',iced:true,
@@ -1116,7 +1118,7 @@ let brewIdx=0,brewStart=0,timerIv=null,brewing=false,stepStart=0,finishedAt=null
 let weight=0,weightOffset=0,wSamples=[],metrics=null,liveTrace=null;
 let simIv=null,simMode=false,ble={device:null,connected:false};
 let brewTrace=[];   // [seconds, grams] sampled ~1/s while brewing with live weight
-let unitF=false,cdIv=null,curRating=0,curTags=new Set(),restoring=false;
+let unitF=true,cdIv=null,curRating=0,curTags=new Set(),restoring=false;
 let paused=false,pauseStart=0;
 /* ---- SFX: synthesized with Web Audio. No audio files; everything is generated.
    Countdown ticks, GO tone, last-3-seconds step ticks, advance chime, and a
@@ -1254,7 +1256,7 @@ function saveSettings(){
 function restoreSettings(){
   const s=Store.get(KEYS.settings,null);
   restoring=true;
-  unitF=s&&'unitF'in s?s.unitF:(Store.get(KEYS.unit,'C')==='F');
+  unitF=s&&'unitF'in s?s.unitF:(Store.get(KEYS.unit,'F')==='F');
   $('unitC').classList.toggle('on',!unitF);
   $('unitFbtn').classList.toggle('on',unitF);
   if(s&&s.theme)setTheme(s.theme);
@@ -1298,11 +1300,27 @@ function restoreSettings(){
 
 /* ============================ 4. ENGINES ============================ */
 /* ---- schedule ---- */
+/* Bloom agitation, picked by dose.
+   A step of type 'agitate' resolves to a swirl or a stir when the schedule is
+   built. Why dose decides it: Barista Hustle's testing found stirring loses its
+   edge at small doses (they measured it falling off around 15 g) — there is too
+   little slurry for a spoon to redistribute, and it drags fines into the bed.
+   Hoffmann's V60 technique swirls instead. At batch size the bed is deep enough
+   that a spoon genuinely mixes, so stirring wins. Hence: swirl small, stir big.
+   The 30 g line is a judgement call — roughly where a single cup becomes a batch. */
+const STIR_MIN_DOSE=30;
+function resolveAgitation(st,dose){
+  if(st.type!=='agitate')return st;
+  return dose>=STIR_MIN_DOSE
+    ?{...st,type:'stir', label:st.stirLabel ||'Stir the bloom'}
+    :{...st,type:'swirl',label:st.swirlLabel||'Swirl the bloom'};
+}
 function buildSchedule(dose,water){
   const defWater=recipe.defaultDose*recipe.ratio;
   const scaleF=recipe.timing==='adaptive'?water/defWater:1;
   let t=0,cum=0;
-  return recipe.steps.map(st=>{
+  return recipe.steps.map(st0=>{
+    const st=resolveAgitation(st0,dose);
     const dur=st.type==='pour'?Math.max(4,Math.round(st.dur*scaleF)):st.dur;
     const out={type:st.type,label:st.label,note:st.note||'',start:t,dur,end:t+dur};
     if(st.type==='pour'){cum+=st.frac*water;out.target=Math.round(cum*10)/10;out.amount=Math.round(st.frac*water);}
@@ -2643,7 +2661,7 @@ function finishUI(){
 function finishToRating(){
   brewing=false;clearInterval(timerIv);
   cleanupBrewUI();
-  if(isBasic()){basicQuickLog();showFrontDoor();return;}   // mornings are autopilot, no rating
+  if(isBasic()){showFrontDoor();return;}   // mornings are autopilot: no rating, no log
   showRating();
 }
 function resetNextBtn(){
@@ -2699,7 +2717,7 @@ function endBrew(){
   $('countdown').style.display='none';
   cleanupBrewUI();
   if(madeProgress&&!isBasic()){showRating();}     // rate anything you actually poured, even cut short
-  else{if(madeProgress)basicQuickLog();showFrontDoor();}
+  else{showFrontDoor();}   // basic mode keeps no log, so nothing to record on an early stop
 }
 
 /* ---- brew print: weight + flow graph, Filtru-style, pure SVG ---- */
@@ -2864,7 +2882,7 @@ function openEditor(mode){
   $('edGrind').value=(!scratch&&GRINDS.includes(base.grind))?base.grind:'Medium';
   $('editor').dataset.baseId=base.custom?(base.baseId||base.id):base.id;
   $('editor').dataset.editingId=(!scratch&&base.custom)?base.id:'';
-  edSteps=(scratch?SCRATCH_STEPS:base.steps).map(st=>({type:st.type,frac:st.frac||0,dur:st.dur}));
+  edSteps=(scratch?SCRATCH_STEPS:base.steps).map(st=>resolveAgitation(st,base.defaultDose)).map(st=>({type:st.type,frac:st.frac||0,dur:st.dur}));
   renderEdRows();
   $('editor').style.display='block';
   $('editor').scrollIntoView({behavior:'smooth',block:'start'});
@@ -2922,7 +2940,7 @@ function wireEditor(){
 const MODEKEY='pourfect-mode',BASICKEY='pourfect-basic';
 const BASIC_RECIPE='v60hario1cup';
 /* Strength in plain language → brew ratio. More water per gram = lighter cup. */
-const STRENGTH={lighter:{ratio:17,label:'Lighter'},regular:{ratio:16,label:'Regular'},strong:{ratio:14,label:'Strong'}};
+const STRENGTH={lighter:{ratio:17,label:'Mild'},regular:{ratio:16,label:'Regular'},strong:{ratio:14,label:'Strong'}};
 const CUP_G=240;   // one cup ≈ 240 g of brewed coffee
 const basicRatio=s=>(STRENGTH[s.strength]||STRENGTH.regular).ratio;
 const doseForCups=(cups,s)=>Math.round(cups*CUP_G/basicRatio(s));
@@ -2980,11 +2998,11 @@ function renderBasic(){
   $('bSum').innerHTML=basicSummary(s);
   $('againCard').style.display=s.brewed?'block':'none';
   $('basicCard').style.display=s.brewed?'none':'block';
-  if(s.brewed)$('againSum').innerHTML=`${s.roast} roast · ${STRENGTH[s.strength||'regular'].label} · ${basicSummary(s)}`;
+  if(s.brewed)$('againSum').innerHTML=`<b>${cupsTxt(s.dose*basicRatio(s)/CUP_G)}</b> · <b>${s.dose} g</b> · ${s.roast} roast · ${STRENGTH[s.strength||'regular'].label}`;
 }
 function readBasicInputs(){
   const s=basicState();
-  s.dose=Math.min(80,Math.max(10,parseFloat($('bDose').value)||20));
+  s.dose=Math.min(60,Math.max(10,parseFloat($('bDose').value)||20));
   const on=document.querySelector('#bRoast .chip.on');
   s.roast=on?on.dataset.r:'Medium';
   const st=document.querySelector('#bStr .chip.on');
@@ -3031,14 +3049,16 @@ function wireModes(){
   const refresh=(fromCups)=>{
     if(fromCups){
       const raw=parseFloat($('bCups').value);
-      if(!(raw>0)){$('bDose').value=0;$('bSum').innerHTML=basicSummary({...basicState(),dose:0});return;}
+      // Mid-typing the field is briefly empty. Leave the partner field and the
+      // summary alone rather than flashing 0 g at someone who just hit backspace.
+      if(!(raw>0))return;
       const s=readBasicInputs();
-      const cups=Math.min(6,Math.max(0.25,raw));
+      const cups=Math.min(4,Math.max(0.25,raw));
       s.dose=doseForCups(cups,s);$('bDose').value=s.dose;
       setBasicState(s);$('bSum').innerHTML=basicSummary(s);
     }else{
       const raw=parseFloat($('bDose').value);
-      if(!(raw>0)){$('bCups').value=0;$('bSum').innerHTML=basicSummary({...basicState(),dose:0});return;}
+      if(!(raw>0))return;
       const s=readBasicInputs();syncCupsField(s);
       setBasicState(s);$('bSum').innerHTML=basicSummary(s);
     }
