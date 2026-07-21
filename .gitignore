@@ -1,0 +1,37 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Node
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# Build & dev artifacts (source assembles into index.html)
+shell.html
+app*.js
+func*.js
+smoke*.js
+pourover-v*.html
+
+# Capacitor native build output
+pourcast-ios/ios/App/build/
+pourcast-ios/ios/App/output/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# Env / secrets (never commit these)
+.env
+.env.*
+*.pem
+*.key
+
+# NOTE: brewer icon PNGs are intentionally NOT ignored.
+# They are the only copies of the source art; index.html embeds them as base64,
+# so the loose .png files are the editable originals worth keeping in history.

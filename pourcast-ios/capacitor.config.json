@@ -1,0 +1,9 @@
+{
+  "appId": "com.pourcast.app",
+  "appName": "Pourcast",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#261C2E"
+  }
+}

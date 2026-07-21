@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Capacitor-generated native project (regenerated with `npx cap add ios`)
+# Keep this ignored until you're ready to commit native config changes.
+# ios/App/Pods/
+ios/App/build/
+ios/App/output/
+DerivedData/
+
+# macOS
+.DS_Store
+
+# Xcode user state
+*.xcuserstate
+xcuserdata/
