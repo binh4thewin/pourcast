@@ -1102,6 +1102,9 @@ function customRecipes(){return Store.get(KEYS.customs,[]);}
 function allRecipes(){return RECIPES.concat(customRecipes());}
 /* ============================ 2. STATE ============================ */
 const $=id=>document.getElementById(id);
+/* Escapes user-entered text (bean/roaster names, notes, BLE device names)
+   before it's interpolated into innerHTML, so it can't break out as markup. */
+const escapeHTML=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ICONS={pour:'🫗',wait:'⏳',stir:'🥄',swirl:'🌀',press:'🔽'};
 const _I=(p)=>`<svg class="ticon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 const TOOL_ICONS={
@@ -1602,8 +1605,8 @@ function roasterOptionsHTML(){
   const presets=PRESET_ROASTERS.filter(p=>!lib.some(r=>r.name===p.name));
   return '<option value="">Select a roaster…</option>'
     +(favCount()?`<option value="__favs">⭐ Favorited Beans</option>`:'')
-    +lib.map(r=>`<option value="${r.name}">${r.name}</option>`).join('')
-    +presets.map(p=>`<option value="${p.name}">${p.name}</option>`).join('')
+    +lib.map(r=>`<option value="${escapeHTML(r.name)}">${escapeHTML(r.name)}</option>`).join('')
+    +presets.map(p=>`<option value="${escapeHTML(p.name)}">${escapeHTML(p.name)}</option>`).join('')
     +'<option value="__newR">＋ Add roaster…</option>';
 }
 // Rebuild the roaster <option>s (e.g. after favoriting) without disturbing selection.
@@ -1642,15 +1645,14 @@ function renderBeans(selBean){
   if($('roasterSel').value==='__favs'){
     const favs=[];
     getLibrary().forEach(r=>r.beans.forEach(b=>{if(b.fav)favs.push({roaster:r.name,bean:b.name});}));
-    const esc=s=>s.replace(/"/g,'&quot;');
     bs.innerHTML='<option value="" disabled'+(selBean?'':' selected')+'>Choose a favorite…</option>'
-      +favs.map(f=>`<option value="${esc(f.bean)}" data-roaster="${esc(f.roaster)}"${selBean===f.bean?' selected':''}>${f.bean} · ${f.roaster}</option>`).join('');
+      +favs.map(f=>`<option value="${escapeHTML(f.bean)}" data-roaster="${escapeHTML(f.roaster)}"${selBean===f.bean?' selected':''}>${escapeHTML(f.bean)} · ${escapeHTML(f.roaster)}</option>`).join('');
     applyBeanSelection();   // resolves roast/name for the picked favorite (or clears)
     return;
   }
   const r=libRoaster($('roasterSel').value);
   const beans=r?r.beans:[];
-  bs.innerHTML=beans.map(b=>`<option value="${b.name.replace(/"/g,'&quot;')}">${b.name}${b.rotating?'':` · ${b.roast}`}</option>`).join('')+'<option value="__newB">＋ Add bean…</option>';
+  bs.innerHTML=beans.map(b=>`<option value="${escapeHTML(b.name)}">${escapeHTML(b.name)}${b.rotating?'':` · ${escapeHTML(b.roast)}`}</option>`).join('')+'<option value="__newB">＋ Add bean…</option>';
   if(selBean&&beans.some(b=>b.name===selBean))bs.value=selBean;
   else if(beans.length)bs.value=beans[0].name;
   applyBeanSelection();
@@ -1995,7 +1997,7 @@ function setScaleUI(state,msg,tag){
   const sum=$('scaleSum');
   if(sum){
     const label=state==='on'?(tag||'Connected'):state==='sim'?'Simulator':'Not connected';
-    sum.innerHTML=`<span class="btmini ${stCls}"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="7,8 17,16 12,21 12,3 17,8 7,16"/><line class="bt-slash" x1="4" y1="20" x2="20" y2="4"/></svg></span>${label}`;
+    sum.innerHTML=`<span class="btmini ${stCls}"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="7,8 17,16 12,21 12,3 17,8 7,16"/><line class="bt-slash" x1="4" y1="20" x2="20" y2="4"/></svg></span>${escapeHTML(label)}`;
     setCollapsed('scaleCard',state!=='off');
   }
   // keep the in-place badge panel in sync if it's open
@@ -2254,7 +2256,7 @@ function wireToolScroll(){
 }
 function populateRecipes(){
   const list=allRecipes().filter(r=>r.id!=='custom'&&(r.tool.includes(tool)||tool==='any'));
-  $('recipeSel').innerHTML=list.map(r=>`<option value="${r.id}">${r.name}</option>`).join('')
+  $('recipeSel').innerHTML=list.map(r=>`<option value="${r.id}">${escapeHTML(r.name)}</option>`).join('')
     +`<optgroup label="Make your own"><option value="__edit__">Customize this method</option><option value="__scratch__">Start from scratch</option></optgroup>`;
   loadRecipe(list[0].id);
 }
@@ -2777,8 +2779,8 @@ function renderLog(){
   const log=loadLog();
   $('logCard').style.display=log.length?'block':'none';
   $('logList').innerHTML=log.slice(0,8).map((e,i)=>
-    `<div class="log-row"><span>${e.date}</span><span style="flex:1">${e.beans||e.recipe}${e.beanAge!=null?` (${e.beanAge}d)`:''}${e.tags&&e.tags.length?` · <i>${e.tags.join(', ')}</i>`:''}</span><span>${fmtW(e.dose)}${e.grindSetting?` @${e.grindSetting}`:''}</span><span class="log-stars">${'★'.repeat(e.rating)}${'☆'.repeat(5-e.rating)}</span><button class="btn-sm" data-again="${i}" style="padding:4px 8px;font-size:11px">↻</button></div>`
-    +(e.note?`<div class="log-row" style="opacity:.7;font-weight:500;padding-top:0">↳ ${e.note}</div>`:'')
+    `<div class="log-row"><span>${e.date}</span><span style="flex:1">${escapeHTML(e.beans||e.recipe)}${e.beanAge!=null?` (${e.beanAge}d)`:''}${e.tags&&e.tags.length?` · <i>${escapeHTML(e.tags.join(', '))}</i>`:''}</span><span>${fmtW(e.dose)}${e.grindSetting?` @${escapeHTML(e.grindSetting)}`:''}</span><span class="log-stars">${'★'.repeat(e.rating)}${'☆'.repeat(5-e.rating)}</span><button class="btn-sm" data-again="${i}" style="padding:4px 8px;font-size:11px">↻</button></div>`
+    +(e.note?`<div class="log-row" style="opacity:.7;font-weight:500;padding-top:0">↳ ${escapeHTML(e.note)}</div>`:'')
   ).join('');
   document.querySelectorAll('[data-again]').forEach(b=>{b.onclick=()=>brewAgain(loadLog()[+b.dataset.again]);});
 }
@@ -2801,7 +2803,7 @@ function showRating(){
   const aDays=beanAgeDays();
   const early=brewIdx<schedule.length?' · ⚠ ended early':'';
   const gs=$('grindSetting').value?` · grind ${$('grindSetting').value}`:'';
-  $('ratingSummary').innerHTML=`<b>${recipe.name}</b> · ${fmtW(dose)} → ${fmtW(totalWater)}${gs} · ${fmtT(finishedAt||elapsed())}${early}${$('beanName').value?` · ${$('beanName').value}`:''}${aDays!==null?` · ${aDays}d off roast`:''}`;
+  $('ratingSummary').innerHTML=`<b>${escapeHTML(recipe.name)}</b> · ${fmtW(dose)} → ${fmtW(totalWater)}${gs} · ${fmtT(finishedAt||elapsed())}${early}${$('beanName').value?` · ${escapeHTML($('beanName').value)}`:''}${aDays!==null?` · ${aDays}d off roast`:''}`;
   const guides=schedule.filter(x=>x.type==='pour').map(x=>x.target);
   $('brewPrint').innerHTML=brewTrace.length>2?brewPrintSVG(brewTrace,guides,undefined,undefined,schedule):'';
   curRating=0;$('brewNote').value='';curTags=new Set();$('brewReport').innerHTML='';
