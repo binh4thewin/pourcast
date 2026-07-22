@@ -36,7 +36,7 @@ header{margin-bottom:14px}
 .hdr-right{display:flex;align-items:center;gap:8px;flex:none}
 #hdrUnit{padding:8px 10px;min-width:42px;text-align:center}
 .hdr-modes{margin-top:12px;width:-moz-fit-content;width:fit-content}
-@media (max-width:420px){h1{font-size:34px}body.burnt h1{font-size:32px}body.calm h1{font-size:28px}}
+@media (max-width:420px){h1{font-size:34px}body.burnt h1{font-size:32px}body.adobe h1{font-size:28px}body.sage h1{font-size:28px}}
 h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;line-height:.95;letter-spacing:-.02em;text-transform:uppercase;
   background:linear-gradient(92deg,var(--magenta),var(--orange) 35%,var(--violet) 70%,var(--teal));
   -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1.5px var(--ink);}
@@ -81,7 +81,8 @@ button:focus-visible{outline:3px solid var(--blue)}
 .chips-ind{height:4px;border-radius:99px;background:rgba(27,11,46,.12);margin:4px 4px 0;position:relative;overflow:hidden}
 .chips-ind[hidden]{display:none}
 .chips-thumb{position:absolute;top:0;bottom:0;left:0;width:30%;border-radius:99px;background:var(--magenta)}
-body.calm .chips-thumb{background:#B08968}
+body.adobe .chips-thumb{background:#B08968}
+body.sage .chips-thumb{background:#8C9068}
 body.burnt .chips-thumb{background:#C0642B}
 .tool-circle{width:70px;height:70px;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;
   background:#fff;color:#261C2E;border:3px solid var(--ink);transition:transform .1s,border-color .1s,box-shadow .1s}
@@ -141,9 +142,12 @@ body.burnt .chips-thumb{background:#C0642B}
 /* SELECTED: bright ring + glow + lift, unmistakable on any background */
 .tool-tile.on .tool-circle{border-color:var(--magenta);box-shadow:0 0 0 3px var(--acid),0 6px 14px rgba(255,46,147,.35);transform:translateY(-2px)}
 .tool-tile.on .tool-name{opacity:1;color:var(--magenta)}
-body.calm .tool-circle{background:#FCF7F1;border:1.5px solid #D9C2B0}
-body.calm .tool-tile.on .tool-circle{border-color:#D19277;box-shadow:0 0 0 3px #EFCBB5;transform:translateY(-2px)}
-body.calm .tool-tile.on .tool-name{color:#969268}
+body.adobe .tool-circle{background:#FCF7F1;border:1.5px solid #D9C2B0}
+body.sage .tool-circle{background:#FBFCF7;border:1.5px solid #C2C4AD}
+body.adobe .tool-tile.on .tool-circle{border-color:#D19277;box-shadow:0 0 0 3px #EFCBB5;transform:translateY(-2px)}
+body.sage .tool-tile.on .tool-circle{border-color:#D19277;box-shadow:0 0 0 3px #DDE0CE;transform:translateY(-2px)}
+body.adobe .tool-tile.on .tool-name{color:#969268}
+body.sage .tool-tile.on .tool-name{color:#969268}
 body.burnt .tool-circle{background:#FBF7EE;border:2px solid #201914}
 body.burnt .tool-tile.on .tool-circle{border-color:#C0642B;box-shadow:0 0 0 3px #E0A472;transform:translateY(-2px)}
 body.burnt .tool-tile.on .tool-name{color:#9C5526}
@@ -181,7 +185,8 @@ body.burnt .tool-tile.on .tool-name{color:#9C5526}
 .scaletag.real{background:#B8F5C0}
 .scaletag.sim{background:var(--acid)}
 .sim-on{background:var(--acid)!important;outline:3px solid var(--ink)}
-body.calm .scaletag.real{background:#DCE8DC}body.calm .scaletag.sim{background:#F1E7D2}
+body.adobe .scaletag.real{background:#DCE8DC}body.adobe .scaletag.sim{background:#F1E7D2}
+body.sage .scaletag.real{background:#DCE8DC}body.sage .scaletag.sim{background:#E9ECDC}
 .pace{font-size:10.5px;font-weight:800;border:2px solid var(--ink);border-radius:99px;padding:3px 9px;flex:none;white-space:nowrap}
 .pace.ok{background:#B8F5C0}.pace.behind{background:#FFC2C2}.pace.ahead{background:#CFE4FF}.pace.hold{background:var(--acid)}
 /* Timeline: segments proportional to duration */
@@ -285,61 +290,114 @@ input[type=date]:focus{outline:3px solid var(--magenta)}
 @keyframes pop{0%{transform:scale(.5);opacity:0}25%{transform:scale(1.12);opacity:1}45%{transform:scale(1)}100%{opacity:1}}
 @keyframes pulseGlow{0%,100%{box-shadow:4px 4px 0 var(--ink)}50%{box-shadow:4px 4px 0 var(--ink),0 0 22px var(--magenta)}}
 .pulse{animation:pulseGlow 1.2s ease-in-out infinite}
-/* ================= CACTUS (Succulent Hues: blush adobe · terracotta rose · sage · olive) ================= */
-body.calm{
+/* ========= ADOBE + SAGE (Succulent Hues: blush adobe · terracotta · sage · olive) ========= */
+body.adobe{
   --ink:#4A473A; --paper:#F6EAE0;
   --magenta:#D19277; --orange:#D19277; --acid:#DDE0CE; --teal:#A1A18A; --violet:#969268; --blue:#A1A18A;
   --border:1px solid #E3CDBC; --shadow:none;
   background:#F6EAE0; color:#4A473A;
 }
-body.calm h1{background:none;color:#615D4C;-webkit-text-stroke:0;font-weight:600;letter-spacing:0;font-size:34px}
-body.calm .tag{color:#969268}
-body.calm .tag b{background:transparent;border:1px solid #D9C2B0;color:#8A5230}
-body.calm .card,body.calm .card.pink,body.calm .card.teal,body.calm .card.yellow,body.calm .card.violet{background:#FCF7F1;border:1px solid #E3CDBC;box-shadow:none}
-body.calm .card h2{background:transparent;color:#6E6A50;padding:0;transform:none;letter-spacing:.12em;font-size:12px}
-body.calm input,body.calm select{background:#FCF7F1;border:1px solid #E3CDBC;color:#4A473A;font-weight:600}
-body.calm button{background:#FCF7F1;color:#4A473A;border:1px solid #D9C2B0;box-shadow:none;font-weight:600;text-transform:none;letter-spacing:0}
-body.calm button:hover,body.calm button:active{transform:none;box-shadow:none;background:#F3E4D6}
+body.sage{
+  --ink:#4A473A; --paper:#EEF0E6;
+  --magenta:#D19277; --orange:#D19277; --acid:#DDE0CE; --teal:#A1A18A; --violet:#969268; --blue:#A1A18A;
+  --border:1px solid #C9CBB6; --shadow:none;
+  background:#EEF0E6; color:#4A473A;
+}
+body.adobe h1{background:none;color:#615D4C;-webkit-text-stroke:0;font-weight:600;letter-spacing:0;font-size:34px}
+body.sage h1{background:none;color:#615D4C;-webkit-text-stroke:0;font-weight:600;letter-spacing:0;font-size:34px}
+body.adobe .tag{color:#969268}
+body.sage .tag{color:#969268}
+body.adobe .tag b{background:transparent;border:1px solid #D9C2B0;color:#8A5230}
+body.sage .tag b{background:transparent;border:1px solid #C2C4AD;color:#8A5230}
+body.adobe .card,body.adobe .card.pink,body.adobe .card.teal,body.adobe .card.yellow,body.adobe .card.violet{background:#FCF7F1;border:1px solid #E3CDBC;box-shadow:none}
+body.sage .card,body.sage .card.pink,body.sage .card.teal,body.sage .card.yellow,body.sage .card.violet{background:#FBFCF7;border:1px solid #C9CBB6;box-shadow:none}
+body.adobe .card h2{background:transparent;color:#6E6A50;padding:0;transform:none;letter-spacing:.12em;font-size:12px}
+body.sage .card h2{background:transparent;color:#6E6A50;padding:0;transform:none;letter-spacing:.12em;font-size:12px}
+body.adobe input,body.adobe select{background:#FCF7F1;border:1px solid #E3CDBC;color:#4A473A;font-weight:600}
+body.sage input,body.sage select{background:#FBFCF7;border:1px solid #C9CBB6;color:#4A473A;font-weight:600}
+body.adobe button{background:#FCF7F1;color:#4A473A;border:1px solid #D9C2B0;box-shadow:none;font-weight:600;text-transform:none;letter-spacing:0}
+body.sage button{background:#FBFCF7;color:#4A473A;border:1px solid #C2C4AD;box-shadow:none;font-weight:600;text-transform:none;letter-spacing:0}
+body.adobe button:hover,body.adobe button:active{transform:none;box-shadow:none;background:#F3E4D6}
+body.sage button:hover,body.sage button:active{transform:none;box-shadow:none;background:#E8EBDC}
 /* colored buttons carry light text, so they must stay dark on hover (not the light neutral above) */
-body.calm .btn-primary:hover,body.calm .btn-primary:active{background:#4E4B3D;color:#F6EAE0}
-body.calm .btn-acid:hover,body.calm .btn-acid:active{background:#8A5230;color:#FCF7F1}
-body.calm .btn-primary{background:#615D4C;color:#F6EAE0;text-shadow:none}
-body.calm .btn-acid{background:#D19277;color:#FCF7F1}
-body.calm .btn-teal{background:#DDE0CE;color:#4A473A}
-body.calm .chip{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none;color:#6B6656}
-body.calm .chip.on{background:#969268!important;color:#FCF7F1!important}
-body.calm .useg.on{background:#615D4C;color:#F6EAE0}
-body.calm .badge,body.calm .badge.b2,body.calm .badge.b3{background:#F0E4D6;border-color:#E3CDBC;color:#7C7867}
-body.calm .badge.rigid{background:#615D4C;color:#F6EAE0}
-body.calm .badge.adaptive{background:#DDE0CE;color:#4A473A}
-body.calm .timing-note,body.calm .age{background:#F0E4D6;border:1px dashed #D9C2B0}
-body.calm .age.stale{background:#F0D5C7}body.calm .age.peak{background:#DDE0CE}body.calm .age.fresh{background:#E9E4D2}body.calm .age.fading{background:#F0DFC6}
-body.calm .step-row.active{background:#F0E4D6;border:1px solid #D9C2B0}
-body.calm .step-row .fill{background:#EBDCC9}
-body.calm .step-row .t,body.calm .eta,body.calm .step-row .cum{color:#6E6A52}
-body.calm .step-row.expanded{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none}
-body.calm .instruction{background:#615D4C;border:none;color:#F6EAE0}
-body.calm .instr-kicker{color:#EFCBB5}body.calm .instr-sub{color:#C9C4AE}
-body.calm .stepbar-wrap,body.calm .waterbar-wrap,body.calm .timeline{background:#FCF7F1;border:1px solid #D9C2B0}
-body.calm .stepbar{background:#D19277}
-body.calm .waterbar{background:#A1A18A}
-body.calm .seg.pour{background:#F1DCCB}body.calm .seg.wait{background:#EAEBE0}body.calm .seg.stir,body.calm .seg.swirl{background:#E6E0D4}
-body.calm .playhead{background:#615D4C}
-body.calm .watertick{background:#CBB8A5}body.calm .watertick.hit{background:#969268}
-body.calm .pace{border-color:#D9C2B0}
-body.calm .pace.behind{background:#F0D5C7}body.calm .pace.ahead{background:#E9E4D2}
-body.calm .flow,body.calm .fr-verdict{border-color:#D9C2B0;background:#FCF7F1}
-body.calm .fr-verdict.fast{background:#F0D5C7}body.calm .fr-verdict.slow{background:#E9E4D2}
-body.calm .insight{background:#F0E4D6!important;border:1px solid #D9C2B0}
-body.calm .tagc{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none;color:#6B6656}
-body.calm .tagc.on{background:#969268;color:#FCF7F1}
-body.calm .log-row:nth-child(odd){background:#F0E4D6}
-body.calm .dot{border-color:#D9C2B0}
-body.calm .scaletag.real{background:#DDE0CE}body.calm .scaletag.sim{background:#F0DFC6}
-body.calm #countdown{background:rgba(246,234,224,.97)}
-body.calm #countdown .cd-num{text-shadow:none;-webkit-text-stroke:0;color:#969268}
-body.calm #countdown .cd-lbl{background:#615D4C;border:none;color:#F6EAE0}
-body.calm #countdown .cd-first{background:#FCF7F1;border:1px solid #D9C2B0;color:#4A473A}
+body.adobe .btn-primary:hover,body.adobe .btn-primary:active{background:#8F5236;color:#FBEFE7}
+body.sage .btn-primary:hover,body.sage .btn-primary:active{background:#4E4B3D;color:#EEF0E6}
+body.adobe .btn-acid:hover,body.adobe .btn-acid:active{background:#7B7752;color:#FCF7F1}
+body.sage .btn-acid:hover,body.sage .btn-acid:active{background:#8A5230;color:#FBFCF7}
+body.adobe .btn-primary{background:#A05B36;color:#FBEFE7;text-shadow:none}
+body.sage .btn-primary{background:#615D4C;color:#EEF0E6;text-shadow:none}
+body.adobe .btn-acid{background:#969268;color:#FCF7F1}
+body.sage .btn-acid{background:#D19277;color:#FBFCF7}
+body.adobe .btn-teal{background:#DDE0CE;color:#4A473A}
+body.sage .btn-teal{background:#DDE0CE;color:#4A473A}
+body.adobe .chip{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none;color:#6B6656}
+body.sage .chip{background:#FBFCF7;border:1px solid #C2C4AD;box-shadow:none;color:#6B6656}
+body.adobe .chip.on{background:#969268!important;color:#FCF7F1!important}
+body.sage .chip.on{background:#969268!important;color:#FBFCF7!important}
+body.adobe .useg.on{background:#615D4C;color:#F6EAE0}
+body.sage .useg.on{background:#615D4C;color:#EEF0E6}
+body.adobe .badge,body.adobe .badge.b2,body.adobe .badge.b3{background:#F0E4D6;border-color:#E3CDBC;color:#7C7867}
+body.sage .badge,body.sage .badge.b2,body.sage .badge.b3{background:#E8EBDC;border-color:#C9CBB6;color:#7C7867}
+body.adobe .badge.rigid{background:#615D4C;color:#F6EAE0}
+body.sage .badge.rigid{background:#615D4C;color:#EEF0E6}
+body.adobe .badge.adaptive{background:#DDE0CE;color:#4A473A}
+body.sage .badge.adaptive{background:#DDE0CE;color:#4A473A}
+body.adobe .timing-note,body.adobe .age{background:#F0E4D6;border:1px dashed #D9C2B0}
+body.sage .timing-note,body.sage .age{background:#E8EBDC;border:1px dashed #C2C4AD}
+body.adobe .age.stale{background:#F0D5C7}body.adobe .age.peak{background:#DDE0CE}body.adobe .age.fresh{background:#E9E4D2}body.adobe .age.fading{background:#F0DFC6}
+body.sage .age.stale{background:#F0D5C7}body.sage .age.peak{background:#DDE0CE}body.sage .age.fresh{background:#E9E4D2}body.sage .age.fading{background:#EAE7D2}
+body.adobe .step-row.active{background:#F0E4D6;border:1px solid #D9C2B0}
+body.sage .step-row.active{background:#E8EBDC;border:1px solid #C2C4AD}
+body.adobe .step-row .fill{background:#EBDCC9}
+body.sage .step-row .fill{background:#DEE1CE}
+body.adobe .step-row .t,body.adobe .eta,body.adobe .step-row .cum{color:#6E6A52}
+body.sage .step-row .t,body.sage .eta,body.sage .step-row .cum{color:#6E6A52}
+body.adobe .step-row.expanded{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none}
+body.sage .step-row.expanded{background:#FBFCF7;border:1px solid #C2C4AD;box-shadow:none}
+body.adobe .instruction{background:#615D4C;border:none;color:#F6EAE0}
+body.sage .instruction{background:#615D4C;border:none;color:#EEF0E6}
+body.adobe .instr-kicker{color:#EFCBB5}body.adobe .instr-sub{color:#C9C4AE}
+body.sage .instr-kicker{color:#DDE0CE}body.sage .instr-sub{color:#C9C4AE}
+body.adobe .stepbar-wrap,body.adobe .waterbar-wrap,body.adobe .timeline{background:#FCF7F1;border:1px solid #D9C2B0}
+body.sage .stepbar-wrap,body.sage .waterbar-wrap,body.sage .timeline{background:#FBFCF7;border:1px solid #C2C4AD}
+body.adobe .stepbar{background:#D19277}
+body.sage .stepbar{background:#D19277}
+body.adobe .waterbar{background:#A1A18A}
+body.sage .waterbar{background:#A1A18A}
+body.adobe .seg.pour{background:#F1DCCB}body.adobe .seg.wait{background:#EAEBE0}body.adobe .seg.stir,body.adobe .seg.swirl{background:#E6E0D4}
+body.sage .seg.pour{background:#E6E9D6}body.sage .seg.wait{background:#EAEBE0}body.sage .seg.stir,body.sage .seg.swirl{background:#E1E4D2}
+body.adobe .playhead{background:#615D4C}
+body.sage .playhead{background:#615D4C}
+body.adobe .watertick{background:#CBB8A5}body.adobe .watertick.hit{background:#969268}
+body.sage .watertick{background:#B5B89E}body.sage .watertick.hit{background:#969268}
+body.adobe .pace{border-color:#D9C2B0}
+body.sage .pace{border-color:#C2C4AD}
+body.adobe .pace.behind{background:#F0D5C7}body.adobe .pace.ahead{background:#E9E4D2}
+body.sage .pace.behind{background:#F0D5C7}body.sage .pace.ahead{background:#E9E4D2}
+body.adobe .flow,body.adobe .fr-verdict{border-color:#D9C2B0;background:#FCF7F1}
+body.sage .flow,body.sage .fr-verdict{border-color:#C2C4AD;background:#FBFCF7}
+body.adobe .fr-verdict.fast{background:#F0D5C7}body.adobe .fr-verdict.slow{background:#E9E4D2}
+body.sage .fr-verdict.fast{background:#F0D5C7}body.sage .fr-verdict.slow{background:#E9E4D2}
+body.adobe .insight{background:#F0E4D6!important;border:1px solid #D9C2B0}
+body.sage .insight{background:#E8EBDC!important;border:1px solid #C2C4AD}
+body.adobe .tagc{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none;color:#6B6656}
+body.sage .tagc{background:#FBFCF7;border:1px solid #C2C4AD;box-shadow:none;color:#6B6656}
+body.adobe .tagc.on{background:#969268;color:#FCF7F1}
+body.sage .tagc.on{background:#969268;color:#FBFCF7}
+body.adobe .log-row:nth-child(odd){background:#F0E4D6}
+body.sage .log-row:nth-child(odd){background:#E8EBDC}
+body.adobe .dot{border-color:#D9C2B0}
+body.sage .dot{border-color:#C2C4AD}
+body.adobe .scaletag.real{background:#DDE0CE}body.adobe .scaletag.sim{background:#F0DFC6}
+body.sage .scaletag.real{background:#DDE0CE}body.sage .scaletag.sim{background:#EAE7D2}
+body.adobe #countdown{background:rgba(246,234,224,.97)}
+body.sage #countdown{background:rgba(238,240,230,.97)}
+body.adobe #countdown .cd-num{text-shadow:none;-webkit-text-stroke:0;color:#969268}
+body.sage #countdown .cd-num{text-shadow:none;-webkit-text-stroke:0;color:#969268}
+body.adobe #countdown .cd-lbl{background:#615D4C;border:none;color:#F6EAE0}
+body.sage #countdown .cd-lbl{background:#615D4C;border:none;color:#EEF0E6}
+body.adobe #countdown .cd-first{background:#FCF7F1;border:1px solid #D9C2B0;color:#4A473A}
+body.sage #countdown .cd-first{background:#FBFCF7;border:1px solid #C2C4AD;color:#4A473A}
 /* ================= BURNT ORANGE (cream paper · ink outlines · fun serif) ================= */
 body.burnt{
   --ink:#201914; --paper:#F5F0E6;
@@ -686,7 +744,7 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
       </div>
       <div><label>Look</label>
         <div class="unitseg" role="group" aria-label="Theme">
-          <button class="btn-sm useg on" id="themeMax">Max</button><button class="btn-sm useg" id="themeCalm">Cactus</button><button class="btn-sm useg" id="themeBurnt">Burnt</button>
+          <button class="btn-sm useg on" id="themeMax">Max</button><button class="btn-sm useg" id="themeAdobe">Adobe</button><button class="btn-sm useg" id="themeSage">Sage</button><button class="btn-sm useg" id="themeBurnt">Burnt</button>
         </div>
       </div>
     </div>
@@ -699,6 +757,7 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
       <pre id="bleDebug" style="display:none;font-size:10.5px;line-height:1.5;background:#1B0B2E;color:#B8F5C0;padding:10px;border-radius:10px;white-space:pre-wrap;margin-top:8px"></pre>
       <div class="scale-alt">Scale not showing up? <span class="linklike" id="btnConnectAll" role="button" tabindex="0" title="Show every Bluetooth device, for scales we don't recognize by name">show all devices</span></div>
     </div>
+    <div id="appVersion" style="margin-top:16px;text-align:center;font-size:11px;opacity:.55">Pourcast</div>
   </div>
 </div>
 
@@ -2334,15 +2393,19 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
+const APP_VERSION='1.1.0';
 let theme='max';
-const THEME_ORDER=['max','calm','burnt'];
-const THEME_LABEL={max:'Max',calm:'Cactus',burnt:'Burnt'};
+const THEME_ORDER=['max','adobe','sage','burnt'];
+const THEME_LABEL={max:'Max',adobe:'Adobe',sage:'Sage',burnt:'Burnt'};
 function setTheme(t){
+  if(t==='calm')t='adobe';
   theme=t;
-  document.body.classList.toggle('calm',t==='calm');
+  document.body.classList.toggle('adobe',t==='adobe');
+  document.body.classList.toggle('sage',t==='sage');
   document.body.classList.toggle('burnt',t==='burnt');
   $('themeMax').classList.toggle('on',t==='max');
-  $('themeCalm').classList.toggle('on',t==='calm');
+  $('themeAdobe').classList.toggle('on',t==='adobe');
+  $('themeSage').classList.toggle('on',t==='sage');
   $('themeBurnt').classList.toggle('on',t==='burnt');
   const ln=$('mpLookName');if(ln)ln.textContent=THEME_LABEL[t]||t;
   saveSettings();
@@ -3223,8 +3286,10 @@ function wireSetup(){
   ['touchend','pointerdown','click'].forEach(ev=>document.addEventListener(ev,firstGestureUnlock,{once:false,passive:true}));
   $('wG').onclick=()=>setWeightUnit(false);
   $('wOz').onclick=()=>setWeightUnit(true);
+  {const av=$('appVersion');if(av)av.textContent='Pourcast v'+APP_VERSION;}
   $('themeMax').onclick=()=>setTheme('max');
-  $('themeCalm').onclick=()=>setTheme('calm');
+  $('themeAdobe').onclick=()=>setTheme('adobe');
+  $('themeSage').onclick=()=>setTheme('sage');
   $('themeBurnt').onclick=()=>setTheme('burnt');
   $('btnSettings').onclick=()=>{
     const c=$('settingsCard');

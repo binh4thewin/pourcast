@@ -36,7 +36,7 @@ header{margin-bottom:14px}
 .hdr-right{display:flex;align-items:center;gap:8px;flex:none}
 #hdrUnit{padding:8px 10px;min-width:42px;text-align:center}
 .hdr-modes{margin-top:12px;width:-moz-fit-content;width:fit-content}
-@media (max-width:420px){h1{font-size:34px}body.burnt h1{font-size:32px}body.calm h1{font-size:28px}}
+@media (max-width:420px){h1{font-size:34px}body.burnt h1{font-size:32px}body.adobe h1{font-size:28px}body.sage h1{font-size:28px}}
 h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;line-height:.95;letter-spacing:-.02em;text-transform:uppercase;
   background:linear-gradient(92deg,var(--magenta),var(--orange) 35%,var(--violet) 70%,var(--teal));
   -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1.5px var(--ink);}
@@ -74,14 +74,15 @@ button:focus-visible{outline:3px solid var(--blue)}
    selection pops with a colored ring + lift, never shadow-on-dark */
 .chips-scroll{position:relative}
 /* evenly spaced, fixed-width brewer tiles in one swipeable/scrollable row */
-#toolChips{display:flex;flex-wrap:nowrap;gap:18px;overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none;padding:10px 2px;justify-content:start}
-#toolChips::-webkit-scrollbar{display:none}
+#toolChips,#bBrewers{display:flex;flex-wrap:nowrap;gap:18px;overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none;padding:10px 2px;justify-content:start}
+#toolChips::-webkit-scrollbar,#bBrewers::-webkit-scrollbar{display:none}
 .tool-tile{flex:0 0 76px;scroll-snap-align:start;text-align:center;cursor:pointer;user-select:none}
 /* slim scroll indicator UNDER the strip; shown only when the icons overflow */
 .chips-ind{height:4px;border-radius:99px;background:rgba(27,11,46,.12);margin:4px 4px 0;position:relative;overflow:hidden}
 .chips-ind[hidden]{display:none}
 .chips-thumb{position:absolute;top:0;bottom:0;left:0;width:30%;border-radius:99px;background:var(--magenta)}
-body.calm .chips-thumb{background:#B08968}
+body.adobe .chips-thumb{background:#B08968}
+body.sage .chips-thumb{background:#8C9068}
 body.burnt .chips-thumb{background:#C0642B}
 .tool-circle{width:70px;height:70px;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;
   background:#fff;color:#261C2E;border:3px solid var(--ink);transition:transform .1s,border-color .1s,box-shadow .1s}
@@ -141,9 +142,12 @@ body.burnt .chips-thumb{background:#C0642B}
 /* SELECTED: bright ring + glow + lift, unmistakable on any background */
 .tool-tile.on .tool-circle{border-color:var(--magenta);box-shadow:0 0 0 3px var(--acid),0 6px 14px rgba(255,46,147,.35);transform:translateY(-2px)}
 .tool-tile.on .tool-name{opacity:1;color:var(--magenta)}
-body.calm .tool-circle{background:#FCF7F1;border:1.5px solid #D9C2B0}
-body.calm .tool-tile.on .tool-circle{border-color:#D19277;box-shadow:0 0 0 3px #EFCBB5;transform:translateY(-2px)}
-body.calm .tool-tile.on .tool-name{color:#969268}
+body.adobe .tool-circle{background:#FCF7F1;border:1.5px solid #D9C2B0}
+body.sage .tool-circle{background:#FBFCF7;border:1.5px solid #C2C4AD}
+body.adobe .tool-tile.on .tool-circle{border-color:#D19277;box-shadow:0 0 0 3px #EFCBB5;transform:translateY(-2px)}
+body.sage .tool-tile.on .tool-circle{border-color:#D19277;box-shadow:0 0 0 3px #DDE0CE;transform:translateY(-2px)}
+body.adobe .tool-tile.on .tool-name{color:#969268}
+body.sage .tool-tile.on .tool-name{color:#969268}
 body.burnt .tool-circle{background:#FBF7EE;border:2px solid #201914}
 body.burnt .tool-tile.on .tool-circle{border-color:#C0642B;box-shadow:0 0 0 3px #E0A472;transform:translateY(-2px)}
 body.burnt .tool-tile.on .tool-name{color:#9C5526}
@@ -181,7 +185,8 @@ body.burnt .tool-tile.on .tool-name{color:#9C5526}
 .scaletag.real{background:#B8F5C0}
 .scaletag.sim{background:var(--acid)}
 .sim-on{background:var(--acid)!important;outline:3px solid var(--ink)}
-body.calm .scaletag.real{background:#DCE8DC}body.calm .scaletag.sim{background:#F1E7D2}
+body.adobe .scaletag.real{background:#DCE8DC}body.adobe .scaletag.sim{background:#F1E7D2}
+body.sage .scaletag.real{background:#DCE8DC}body.sage .scaletag.sim{background:#E9ECDC}
 .pace{font-size:10.5px;font-weight:800;border:2px solid var(--ink);border-radius:99px;padding:3px 9px;flex:none;white-space:nowrap}
 .pace.ok{background:#B8F5C0}.pace.behind{background:#FFC2C2}.pace.ahead{background:#CFE4FF}.pace.hold{background:var(--acid)}
 /* Timeline: segments proportional to duration */
@@ -285,61 +290,114 @@ input[type=date]:focus{outline:3px solid var(--magenta)}
 @keyframes pop{0%{transform:scale(.5);opacity:0}25%{transform:scale(1.12);opacity:1}45%{transform:scale(1)}100%{opacity:1}}
 @keyframes pulseGlow{0%,100%{box-shadow:4px 4px 0 var(--ink)}50%{box-shadow:4px 4px 0 var(--ink),0 0 22px var(--magenta)}}
 .pulse{animation:pulseGlow 1.2s ease-in-out infinite}
-/* ================= CACTUS (Succulent Hues: blush adobe · terracotta rose · sage · olive) ================= */
-body.calm{
+/* ========= ADOBE + SAGE (Succulent Hues: blush adobe · terracotta · sage · olive) ========= */
+body.adobe{
   --ink:#4A473A; --paper:#F6EAE0;
   --magenta:#D19277; --orange:#D19277; --acid:#DDE0CE; --teal:#A1A18A; --violet:#969268; --blue:#A1A18A;
   --border:1px solid #E3CDBC; --shadow:none;
   background:#F6EAE0; color:#4A473A;
 }
-body.calm h1{background:none;color:#615D4C;-webkit-text-stroke:0;font-weight:600;letter-spacing:0;font-size:34px}
-body.calm .tag{color:#969268}
-body.calm .tag b{background:transparent;border:1px solid #D9C2B0;color:#8A5230}
-body.calm .card,body.calm .card.pink,body.calm .card.teal,body.calm .card.yellow,body.calm .card.violet{background:#FCF7F1;border:1px solid #E3CDBC;box-shadow:none}
-body.calm .card h2{background:transparent;color:#6E6A50;padding:0;transform:none;letter-spacing:.12em;font-size:12px}
-body.calm input,body.calm select{background:#FCF7F1;border:1px solid #E3CDBC;color:#4A473A;font-weight:600}
-body.calm button{background:#FCF7F1;color:#4A473A;border:1px solid #D9C2B0;box-shadow:none;font-weight:600;text-transform:none;letter-spacing:0}
-body.calm button:hover,body.calm button:active{transform:none;box-shadow:none;background:#F3E4D6}
+body.sage{
+  --ink:#4A473A; --paper:#EEF0E6;
+  --magenta:#D19277; --orange:#D19277; --acid:#DDE0CE; --teal:#A1A18A; --violet:#969268; --blue:#A1A18A;
+  --border:1px solid #C9CBB6; --shadow:none;
+  background:#EEF0E6; color:#4A473A;
+}
+body.adobe h1{background:none;color:#615D4C;-webkit-text-stroke:0;font-weight:600;letter-spacing:0;font-size:34px}
+body.sage h1{background:none;color:#615D4C;-webkit-text-stroke:0;font-weight:600;letter-spacing:0;font-size:34px}
+body.adobe .tag{color:#969268}
+body.sage .tag{color:#969268}
+body.adobe .tag b{background:transparent;border:1px solid #D9C2B0;color:#8A5230}
+body.sage .tag b{background:transparent;border:1px solid #C2C4AD;color:#8A5230}
+body.adobe .card,body.adobe .card.pink,body.adobe .card.teal,body.adobe .card.yellow,body.adobe .card.violet{background:#FCF7F1;border:1px solid #E3CDBC;box-shadow:none}
+body.sage .card,body.sage .card.pink,body.sage .card.teal,body.sage .card.yellow,body.sage .card.violet{background:#FBFCF7;border:1px solid #C9CBB6;box-shadow:none}
+body.adobe .card h2{background:transparent;color:#6E6A50;padding:0;transform:none;letter-spacing:.12em;font-size:12px}
+body.sage .card h2{background:transparent;color:#6E6A50;padding:0;transform:none;letter-spacing:.12em;font-size:12px}
+body.adobe input,body.adobe select{background:#FCF7F1;border:1px solid #E3CDBC;color:#4A473A;font-weight:600}
+body.sage input,body.sage select{background:#FBFCF7;border:1px solid #C9CBB6;color:#4A473A;font-weight:600}
+body.adobe button{background:#FCF7F1;color:#4A473A;border:1px solid #D9C2B0;box-shadow:none;font-weight:600;text-transform:none;letter-spacing:0}
+body.sage button{background:#FBFCF7;color:#4A473A;border:1px solid #C2C4AD;box-shadow:none;font-weight:600;text-transform:none;letter-spacing:0}
+body.adobe button:hover,body.adobe button:active{transform:none;box-shadow:none;background:#F3E4D6}
+body.sage button:hover,body.sage button:active{transform:none;box-shadow:none;background:#E8EBDC}
 /* colored buttons carry light text, so they must stay dark on hover (not the light neutral above) */
-body.calm .btn-primary:hover,body.calm .btn-primary:active{background:#4E4B3D;color:#F6EAE0}
-body.calm .btn-acid:hover,body.calm .btn-acid:active{background:#8A5230;color:#FCF7F1}
-body.calm .btn-primary{background:#615D4C;color:#F6EAE0;text-shadow:none}
-body.calm .btn-acid{background:#D19277;color:#FCF7F1}
-body.calm .btn-teal{background:#DDE0CE;color:#4A473A}
-body.calm .chip{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none;color:#6B6656}
-body.calm .chip.on{background:#969268!important;color:#FCF7F1!important}
-body.calm .useg.on{background:#615D4C;color:#F6EAE0}
-body.calm .badge,body.calm .badge.b2,body.calm .badge.b3{background:#F0E4D6;border-color:#E3CDBC;color:#7C7867}
-body.calm .badge.rigid{background:#615D4C;color:#F6EAE0}
-body.calm .badge.adaptive{background:#DDE0CE;color:#4A473A}
-body.calm .timing-note,body.calm .age{background:#F0E4D6;border:1px dashed #D9C2B0}
-body.calm .age.stale{background:#F0D5C7}body.calm .age.peak{background:#DDE0CE}body.calm .age.fresh{background:#E9E4D2}body.calm .age.fading{background:#F0DFC6}
-body.calm .step-row.active{background:#F0E4D6;border:1px solid #D9C2B0}
-body.calm .step-row .fill{background:#EBDCC9}
-body.calm .step-row .t,body.calm .eta,body.calm .step-row .cum{color:#6E6A52}
-body.calm .step-row.expanded{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none}
-body.calm .instruction{background:#615D4C;border:none;color:#F6EAE0}
-body.calm .instr-kicker{color:#EFCBB5}body.calm .instr-sub{color:#C9C4AE}
-body.calm .stepbar-wrap,body.calm .waterbar-wrap,body.calm .timeline{background:#FCF7F1;border:1px solid #D9C2B0}
-body.calm .stepbar{background:#D19277}
-body.calm .waterbar{background:#A1A18A}
-body.calm .seg.pour{background:#F1DCCB}body.calm .seg.wait{background:#EAEBE0}body.calm .seg.stir,body.calm .seg.swirl{background:#E6E0D4}
-body.calm .playhead{background:#615D4C}
-body.calm .watertick{background:#CBB8A5}body.calm .watertick.hit{background:#969268}
-body.calm .pace{border-color:#D9C2B0}
-body.calm .pace.behind{background:#F0D5C7}body.calm .pace.ahead{background:#E9E4D2}
-body.calm .flow,body.calm .fr-verdict{border-color:#D9C2B0;background:#FCF7F1}
-body.calm .fr-verdict.fast{background:#F0D5C7}body.calm .fr-verdict.slow{background:#E9E4D2}
-body.calm .insight{background:#F0E4D6!important;border:1px solid #D9C2B0}
-body.calm .tagc{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none;color:#6B6656}
-body.calm .tagc.on{background:#969268;color:#FCF7F1}
-body.calm .log-row:nth-child(odd){background:#F0E4D6}
-body.calm .dot{border-color:#D9C2B0}
-body.calm .scaletag.real{background:#DDE0CE}body.calm .scaletag.sim{background:#F0DFC6}
-body.calm #countdown{background:rgba(246,234,224,.97)}
-body.calm #countdown .cd-num{text-shadow:none;-webkit-text-stroke:0;color:#969268}
-body.calm #countdown .cd-lbl{background:#615D4C;border:none;color:#F6EAE0}
-body.calm #countdown .cd-first{background:#FCF7F1;border:1px solid #D9C2B0;color:#4A473A}
+body.adobe .btn-primary:hover,body.adobe .btn-primary:active{background:#8F5236;color:#FBEFE7}
+body.sage .btn-primary:hover,body.sage .btn-primary:active{background:#4E4B3D;color:#EEF0E6}
+body.adobe .btn-acid:hover,body.adobe .btn-acid:active{background:#7B7752;color:#FCF7F1}
+body.sage .btn-acid:hover,body.sage .btn-acid:active{background:#8A5230;color:#FBFCF7}
+body.adobe .btn-primary{background:#A05B36;color:#FBEFE7;text-shadow:none}
+body.sage .btn-primary{background:#615D4C;color:#EEF0E6;text-shadow:none}
+body.adobe .btn-acid{background:#969268;color:#FCF7F1}
+body.sage .btn-acid{background:#D19277;color:#FBFCF7}
+body.adobe .btn-teal{background:#DDE0CE;color:#4A473A}
+body.sage .btn-teal{background:#DDE0CE;color:#4A473A}
+body.adobe .chip{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none;color:#6B6656}
+body.sage .chip{background:#FBFCF7;border:1px solid #C2C4AD;box-shadow:none;color:#6B6656}
+body.adobe .chip.on{background:#969268!important;color:#FCF7F1!important}
+body.sage .chip.on{background:#969268!important;color:#FBFCF7!important}
+body.adobe .useg.on{background:#615D4C;color:#F6EAE0}
+body.sage .useg.on{background:#615D4C;color:#EEF0E6}
+body.adobe .badge,body.adobe .badge.b2,body.adobe .badge.b3{background:#F0E4D6;border-color:#E3CDBC;color:#7C7867}
+body.sage .badge,body.sage .badge.b2,body.sage .badge.b3{background:#E8EBDC;border-color:#C9CBB6;color:#7C7867}
+body.adobe .badge.rigid{background:#615D4C;color:#F6EAE0}
+body.sage .badge.rigid{background:#615D4C;color:#EEF0E6}
+body.adobe .badge.adaptive{background:#DDE0CE;color:#4A473A}
+body.sage .badge.adaptive{background:#DDE0CE;color:#4A473A}
+body.adobe .timing-note,body.adobe .age{background:#F0E4D6;border:1px dashed #D9C2B0}
+body.sage .timing-note,body.sage .age{background:#E8EBDC;border:1px dashed #C2C4AD}
+body.adobe .age.stale{background:#F0D5C7}body.adobe .age.peak{background:#DDE0CE}body.adobe .age.fresh{background:#E9E4D2}body.adobe .age.fading{background:#F0DFC6}
+body.sage .age.stale{background:#F0D5C7}body.sage .age.peak{background:#DDE0CE}body.sage .age.fresh{background:#E9E4D2}body.sage .age.fading{background:#EAE7D2}
+body.adobe .step-row.active{background:#F0E4D6;border:1px solid #D9C2B0}
+body.sage .step-row.active{background:#E8EBDC;border:1px solid #C2C4AD}
+body.adobe .step-row .fill{background:#EBDCC9}
+body.sage .step-row .fill{background:#DEE1CE}
+body.adobe .step-row .t,body.adobe .eta,body.adobe .step-row .cum{color:#6E6A52}
+body.sage .step-row .t,body.sage .eta,body.sage .step-row .cum{color:#6E6A52}
+body.adobe .step-row.expanded{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none}
+body.sage .step-row.expanded{background:#FBFCF7;border:1px solid #C2C4AD;box-shadow:none}
+body.adobe .instruction{background:#615D4C;border:none;color:#F6EAE0}
+body.sage .instruction{background:#615D4C;border:none;color:#EEF0E6}
+body.adobe .instr-kicker{color:#EFCBB5}body.adobe .instr-sub{color:#C9C4AE}
+body.sage .instr-kicker{color:#DDE0CE}body.sage .instr-sub{color:#C9C4AE}
+body.adobe .stepbar-wrap,body.adobe .waterbar-wrap,body.adobe .timeline{background:#FCF7F1;border:1px solid #D9C2B0}
+body.sage .stepbar-wrap,body.sage .waterbar-wrap,body.sage .timeline{background:#FBFCF7;border:1px solid #C2C4AD}
+body.adobe .stepbar{background:#D19277}
+body.sage .stepbar{background:#D19277}
+body.adobe .waterbar{background:#A1A18A}
+body.sage .waterbar{background:#A1A18A}
+body.adobe .seg.pour{background:#F1DCCB}body.adobe .seg.wait{background:#EAEBE0}body.adobe .seg.stir,body.adobe .seg.swirl{background:#E6E0D4}
+body.sage .seg.pour{background:#E6E9D6}body.sage .seg.wait{background:#EAEBE0}body.sage .seg.stir,body.sage .seg.swirl{background:#E1E4D2}
+body.adobe .playhead{background:#615D4C}
+body.sage .playhead{background:#615D4C}
+body.adobe .watertick{background:#CBB8A5}body.adobe .watertick.hit{background:#969268}
+body.sage .watertick{background:#B5B89E}body.sage .watertick.hit{background:#969268}
+body.adobe .pace{border-color:#D9C2B0}
+body.sage .pace{border-color:#C2C4AD}
+body.adobe .pace.behind{background:#F0D5C7}body.adobe .pace.ahead{background:#E9E4D2}
+body.sage .pace.behind{background:#F0D5C7}body.sage .pace.ahead{background:#E9E4D2}
+body.adobe .flow,body.adobe .fr-verdict{border-color:#D9C2B0;background:#FCF7F1}
+body.sage .flow,body.sage .fr-verdict{border-color:#C2C4AD;background:#FBFCF7}
+body.adobe .fr-verdict.fast{background:#F0D5C7}body.adobe .fr-verdict.slow{background:#E9E4D2}
+body.sage .fr-verdict.fast{background:#F0D5C7}body.sage .fr-verdict.slow{background:#E9E4D2}
+body.adobe .insight{background:#F0E4D6!important;border:1px solid #D9C2B0}
+body.sage .insight{background:#E8EBDC!important;border:1px solid #C2C4AD}
+body.adobe .tagc{background:#FCF7F1;border:1px solid #D9C2B0;box-shadow:none;color:#6B6656}
+body.sage .tagc{background:#FBFCF7;border:1px solid #C2C4AD;box-shadow:none;color:#6B6656}
+body.adobe .tagc.on{background:#969268;color:#FCF7F1}
+body.sage .tagc.on{background:#969268;color:#FBFCF7}
+body.adobe .log-row:nth-child(odd){background:#F0E4D6}
+body.sage .log-row:nth-child(odd){background:#E8EBDC}
+body.adobe .dot{border-color:#D9C2B0}
+body.sage .dot{border-color:#C2C4AD}
+body.adobe .scaletag.real{background:#DDE0CE}body.adobe .scaletag.sim{background:#F0DFC6}
+body.sage .scaletag.real{background:#DDE0CE}body.sage .scaletag.sim{background:#EAE7D2}
+body.adobe #countdown{background:rgba(246,234,224,.97)}
+body.sage #countdown{background:rgba(238,240,230,.97)}
+body.adobe #countdown .cd-num{text-shadow:none;-webkit-text-stroke:0;color:#969268}
+body.sage #countdown .cd-num{text-shadow:none;-webkit-text-stroke:0;color:#969268}
+body.adobe #countdown .cd-lbl{background:#615D4C;border:none;color:#F6EAE0}
+body.sage #countdown .cd-lbl{background:#615D4C;border:none;color:#EEF0E6}
+body.adobe #countdown .cd-first{background:#FCF7F1;border:1px solid #D9C2B0;color:#4A473A}
+body.sage #countdown .cd-first{background:#FBFCF7;border:1px solid #C2C4AD;color:#4A473A}
 /* ================= BURNT ORANGE (cream paper · ink outlines · fun serif) ================= */
 body.burnt{
   --ink:#201914; --paper:#F5F0E6;
@@ -496,7 +554,7 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
   <div class="hdr-top">
     <h1>Pourcast</h1>
     <div class="hdr-right">
-      <button class="btn-sm" id="hdrUnit" title="Temperature units, tap to switch">°C</button>
+      <button class="btn-sm" id="hdrUnit" title="Temperature units, tap to switch">°F</button>
       <span class="btstat off" id="hdrDot" role="button" tabindex="0" title="Scale not connected, tap to connect">
         <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="7,8 17,16 12,21 12,3 17,8 7,16"/><line class="bt-slash" x1="4" y1="20" x2="20" y2="4"/></svg>
       </span>
@@ -515,9 +573,12 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
     <button class="btn-sm" id="btnBasicChange" style="width:100%">Change beans or amount</button>
   </div>
   <div class="card yellow" id="basicCard">
-    <div class="row">
-      <div><label for="bCups">Cups</label><input type="number" id="bCups" step="0.5" min="0.5" max="6" value="1"></div>
-      <div><label for="bDose">Beans (g)</label><input type="number" id="bDose" step="1" min="10" max="80" value="20"></div>
+    <label>Brewer</label>
+    <div id="bBrewers"></div>
+    <div class="chips-ind" id="bInd" aria-hidden="true" hidden><span class="chips-thumb" id="bThumb"></span></div>
+    <div class="row" style="margin-top:12px">
+      <div><label for="bCups">Cups</label><input type="number" id="bCups" step="0.25" min="0.25" max="4" value="1"></div>
+      <div><label for="bDose">Beans (g)</label><input type="number" id="bDose" step="1" min="10" max="60" value="20"></div>
     </div>
     <div style="font-size:11px;font-weight:700;color:var(--violet);margin-top:6px">Fill in either one, the other adjusts automatically</div>
     <label style="margin-top:12px">Strength</label>
@@ -668,7 +729,7 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
     <div class="row" style="align-items:center">
       <div><label>Temperature units</label>
         <div class="unitseg" role="group" aria-label="Temperature units">
-          <button class="btn-sm useg on" id="unitC">°C</button><button class="btn-sm useg" id="unitFbtn">°F</button>
+          <button class="btn-sm useg" id="unitC">°C</button><button class="btn-sm useg on" id="unitFbtn">°F</button>
         </div>
       </div>
       <div><label>Sound effects</label>
@@ -683,7 +744,7 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
       </div>
       <div><label>Look</label>
         <div class="unitseg" role="group" aria-label="Theme">
-          <button class="btn-sm useg on" id="themeMax">Max</button><button class="btn-sm useg" id="themeCalm">Cactus</button><button class="btn-sm useg" id="themeBurnt">Burnt</button>
+          <button class="btn-sm useg on" id="themeMax">Max</button><button class="btn-sm useg" id="themeAdobe">Adobe</button><button class="btn-sm useg" id="themeSage">Sage</button><button class="btn-sm useg" id="themeBurnt">Burnt</button>
         </div>
       </div>
     </div>
@@ -696,6 +757,7 @@ input.bad,input.bad:focus{outline:3px solid #FF5A5A!important;border-color:#FF5A
       <pre id="bleDebug" style="display:none;font-size:10.5px;line-height:1.5;background:#1B0B2E;color:#B8F5C0;padding:10px;border-radius:10px;white-space:pre-wrap;margin-top:8px"></pre>
       <div class="scale-alt">Scale not showing up? <span class="linklike" id="btnConnectAll" role="button" tabindex="0" title="Show every Bluetooth device, for scales we don't recognize by name">show all devices</span></div>
     </div>
+    <div id="appVersion" style="margin-top:16px;text-align:center;font-size:11px;opacity:.55">Pourcast</div>
   </div>
 </div>
 
@@ -848,7 +910,7 @@ const RECIPES=[
     {type:'wait',dur:45,label:'Final drawdown'}
   ]},
  {id:'winton5',tool:['v60','origami','any'],champ:'Modern competition style',timing:'rigid',
-  name:'Five Even Pours · World Champ Method',ratio:16.7,defaultDose:30,grind:'Medium-coarse',tempC:[92,94],roastRec:'Light',
+  name:'Five Even Pours · World Champ Method',ratio:15,defaultDose:20,grind:'Medium-coarse',tempC:[92,94],roastRec:'Light',
   desc:'Five equal center pours on a 40s clock. No dedicated bloom (pour 1 acts as one), no stirs, no swirls, minimal agitation.',
   steps:[
     {type:'pour',frac:.20,dur:12,label:'Pour 1 · center'},{type:'wait',dur:28,label:'Settle'},
@@ -867,9 +929,9 @@ const RECIPES=[
     {type:'pour',frac:.48,dur:30,label:'Main pour → 60% · brisk spiral',note:'one continuous pour begins, checkpoint: 60% of water by 1:15'},
     {type:'pour',frac:.40,dur:30,label:'Final pour → 100% · ease off',note:'do NOT stop, same pour, ~20% slower and gentler to the end'},
     {type:'stir',dur:8,label:'Stir · 1x each way',note:'knock grounds off walls'},
-    {type:'wait',dur:15,label:'Let bed settle'},
+    {type:'wait',dur:2,label:'Let bed settle'},
     {type:'swirl',dur:5,label:'Final gentle swirl'},
-    {type:'wait',dur:60,label:'Drawdown to flat bed'}
+    {type:'wait',dur:90,label:'Drawdown to flat bed'}
   ]},
  {id:'rao',tool:['v60','any'],champ:'High-extraction school',timing:'adaptive',
   name:'Single Spiral & Spin',ratio:16.7,defaultDose:22,grind:'Medium-fine',tempC:[93,95],roastRec:'Light',
@@ -945,10 +1007,12 @@ const RECIPES=[
   desc:'The straightforward daily single cup: bloom with 2x the coffee weight, let it rest, then two easy pours (to 60%, then 100%). Fast, forgiving, and the timing scales to your dose. The recipe to reach for before caffeine.',
   steps:[
     {type:'pour',frac:.125,dur:8,label:'Bloom · 2× coffee'},
+    {type:'agitate',dur:5,note:'until no dry clumps',swirlLabel:'Swirl the bloom',stirLabel:'Stir the bloom'},
     {type:'wait',dur:40,label:'Bloom rest'},
     {type:'pour',frac:.475,dur:22,label:'Pour 1 · to 60%'},
     {type:'wait',dur:15,label:'Pause · let it settle'},
     {type:'pour',frac:.40,dur:18,label:'Pour 2 · to 100%'},
+    {type:'swirl',dur:5,label:'Flattening swirl',note:'level the bed'},
     {type:'wait',dur:55,label:'Drawdown'}
   ]},
  {id:'v60iced',tool:['v60'],champ:'Japanese iced standard',timing:'adaptive',iced:true,
@@ -1097,6 +1161,9 @@ function customRecipes(){return Store.get(KEYS.customs,[]);}
 function allRecipes(){return RECIPES.concat(customRecipes());}
 /* ============================ 2. STATE ============================ */
 const $=id=>document.getElementById(id);
+/* Escapes user-entered text (bean/roaster names, notes, BLE device names)
+   before it's interpolated into innerHTML, so it can't break out as markup. */
+const escapeHTML=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ICONS={pour:'🫗',wait:'⏳',stir:'🥄',swirl:'🌀',press:'🔽'};
 const _I=(p)=>`<svg class="ticon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 const TOOL_ICONS={
@@ -1116,7 +1183,7 @@ let brewIdx=0,brewStart=0,timerIv=null,brewing=false,stepStart=0,finishedAt=null
 let weight=0,weightOffset=0,wSamples=[],metrics=null,liveTrace=null;
 let simIv=null,simMode=false,ble={device:null,connected:false};
 let brewTrace=[];   // [seconds, grams] sampled ~1/s while brewing with live weight
-let unitF=false,cdIv=null,curRating=0,curTags=new Set(),restoring=false;
+let unitF=true,cdIv=null,curRating=0,curTags=new Set(),restoring=false;
 let paused=false,pauseStart=0;
 /* ---- SFX: synthesized with Web Audio. No audio files; everything is generated.
    Countdown ticks, GO tone, last-3-seconds step ticks, advance chime, and a
@@ -1254,7 +1321,7 @@ function saveSettings(){
 function restoreSettings(){
   const s=Store.get(KEYS.settings,null);
   restoring=true;
-  unitF=s&&'unitF'in s?s.unitF:(Store.get(KEYS.unit,'C')==='F');
+  unitF=s&&'unitF'in s?s.unitF:(Store.get(KEYS.unit,'F')==='F');
   $('unitC').classList.toggle('on',!unitF);
   $('unitFbtn').classList.toggle('on',unitF);
   if(s&&s.theme)setTheme(s.theme);
@@ -1298,11 +1365,27 @@ function restoreSettings(){
 
 /* ============================ 4. ENGINES ============================ */
 /* ---- schedule ---- */
+/* Bloom agitation, picked by dose.
+   A step of type 'agitate' resolves to a swirl or a stir when the schedule is
+   built. Why dose decides it: Barista Hustle's testing found stirring loses its
+   edge at small doses (they measured it falling off around 15 g) — there is too
+   little slurry for a spoon to redistribute, and it drags fines into the bed.
+   Hoffmann's V60 technique swirls instead. At batch size the bed is deep enough
+   that a spoon genuinely mixes, so stirring wins. Hence: swirl small, stir big.
+   The 30 g line is a judgement call — roughly where a single cup becomes a batch. */
+const STIR_MIN_DOSE=30;
+function resolveAgitation(st,dose){
+  if(st.type!=='agitate')return st;
+  return dose>=STIR_MIN_DOSE
+    ?{...st,type:'stir', label:st.stirLabel ||'Stir the bloom'}
+    :{...st,type:'swirl',label:st.swirlLabel||'Swirl the bloom'};
+}
 function buildSchedule(dose,water){
   const defWater=recipe.defaultDose*recipe.ratio;
   const scaleF=recipe.timing==='adaptive'?water/defWater:1;
   let t=0,cum=0;
-  return recipe.steps.map(st=>{
+  return recipe.steps.map(st0=>{
+    const st=resolveAgitation(st0,dose);
     const dur=st.type==='pour'?Math.max(4,Math.round(st.dur*scaleF)):st.dur;
     const out={type:st.type,label:st.label,note:st.note||'',start:t,dur,end:t+dur};
     if(st.type==='pour'){cum+=st.frac*water;out.target=Math.round(cum*10)/10;out.amount=Math.round(st.frac*water);}
@@ -1581,8 +1664,8 @@ function roasterOptionsHTML(){
   const presets=PRESET_ROASTERS.filter(p=>!lib.some(r=>r.name===p.name));
   return '<option value="">Select a roaster…</option>'
     +(favCount()?`<option value="__favs">⭐ Favorited Beans</option>`:'')
-    +lib.map(r=>`<option value="${r.name}">${r.name}</option>`).join('')
-    +presets.map(p=>`<option value="${p.name}">${p.name}</option>`).join('')
+    +lib.map(r=>`<option value="${escapeHTML(r.name)}">${escapeHTML(r.name)}</option>`).join('')
+    +presets.map(p=>`<option value="${escapeHTML(p.name)}">${escapeHTML(p.name)}</option>`).join('')
     +'<option value="__newR">＋ Add roaster…</option>';
 }
 // Rebuild the roaster <option>s (e.g. after favoriting) without disturbing selection.
@@ -1621,15 +1704,14 @@ function renderBeans(selBean){
   if($('roasterSel').value==='__favs'){
     const favs=[];
     getLibrary().forEach(r=>r.beans.forEach(b=>{if(b.fav)favs.push({roaster:r.name,bean:b.name});}));
-    const esc=s=>s.replace(/"/g,'&quot;');
     bs.innerHTML='<option value="" disabled'+(selBean?'':' selected')+'>Choose a favorite…</option>'
-      +favs.map(f=>`<option value="${esc(f.bean)}" data-roaster="${esc(f.roaster)}"${selBean===f.bean?' selected':''}>${f.bean} · ${f.roaster}</option>`).join('');
+      +favs.map(f=>`<option value="${escapeHTML(f.bean)}" data-roaster="${escapeHTML(f.roaster)}"${selBean===f.bean?' selected':''}>${escapeHTML(f.bean)} · ${escapeHTML(f.roaster)}</option>`).join('');
     applyBeanSelection();   // resolves roast/name for the picked favorite (or clears)
     return;
   }
   const r=libRoaster($('roasterSel').value);
   const beans=r?r.beans:[];
-  bs.innerHTML=beans.map(b=>`<option value="${b.name.replace(/"/g,'&quot;')}">${b.name}${b.rotating?'':` · ${b.roast}`}</option>`).join('')+'<option value="__newB">＋ Add bean…</option>';
+  bs.innerHTML=beans.map(b=>`<option value="${escapeHTML(b.name)}">${escapeHTML(b.name)}${b.rotating?'':` · ${escapeHTML(b.roast)}`}</option>`).join('')+'<option value="__newB">＋ Add bean…</option>';
   if(selBean&&beans.some(b=>b.name===selBean))bs.value=selBean;
   else if(beans.length)bs.value=beans[0].name;
   applyBeanSelection();
@@ -1974,7 +2056,7 @@ function setScaleUI(state,msg,tag){
   const sum=$('scaleSum');
   if(sum){
     const label=state==='on'?(tag||'Connected'):state==='sim'?'Simulator':'Not connected';
-    sum.innerHTML=`<span class="btmini ${stCls}"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="7,8 17,16 12,21 12,3 17,8 7,16"/><line class="bt-slash" x1="4" y1="20" x2="20" y2="4"/></svg></span>${label}`;
+    sum.innerHTML=`<span class="btmini ${stCls}"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="7,8 17,16 12,21 12,3 17,8 7,16"/><line class="bt-slash" x1="4" y1="20" x2="20" y2="4"/></svg></span>${escapeHTML(label)}`;
     setCollapsed('scaleCard',state!=='off');
   }
   // keep the in-place badge panel in sync if it's open
@@ -2208,9 +2290,9 @@ function renderChips(){
 }
 // Show a slim scroll indicator ONLY when the brewer strip overflows (e.g. mobile).
 // When every icon fits (desktop), it hides — no arrows, nothing over the icons.
-function updateToolArrows(){
-  const el=$('toolChips');if(!el)return;
-  const ind=$('toolInd'),thumb=$('toolThumb');
+function updateStripInd(stripId,indId,thumbId){
+  const el=$(stripId);if(!el)return;
+  const ind=$(indId),thumb=$(thumbId);
   const range=el.scrollWidth-el.clientWidth;
   const overflow=range>2;
   if(ind)ind.hidden=!overflow;
@@ -2220,14 +2302,20 @@ function updateToolArrows(){
     thumb.style.left=((el.scrollLeft/range)*(100-w))+'%';
   }
 }
+function updateToolArrows(){updateStripInd('toolChips','toolInd','toolThumb');}
+function updateBrewerArrows(){updateStripInd('bBrewers','bInd','bThumb');}
+function wireStripScroll(stripId,fn){
+  const el=$(stripId);if(!el)return;
+  el.addEventListener('scroll',fn,{passive:true});
+  window.addEventListener('resize',fn);
+}
 function wireToolScroll(){
-  const el=$('toolChips');if(!el)return;
-  el.addEventListener('scroll',updateToolArrows,{passive:true});
-  window.addEventListener('resize',updateToolArrows);
+  wireStripScroll('toolChips',updateToolArrows);
+  wireStripScroll('bBrewers',updateBrewerArrows);   // Basic mode uses the same strip
 }
 function populateRecipes(){
   const list=allRecipes().filter(r=>r.id!=='custom'&&(r.tool.includes(tool)||tool==='any'));
-  $('recipeSel').innerHTML=list.map(r=>`<option value="${r.id}">${r.name}</option>`).join('')
+  $('recipeSel').innerHTML=list.map(r=>`<option value="${r.id}">${escapeHTML(r.name)}</option>`).join('')
     +`<optgroup label="Make your own"><option value="__edit__">Customize this method</option><option value="__scratch__">Start from scratch</option></optgroup>`;
   loadRecipe(list[0].id);
 }
@@ -2305,15 +2393,19 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
+const APP_VERSION='1.1.0';
 let theme='max';
-const THEME_ORDER=['max','calm','burnt'];
-const THEME_LABEL={max:'Max',calm:'Cactus',burnt:'Burnt'};
+const THEME_ORDER=['max','adobe','sage','burnt'];
+const THEME_LABEL={max:'Max',adobe:'Adobe',sage:'Sage',burnt:'Burnt'};
 function setTheme(t){
+  if(t==='calm')t='adobe';
   theme=t;
-  document.body.classList.toggle('calm',t==='calm');
+  document.body.classList.toggle('adobe',t==='adobe');
+  document.body.classList.toggle('sage',t==='sage');
   document.body.classList.toggle('burnt',t==='burnt');
   $('themeMax').classList.toggle('on',t==='max');
-  $('themeCalm').classList.toggle('on',t==='calm');
+  $('themeAdobe').classList.toggle('on',t==='adobe');
+  $('themeSage').classList.toggle('on',t==='sage');
   $('themeBurnt').classList.toggle('on',t==='burnt');
   const ln=$('mpLookName');if(ln)ln.textContent=THEME_LABEL[t]||t;
   saveSettings();
@@ -2643,7 +2735,7 @@ function finishUI(){
 function finishToRating(){
   brewing=false;clearInterval(timerIv);
   cleanupBrewUI();
-  if(isBasic()){basicQuickLog();showFrontDoor();return;}   // mornings are autopilot, no rating
+  if(isBasic()){showFrontDoor();return;}   // mornings are autopilot: no rating, no log
   showRating();
 }
 function resetNextBtn(){
@@ -2699,7 +2791,7 @@ function endBrew(){
   $('countdown').style.display='none';
   cleanupBrewUI();
   if(madeProgress&&!isBasic()){showRating();}     // rate anything you actually poured, even cut short
-  else{if(madeProgress)basicQuickLog();showFrontDoor();}
+  else{showFrontDoor();}   // basic mode keeps no log, so nothing to record on an early stop
 }
 
 /* ---- brew print: weight + flow graph, Filtru-style, pure SVG ---- */
@@ -2750,8 +2842,8 @@ function renderLog(){
   const log=loadLog();
   $('logCard').style.display=log.length?'block':'none';
   $('logList').innerHTML=log.slice(0,8).map((e,i)=>
-    `<div class="log-row"><span>${e.date}</span><span style="flex:1">${e.beans||e.recipe}${e.beanAge!=null?` (${e.beanAge}d)`:''}${e.tags&&e.tags.length?` · <i>${e.tags.join(', ')}</i>`:''}</span><span>${fmtW(e.dose)}${e.grindSetting?` @${e.grindSetting}`:''}</span><span class="log-stars">${'★'.repeat(e.rating)}${'☆'.repeat(5-e.rating)}</span><button class="btn-sm" data-again="${i}" style="padding:4px 8px;font-size:11px">↻</button></div>`
-    +(e.note?`<div class="log-row" style="opacity:.7;font-weight:500;padding-top:0">↳ ${e.note}</div>`:'')
+    `<div class="log-row"><span>${e.date}</span><span style="flex:1">${escapeHTML(e.beans||e.recipe)}${e.beanAge!=null?` (${e.beanAge}d)`:''}${e.tags&&e.tags.length?` · <i>${escapeHTML(e.tags.join(', '))}</i>`:''}</span><span>${fmtW(e.dose)}${e.grindSetting?` @${escapeHTML(e.grindSetting)}`:''}</span><span class="log-stars">${'★'.repeat(e.rating)}${'☆'.repeat(5-e.rating)}</span><button class="btn-sm" data-again="${i}" style="padding:4px 8px;font-size:11px">↻</button></div>`
+    +(e.note?`<div class="log-row" style="opacity:.7;font-weight:500;padding-top:0">↳ ${escapeHTML(e.note)}</div>`:'')
   ).join('');
   document.querySelectorAll('[data-again]').forEach(b=>{b.onclick=()=>brewAgain(loadLog()[+b.dataset.again]);});
 }
@@ -2774,7 +2866,7 @@ function showRating(){
   const aDays=beanAgeDays();
   const early=brewIdx<schedule.length?' · ⚠ ended early':'';
   const gs=$('grindSetting').value?` · grind ${$('grindSetting').value}`:'';
-  $('ratingSummary').innerHTML=`<b>${recipe.name}</b> · ${fmtW(dose)} → ${fmtW(totalWater)}${gs} · ${fmtT(finishedAt||elapsed())}${early}${$('beanName').value?` · ${$('beanName').value}`:''}${aDays!==null?` · ${aDays}d off roast`:''}`;
+  $('ratingSummary').innerHTML=`<b>${escapeHTML(recipe.name)}</b> · ${fmtW(dose)} → ${fmtW(totalWater)}${gs} · ${fmtT(finishedAt||elapsed())}${early}${$('beanName').value?` · ${escapeHTML($('beanName').value)}`:''}${aDays!==null?` · ${aDays}d off roast`:''}`;
   const guides=schedule.filter(x=>x.type==='pour').map(x=>x.target);
   $('brewPrint').innerHTML=brewTrace.length>2?brewPrintSVG(brewTrace,guides,undefined,undefined,schedule):'';
   curRating=0;$('brewNote').value='';curTags=new Set();$('brewReport').innerHTML='';
@@ -2864,7 +2956,7 @@ function openEditor(mode){
   $('edGrind').value=(!scratch&&GRINDS.includes(base.grind))?base.grind:'Medium';
   $('editor').dataset.baseId=base.custom?(base.baseId||base.id):base.id;
   $('editor').dataset.editingId=(!scratch&&base.custom)?base.id:'';
-  edSteps=(scratch?SCRATCH_STEPS:base.steps).map(st=>({type:st.type,frac:st.frac||0,dur:st.dur}));
+  edSteps=(scratch?SCRATCH_STEPS:base.steps).map(st=>resolveAgitation(st,base.defaultDose)).map(st=>({type:st.type,frac:st.frac||0,dur:st.dur}));
   renderEdRows();
   $('editor').style.display='block';
   $('editor').scrollIntoView({behavior:'smooth',block:'start'});
@@ -2920,11 +3012,32 @@ function wireEditor(){
 /* Two front doors, one engine. Basic = dose + roast, everything else derived:
    1:16 V60 (bloom + two pours), temp from roast. No methods, no library, no rating. */
 const MODEKEY='pourfect-mode',BASICKEY='pourfect-basic';
-const BASIC_RECIPE='v60hario1cup';
+/* Basic mode: one forgiving recipe per brewer, plus the volume that brewer can
+   physically hold. maxDose is the real constraint — a V60-02 brims around 400 ml,
+   so asking it for a 700 g pour schedules a brew nobody can pour. baseRatio is
+   the brewer's sensible default strength; the Strength chips shift it from there. */
+const BASIC_BREWERS=[
+ {id:'v60',        recipe:'v60hario1cup',   baseRatio:16,  maxDose:40},
+ {id:'kalita',     recipe:'kalitaPulse',    baseRatio:16,  maxDose:35},
+ {id:'chemex',     recipe:'chemexClassic',  baseRatio:16,  maxDose:60},
+ {id:'origami',    recipe:'hedrick',        baseRatio:16,  maxDose:40},
+ {id:'melitta',    recipe:'melitta1cup',    baseRatio:16,  maxDose:30},
+ {id:'aeropress',  recipe:'aeropressClassic',baseRatio:15, maxDose:20},
+ {id:'frenchpress',recipe:'frenchClassic',  baseRatio:15,  maxDose:60},
+ {id:'phin',       recipe:'phinClassic',    baseRatio:5,   maxDose:30},
+ {id:'any',        recipe:'hedrick',        baseRatio:16,  maxDose:40}
+];
+const basicBrewer=s=>BASIC_BREWERS.find(b=>b.id===(s&&s.brewer))||BASIC_BREWERS[0];
+/* Once you've brewed, the front door is the Brew Again card. But while you're
+   actively changing beans/brewer/amount, any re-render must leave the setup card
+   open — otherwise tapping a brewer bounces you straight back out. */
+let basicEditing=false;
 /* Strength in plain language → brew ratio. More water per gram = lighter cup. */
-const STRENGTH={lighter:{ratio:17,label:'Lighter'},regular:{ratio:16,label:'Regular'},strong:{ratio:14,label:'Strong'}};
+/* Strength shifts the brewer's base ratio rather than naming an absolute one —
+   a Phin at 1:5 and a V60 at 1:16 both need 'stronger', just not the same number. */
+const STRENGTH={lighter:{d:1,label:'Mild'},regular:{d:0,label:'Regular'},strong:{d:-2,label:'Strong'}};
 const CUP_G=240;   // one cup ≈ 240 g of brewed coffee
-const basicRatio=s=>(STRENGTH[s.strength]||STRENGTH.regular).ratio;
+const basicRatio=s=>Math.max(4,basicBrewer(s).baseRatio+(STRENGTH[s.strength]||STRENGTH.regular).d);
 const doseForCups=(cups,s)=>Math.round(cups*CUP_G/basicRatio(s));
 const isBasic=()=>document.body.classList.contains('basic');
 function setMode(m){
@@ -2935,15 +3048,20 @@ function setMode(m){
   showFrontDoor();
 }
 function showFrontDoor(){
+  basicEditing=false;
   document.body.classList.remove('brewing');
   $('brew').style.display='none';$('rating').style.display='none';
-  if(isBasic()){$('setup').style.display='none';$('basic').style.display='block';renderBasic();}
+  if(isBasic()){$('setup').style.display='none';$('basic').style.display='block';renderBasic();requestAnimationFrame(updateBrewerArrows);}
   else{$('basic').style.display='none';$('setup').style.display='';requestAnimationFrame(updateToolArrows);}
 }
-function basicState(){return Store.get(BASICKEY,null)||{dose:20,roast:'Medium',strength:'regular',brewed:false};}
+function basicState(){
+  const s=Store.get(BASICKEY,null)||{dose:20,roast:'Medium',strength:'regular',brewed:false};
+  if(!s.brewer||!BASIC_BREWERS.some(b=>b.id===s.brewer))s.brewer='v60';   // pre-brewer saves
+  return s;
+}
 function setBasicState(s){Store.set(BASICKEY,s);}
-function basicTemp(roast){
-  const r=RECIPES.find(x=>x.id===BASIC_RECIPE);
+function basicTemp(roast,st){
+  const r=RECIPES.find(x=>x.id===basicBrewer(st||basicState()).recipe);
   const diff=(ROAST_IDX[roast]??2)-(ROAST_IDX[r.roastRec]??2);
   const d=Math.round(diff>0?-2*diff:-1.5*diff);
   const clamp=c=>Math.min(100,Math.max(80,c+d));
@@ -2959,32 +3077,59 @@ function cupsTxt(cups){
    grow with water on adaptive recipes; waits are fixed). Keeps the on-screen
    estimate honest instead of a hard-coded number. */
 function basicBrewTime(s){
-  const r=RECIPES.find(x=>x.id===BASIC_RECIPE);
+  const r=RECIPES.find(x=>x.id===basicBrewer(s).recipe);
   const water=s.dose*basicRatio(s);
   const scaleF=r.timing==='adaptive'?water/(r.defaultDose*r.ratio):1;
   return r.steps.reduce((t,st)=>t+(st.type==='pour'?Math.max(4,Math.round(st.dur*scaleF)):st.dur),0);
 }
 function basicSummary(s){
   const water=Math.round(s.dose*basicRatio(s));
-  return `makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${s.dose} g</b> beans · <b>${water} g</b> water · kettle at <b>${basicTemp(s.roast)}</b> · ready in ~<b>${fmtT(basicBrewTime(s))}</b>`;
+  return `makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${s.dose} g</b> beans · <b>${water} g</b> water · kettle at <b>${basicTemp(s.roast,s)}</b> · ready in ~<b>${fmtT(basicBrewTime(s))}</b>`;
 }
 function syncCupsField(s){
   $('bCups').value=Math.round(s.dose*basicRatio(s)/CUP_G*4)/4;   // beans → cups, quarter steps
 }
+function renderBasicBrewers(){
+  const s=basicState();
+  $('bBrewers').innerHTML=BASIC_BREWERS.filter(b=>b.id!=='any').map(b=>{
+    const t=TOOLS.find(x=>x.id===b.id);
+    return `<div class="tool-tile ${b.id===s.brewer?'on':''}" data-b="${b.id}" role="button" tabindex="0" aria-pressed="${b.id===s.brewer}">
+      <div class="tool-circle">${TOOL_IMGS[b.id]?`<img class="timg" src="${TOOL_IMGS[b.id]}" alt="">`:(TOOL_ICONS[b.id]||'')}</div>
+      <div class="tool-name">${t?t.name:b.id}</div>
+    </div>`;}).join('');
+  $('bBrewers').querySelectorAll('.tool-tile').forEach(c=>{
+    const pick=()=>{
+      const st=readBasicInputs();
+      st.brewer=c.dataset.b;
+      st.dose=Math.min(basicBrewer(st).maxDose,st.dose);   // new brewer may hold less
+      setBasicState(st);renderBasic();
+    };
+    c.onclick=pick;c.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();pick();}};
+  });
+  requestAnimationFrame(updateBrewerArrows);   // needs layout before it can measure overflow
+}
 function renderBasic(){
   const s=basicState();
+  const brw=basicBrewer(s);
+  renderBasicBrewers();
+  $('bDose').max=brw.maxDose;
+  $('bCups').max=Math.round(brw.maxDose*basicRatio(s)/CUP_G*4)/4;
   $('bDose').value=s.dose;
   syncCupsField(s);
   document.querySelectorAll('#bRoast .chip').forEach(c=>c.classList.toggle('on',c.dataset.r===s.roast));
   document.querySelectorAll('#bStr .chip').forEach(c=>c.classList.toggle('on',c.dataset.s===(s.strength||'regular')));
   $('bSum').innerHTML=basicSummary(s);
-  $('againCard').style.display=s.brewed?'block':'none';
-  $('basicCard').style.display=s.brewed?'none':'block';
-  if(s.brewed)$('againSum').innerHTML=`${s.roast} roast · ${STRENGTH[s.strength||'regular'].label} · ${basicSummary(s)}`;
+  const showAgain=s.brewed&&!basicEditing;
+  $('againCard').style.display=showAgain?'block':'none';
+  $('basicCard').style.display=showAgain?'none':'block';
+  if(s.brewed){
+    const tn=TOOLS.find(x=>x.id===s.brewer);
+    $('againSum').innerHTML=`<b>${tn?tn.name:''}</b> · <b>${cupsTxt(s.dose*basicRatio(s)/CUP_G)}</b> · <b>${s.dose} g</b> · ${s.roast} roast · ${STRENGTH[s.strength||'regular'].label}`;
+  }
 }
 function readBasicInputs(){
   const s=basicState();
-  s.dose=Math.min(80,Math.max(10,parseFloat($('bDose').value)||20));
+  s.dose=Math.min(basicBrewer(s).maxDose,Math.max(10,parseFloat($('bDose').value)||20));
   const on=document.querySelector('#bRoast .chip.on');
   s.roast=on?on.dataset.r:'Medium';
   const st=document.querySelector('#bStr .chip.on');
@@ -2992,10 +3137,12 @@ function readBasicInputs(){
   return s;
 }
 function startBasic(fromAgain){
+  basicEditing=false;
   const s=fromAgain?basicState():readBasicInputs();
   s.brewed=true;setBasicState(s);
-  tool='v60';renderChips();populateRecipes();
-  loadRecipe(BASIC_RECIPE);
+  const brw=basicBrewer(s);
+  tool=brw.id;renderChips();populateRecipes();
+  loadRecipe(brw.recipe);
   $('roast').value=s.roast;
   $('dose').value=s.dose;
   $('ratioInput').value=basicRatio(s);
@@ -3007,7 +3154,7 @@ function basicQuickLog(){
   const s=basicState();
   const log=loadLog();
   log.unshift({date:new Date().toLocaleDateString(undefined,{month:'short',day:'numeric'}),
-    recipe:recipe?recipe.name:'Basic brew',recipeId:recipe?recipe.id:BASIC_RECIPE,ratio:basicRatio(s),tool:'v60',
+    recipe:recipe?recipe.name:'Basic brew',recipeId:recipe?recipe.id:basicBrewer(s).recipe,ratio:basicRatio(s),tool:s.brewer||'v60',
     grindSetting:'',beans:'',roast:s.roast,dose:s.dose,water:Math.round(s.dose*basicRatio(s)),
     time:fmtT(finishedAt||0),rating:3,note:'',tags:[],insights:[],beanAge:null,
     trace:brewTrace.filter((_,i)=>i%3===0).slice(0,120)});
@@ -3019,7 +3166,7 @@ function wireModes(){
   $('mpPrint').onclick=()=>{$('modePick').style.display='none';setMode('print');};
   $('btnBasicBrew').onclick=()=>askStartConfirm(()=>startBasic(false));
   $('btnAgain').onclick=()=>askStartConfirm(()=>startBasic(true));
-  $('btnBasicChange').onclick=()=>{$('againCard').style.display='none';$('basicCard').style.display='block';};
+  $('btnBasicChange').onclick=()=>{basicEditing=true;renderBasic();};
   $('hdrBasic').onclick=()=>setMode('basic');
   $('hdrPrint').onclick=()=>setMode('print');
   $('hdrUnit').onclick=()=>setUnit(!unitF);
@@ -3031,14 +3178,16 @@ function wireModes(){
   const refresh=(fromCups)=>{
     if(fromCups){
       const raw=parseFloat($('bCups').value);
-      if(!(raw>0)){$('bDose').value=0;$('bSum').innerHTML=basicSummary({...basicState(),dose:0});return;}
+      // Mid-typing the field is briefly empty. Leave the partner field and the
+      // summary alone rather than flashing 0 g at someone who just hit backspace.
+      if(!(raw>0))return;
       const s=readBasicInputs();
-      const cups=Math.min(6,Math.max(0.25,raw));
+      const cups=Math.min(basicBrewer(basicState()).maxDose*basicRatio(basicState())/CUP_G,Math.max(0.25,raw));
       s.dose=doseForCups(cups,s);$('bDose').value=s.dose;
       setBasicState(s);$('bSum').innerHTML=basicSummary(s);
     }else{
       const raw=parseFloat($('bDose').value);
-      if(!(raw>0)){$('bCups').value=0;$('bSum').innerHTML=basicSummary({...basicState(),dose:0});return;}
+      if(!(raw>0))return;
       const s=readBasicInputs();syncCupsField(s);
       setBasicState(s);$('bSum').innerHTML=basicSummary(s);
     }
@@ -3137,8 +3286,10 @@ function wireSetup(){
   ['touchend','pointerdown','click'].forEach(ev=>document.addEventListener(ev,firstGestureUnlock,{once:false,passive:true}));
   $('wG').onclick=()=>setWeightUnit(false);
   $('wOz').onclick=()=>setWeightUnit(true);
+  {const av=$('appVersion');if(av)av.textContent='Pourcast v'+APP_VERSION;}
   $('themeMax').onclick=()=>setTheme('max');
-  $('themeCalm').onclick=()=>setTheme('calm');
+  $('themeAdobe').onclick=()=>setTheme('adobe');
+  $('themeSage').onclick=()=>setTheme('sage');
   $('themeBurnt').onclick=()=>setTheme('burnt');
   $('btnSettings').onclick=()=>{
     const c=$('settingsCard');
