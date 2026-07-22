@@ -14,7 +14,7 @@ cd "$(dirname "$0")"
 
 SRC_DIR="."
 DEST_DIR="pourcast-ios/www"
-FILES=("index.html" "pour.mp3")
+FILES=("index.html" "styles.css" "app.js" "pour.mp3")
 
 if [ ! -d "$DEST_DIR" ]; then
   echo "sync-ios: $DEST_DIR not found — nothing to sync." >&2
