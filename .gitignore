@@ -12,9 +12,10 @@ node_modules/
 npm-debug.log*
 package-lock.json
 
-# Build & dev artifacts (source assembles into index.html)
+# Dev/scratch artifacts. NOTE: as of v1.2.0 the app is split into
+# index.html + styles.css + app.js (all tracked). app.js is intentionally
+# NOT ignored; the patterns below only catch old scratch/build files.
 shell.html
-app*.js
 func*.js
 smoke*.js
 pourover-v*.html

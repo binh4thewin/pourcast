@@ -8,7 +8,8 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 ## [Unreleased]
 
-_Work in progress lands here, then moves under a version heading at release._
+### Changed
+- Refactored the single `index.html` into `index.html` + `styles.css` + `app.js` for maintainability (no behavior change). `sync-ios.sh` now bundles all three into the iOS payload.
 
 ## [1.1.0] — 2026-07-21
 
