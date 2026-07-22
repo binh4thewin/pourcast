@@ -1197,8 +1197,8 @@ function setScaleUI(state,msg,tag){
 // Fill the badge's scale panel with the current status before showing it.
 function refreshScaleModal(){
   const smb=$('smConnect'),sm=$('smStatus');
-  if(!navigator.bluetooth){
-    if(sm)sm.textContent='Bluetooth scales aren’t supported on this device (iPhone/iPad). The app runs fully guided on timers, no scale needed.';
+  if(!bleNativeAvailable()&&!navigator.bluetooth){
+    if(sm)sm.textContent='Bluetooth scales aren’t supported on this device. The app runs fully guided on timers, no scale needed.';
     if(smb){smb.disabled=true;smb.style.opacity='.4';smb.style.cursor='not-allowed';smb.textContent='Connect scale';}
     return;
   }
@@ -1243,6 +1243,7 @@ function scheduleAutoReconnect(){
 }
 function brewingSuppressRecon(){return false;}
 async function autoReconnectOnLoad(){
+  if(bleNativeAvailable())return autoReconnectNative();
   try{
     if(!navigator.bluetooth||!navigator.bluetooth.getDevices)return;
     const saved=JSON.parse(localStorage.getItem('pc_scale')||'null');
@@ -1255,15 +1256,126 @@ async function autoReconnectOnLoad(){
     await attachAndNegotiate(dev);
   }catch(e){blog('auto-reconnect failed: '+e.message);setScaleUI('off','Not connected');}
 }
-/* iPhones and iPads can't use Web Bluetooth in any browser (all iOS browsers
-   run Safari's engine). Detect that on load and make it obvious instead of
-   letting the user tap a Connect button that can never open a picker. */
+/* ---- Native Bluetooth (Capacitor / iOS) --------------------------------
+   iOS WKWebView has no Web Bluetooth, so inside the native app we route the
+   SAME six scale adapters through @capacitor-community/bluetooth-le. The
+   trick: a shim that mimics the exact Web Bluetooth surface the adapters use
+   (device.gatt.connect → getPrimaryService → getCharacteristic →
+   startNotifications / 'characteristicvaluechanged' / writeValue), backed by
+   the native BluetoothLe bridge. Every byte-parser (parse/decode*) is reused
+   unchanged. No bundler needed: we talk to window.Capacitor.Plugins.BluetoothLe
+   directly and replicate the small things BleClient does — hex⇄DataView,
+   the 'notification|id|svc|chr' listener key, and UUID normalisation.
+   NOTE: cannot be verified in the iOS Simulator (no BLE radio); needs a real
+   device + scale. See RUNBOOK.md "Milestone 2". */
+function capNative(){return !!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());}
+function bleBridge(){return window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.BluetoothLe;}
+function bleNativeAvailable(){return capNative()&&!!bleBridge();}
+// 16-bit number → full UUID; strings lower-cased (native wants 128-bit lower).
+function nUUID(u){return typeof u==='number'?`0000${u.toString(16).padStart(4,'0')}-0000-1000-8000-00805f9b34fb`:String(u).toLowerCase();}
+// native characteristic values cross the bridge as hex strings (matches BleClient)
+function hexToDV(hex){const bin=[];let buf=0,empty=1;for(let i=0;i<hex.length;i++){const c=hex.charCodeAt(i);if((c>47&&c<58)||(c>64&&c<71)||(c>96&&c<103)){buf=(buf<<4)^((c>64?c+9:c)&15);if((empty^=1))bin.push(buf&0xff);}}return new DataView(Uint8Array.from(bin).buffer);}
+function dvToHex(dv){const u=new Uint8Array(dv.buffer,dv.byteOffset,dv.byteLength);let s='';for(const n of u)s+=n.toString(16).padStart(2,'0');return s;}
+function toDV(b){if(b instanceof DataView)return b;const u=b instanceof Uint8Array?b:Uint8Array.from(b);return new DataView(u.buffer,u.byteOffset,u.byteLength);}
+// notification listener handles for the current device — cleared on every
+// (re)connect so a reconnect can't stack duplicate listeners (double weight).
+let NATIVE_NOTIFY=[];
+async function clearNativeNotify(){for(const h of NATIVE_NOTIFY){try{h&&h.remove&&await h.remove();}catch(_){}}NATIVE_NOTIFY=[];}
+function nativeChar(deviceId,svc,chr,props){
+  return {
+    properties:props||{}, _cb:null,
+    addEventListener(type,cb){if(type==='characteristicvaluechanged')this._cb=cb;},
+    async startNotifications(){
+      const self=this,key=`notification|${deviceId}|${svc}|${chr}`;
+      const h=await bleBridge().addListener(key,ev=>{if(self._cb)self._cb({target:{value:hexToDV((ev&&ev.value)||'')}});});
+      NATIVE_NOTIFY.push(h);
+      await bleBridge().startNotifications({deviceId,service:svc,characteristic:chr});
+    },
+    // Web writeValue ≈ with-response, fall back to without-response (some scales)
+    async writeValue(bytes){
+      const value=dvToHex(toDV(bytes)),b=bleBridge();
+      try{await b.write({deviceId,service:svc,characteristic:chr,value});}
+      catch(e){try{await b.writeWithoutResponse({deviceId,service:svc,characteristic:chr,value});}catch(_){throw e;}}
+    }
+  };
+}
+function nativeService(deviceId,svc,chars){
+  return {
+    uuid:svc,
+    async getCharacteristic(cu){const u=nUUID(cu),m=(chars||[]).find(c=>String(c.uuid).toLowerCase()===u);if(!m&&(chars||[]).length)throw new Error('characteristic '+u+' not found');return nativeChar(deviceId,svc,u,m&&m.properties);},
+    async getCharacteristics(){return (chars||[]).map(c=>nativeChar(deviceId,svc,String(c.uuid).toLowerCase(),c.properties));}
+  };
+}
+function nativeServer(deviceId,services){
+  return {
+    // throw on missing service — adapters rely on this to detect "not my scale"
+    async getPrimaryService(su){const u=nUUID(su),s=(services||[]).find(x=>String(x.uuid).toLowerCase()===u);if(!s)throw new Error('service '+u+' not found');return nativeService(deviceId,u,s.characteristics);},
+    async getPrimaryServices(){return (services||[]).map(s=>nativeService(deviceId,String(s.uuid).toLowerCase(),s.characteristics));}
+  };
+}
+function nativeDevice(deviceId,name){
+  const dev={id:deviceId,name:name||'',_disc:null,_discHandle:null,
+    addEventListener(type,cb){if(type==='gattserverdisconnected')dev._disc=cb;},
+    gatt:{
+      async connect(){
+        const b=bleBridge();
+        await clearNativeNotify();          // drop any listeners from a prior connect
+        await b.connect({deviceId});
+        if(dev._discHandle&&dev._discHandle.remove)try{await dev._discHandle.remove();}catch(_){}
+        dev._discHandle=await b.addListener(`disconnected|${deviceId}`,()=>{if(dev._disc)dev._disc();});
+        const res=await b.getServices({deviceId});
+        return nativeServer(deviceId,(res&&res.services)||[]);
+      },
+      async disconnect(){try{await bleBridge().disconnect({deviceId});}catch(_){}}
+    }
+  };
+  return dev;
+}
+async function connectScaleNative(showAll){
+  const b=bleBridge();
+  setScaleUI('off','Choosing device…');
+  await b.initialize();
+  const OPT=[WSS.svc,0x181B,ACAIA.svc,ACAIA_LEGACY.svc,BOOKOO.svc,FELICITA.svc,TIMEMORE.svc,'0000fff0-0000-1000-8000-00805f9b34fb','0000ff12-0000-1000-8000-00805f9b34fb'].map(nUUID);
+  const SCALE_SVCS=[WSS.svc,ACAIA.svc,ACAIA_LEGACY.svc,BOOKOO.svc,FELICITA.svc].map(nUUID);
+  /* Native requestDevice takes a flat filter, not Web Bluetooth's multi-filter
+     array or several name-prefixes. Filtered = must advertise a known scale
+     service; "show all" = every BLE device (fallback for scales that don't
+     advertise their service in the scan record, e.g. some Acaia firmwares). */
+  const opts=showAll?{optionalServices:OPT}:{services:SCALE_SVCS,optionalServices:OPT};
+  blog(showAll?'native picker: all devices':'native picker: known scale services');
+  const dev=await b.requestDevice(opts);
+  blog('chose device: '+(dev.name||'(unnamed)'));
+  await attachAndNegotiate(nativeDevice(dev.deviceId,dev.name));
+}
+async function autoReconnectNative(){
+  try{
+    const saved=JSON.parse(localStorage.getItem('pc_scale')||'null');if(!saved||!saved.id)return;
+    const b=bleBridge();await b.initialize();
+    const res=await b.getDevices({deviceIds:[saved.id]});
+    const found=(res&&res.devices||[]).find(d=>d.deviceId===saved.id);
+    if(!found){blog('remembered scale not known to system');return;}
+    setScaleUI('off','Reconnecting to '+(found.name||saved.name||'scale')+'…');
+    await attachAndNegotiate(nativeDevice(found.deviceId,found.name||saved.name));
+  }catch(e){blog('native auto-reconnect failed: '+(e&&e.message));setScaleUI('off','Not connected');}
+}
+/* ------------------------------------------------------------------------ */
+/* Web Bluetooth is unavailable in the iOS WKWebView, but the native app
+   supplies it through the Capacitor bridge above. Only when NEITHER exists
+   (e.g. a desktop browser with the flag off) do we disable the UI. */
 function initScaleSupport(){
-  if(navigator.bluetooth)return;
-  const s=$('scaleStatus');if(s)s.textContent='Bluetooth scales aren’t supported on iPhone or iPad. The app runs fully guided on timers, no scale needed.';
+  if(bleNativeAvailable()||navigator.bluetooth)return;
+  const s=$('scaleStatus');if(s)s.textContent='Bluetooth scales aren’t supported on this device. The app runs fully guided on timers, no scale needed.';
   ['btnConnect','btnConnectAll'].forEach(id=>{const b=$(id);if(b){b.disabled=true;b.style.opacity='.4';b.style.cursor='not-allowed';}});
 }
 async function connectScale(showAll=false){
+  if(bleNativeAvailable()){
+    try{await connectScaleNative(showAll);}
+    catch(e){const m=(e&&e.message)||'';blog('✗ '+((e&&e.name)||'')+': '+m);
+      setScaleUI('off',/cancel|no device|not found|denied/i.test(m)
+        ?(showAll?'No device chosen':'Scale not in the list? Tap "All devices" to widen the search.')
+        :'Connect failed: '+(m||'unknown'));}
+    return;
+  }
   if(!navigator.bluetooth){setScaleUI('off','Bluetooth scales aren’t supported on this device (iPhone/iPad). The app runs fully guided on timers.');return;}
   try{
     setScaleUI('off','Choosing device…');
