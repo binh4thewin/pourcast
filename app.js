@@ -25,6 +25,19 @@ const TOOLS=[
    'adaptive' = pour durations scale with water volume.
    tempC is calibrated for roastRec. */
 const RECIPES=[
+ {id:'basic6040',tool:['v60','origami','any'],champ:'Beginner-friendly two-pour',timing:'adaptive',
+  name:'Basic 60/40 · Two Pours',ratio:16,defaultDose:18,grind:'Medium',tempC:[92,94],roastRec:'Medium',
+  desc:'A no-fuss two-pour V60 after the bloom: one bigger pour for 60% of the water, a quick stir, then a final pour for the last 40%. Forgiving and easy to nail with or without a scale.',
+  steps:[
+    {type:'pour',frac:.15,dur:10,label:'Bloom pour'},
+    {type:'wait',dur:30,label:'Bloom rest',note:'wet all the grounds, let it degas'},
+    {type:'pour',frac:.51,dur:30,label:'Pour 1 → 60% · steady spiral',note:'the bigger of the two pours'},
+    {type:'stir',dur:8,label:'Stir · 1x each way',note:'knock grounds off the walls, even the bed'},
+    {type:'wait',dur:5,label:'Let bed settle'},
+    {type:'pour',frac:.34,dur:25,label:'Pour 2 → 100% · ease off',note:'final 40%, gentler to the finish'},
+    {type:'swirl',dur:5,label:'Gentle swirl'},
+    {type:'wait',dur:45,label:'Let it drain'}
+ ]},
  {id:'kasuya46',tool:['v60','origami','any'],champ:'Competition-born classic',timing:'rigid',
   name:'The 4:6 · World Champ Method',ratio:15,defaultDose:20,grind:'Coarse',tempC:[92,96],roastRec:'Light',
   desc:'Five equal pours on a fixed 45s clock, letting the bed fully drain between pours. First 40% of water tunes sweetness vs acidity, last 60% tunes strength.',
@@ -36,7 +49,7 @@ const RECIPES=[
     {type:'pour',frac:.20,dur:10,label:'Pour 3 · strength'},
     {type:'wait',dur:35,label:'Drain fully',note:'wait for a dry-ish bed'},
     {type:'pour',frac:.20,dur:10,label:'Pour 4 · strength'},
-    {type:'wait',dur:20,label:'Drain fully'},
+    {type:'wait',dur:35,label:'Drain fully'},
     {type:'pour',frac:.20,dur:10,label:'Pour 5 · strength'},
     {type:'wait',dur:45,label:'Final drawdown'}
   ]},
@@ -170,7 +183,7 @@ const RECIPES=[
     {type:'pour',frac:.20,dur:10,label:'Pour 3 · strength'},
     {type:'wait',dur:35,label:'Drain fully'},
     {type:'pour',frac:.20,dur:10,label:'Pour 4 · strength'},
-    {type:'wait',dur:20,label:'Drain fully'},
+    {type:'wait',dur:35,label:'Drain fully'},
     {type:'pour',frac:.20,dur:10,label:'Pour 5 · strength'},
     {type:'wait',dur:45,label:'Final drawdown'}
   ]},
@@ -1636,7 +1649,7 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.1.0';
+const APP_VERSION='1.3.0';
 let theme='max';
 const THEME_ORDER=['max','adobe','sage','burnt'];
 const THEME_LABEL={max:'Max',adobe:'Adobe',sage:'Sage',burnt:'Burnt'};
