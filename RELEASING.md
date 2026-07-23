@@ -13,7 +13,7 @@ Semantic versioning — `MAJOR.MINOR.PATCH`:
 
 Two numbers matter for iOS:
 
-- **Marketing version** (`CFBundleShortVersionString`) — what users see, e.g. `1.2.0`. Canonical source of truth is `APP_VERSION` in `index.html`; `pourcast-ios/package.json` mirrors it. `release.sh` updates both.
+- **Marketing version** (`CFBundleShortVersionString`) — what users see, e.g. `1.2.0`. Canonical source of truth is `APP_VERSION` in `app.js` (it moved there in the index.html → index.html + styles.css + app.js split); `pourcast-ios/package.json` mirrors it. `release.sh` updates both.
 - **Build number** (`CFBundleVersion`) — an integer that must **increase on every upload** to App Store Connect, even re-uploads of the same marketing version. Bump this in Xcode each time you archive.
 
 ## Release checklist
