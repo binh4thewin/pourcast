@@ -48,8 +48,14 @@ echo "Committing + tagging ..."
 # unrelated in-progress work is never swept into the release commit.
 RELEASE_FILES=(
   CHANGELOG.md
+  # root web app — what GitHub Pages serves; all four must be committed or the
+  # live site ships stale HTML/CSS/audio (app.js alone is not enough)
+  index.html
+  styles.css
   app.js
+  pour.mp3
   pourcast-ios/package.json
+  # iOS payload mirror (kept in sync by sync-ios.sh)
   pourcast-ios/www/app.js
   pourcast-ios/www/index.html
   pourcast-ios/www/styles.css
