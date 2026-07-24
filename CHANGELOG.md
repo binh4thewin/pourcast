@@ -8,7 +8,29 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 ## [Unreleased]
 
-_In progress: native (Capacitor/iOS) Bluetooth support — routing the six scale adapters through `@capacitor-community/bluetooth-le`. Not yet complete; needs verification on a real device + scale (see `pourcast-ios/RUNBOOK.md`)._
+_Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
+
+## [1.4.0] — 2026-07-24
+
+### Added
+- **Haze** — a new calming theme: a soft pastel-sky gradient (peach → periwinkle → watery teal) with frosted cards. Replaces Sage in the lineup (Max · Adobe · Haze · Burnt).
+- The brew screen now shows the **brewer name** at the top, and teaching cues on the wait steps: **"Wait, let it bloom"** during the bloom rest and **"Last step · Drawdown"** at the finish.
+- A live **step countdown** (mm:ss.s) showing exactly how much time is left in the current step.
+
+### Changed
+- **Brew screen redesign**: the total-time counter is tucked into the top-left corner (mm:ss), the instruction is the centered focus, and Exit / Pause / Next are anchored to the bottom of the screen.
+- Calmer brewing feel: quieter tenths, a de-emphasized per-pour countdown, a smoothed progress-bar fill (respects reduced-motion), and tabular figures so the numbers don't jitter.
+- The total-time counter is now clean mm:ss (no tenths), and the completed timer lands exactly on the goal time.
+- While paused, the Next-step button is hidden — the only actions are Resume or Exit.
+- Native (Capacitor/iOS) Bluetooth scale support is now implemented in code; the web build is unaffected. Pending on-device verification.
+
+### Fixed
+- Respect iOS safe areas: the settings gear and header controls no longer clip past the screen edge.
+- The 3-2-1 countdown overlay is now fully opaque — the brew screen no longer bleeds through it.
+- Burnt theme frame now shows only the left/right side rails (removed the top/bottom lines that crossed the notch and home indicator).
+
+### Removed
+- The **Sage** theme (reworked into Haze; a saved Sage look now shows as Haze automatically).
 
 ## [1.3.0] — 2026-07-23
 

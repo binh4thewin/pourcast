@@ -432,6 +432,10 @@ function renderOzHint(){
 }
 const hasLiveWeight=()=>ble.connected||simMode;
 const fmtT=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+// zero-padded mm:ss for the brew screen only (fmtT stays single-digit elsewhere)
+const fmtClock=s=>{const x=Math.max(0,s);return String(Math.floor(x/60)).padStart(2,'0')+':'+String(Math.floor(x%60)).padStart(2,'0');};
+// current-step countdown with a quiet tenths digit, e.g. 0:07.4 — this is where the tenths live
+const stepCountdownHTML=s=>{s=Math.max(0,s);return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}<span class="t-frac">.${Math.floor((s%1)*10)}</span>`;};
 
 /* ============================ 3. STORE ============================ */
 /* All persistence flows through Store. localStorage when available
@@ -1649,10 +1653,10 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.3.0';
+const APP_VERSION='1.4.0';
 let theme='max';
 const THEME_ORDER=['max','adobe','sage','burnt'];
-const THEME_LABEL={max:'Max',adobe:'Adobe',sage:'Sage',burnt:'Burnt'};
+const THEME_LABEL={max:'Max',adobe:'Adobe',sage:'Haze',burnt:'Burnt'};
 function setTheme(t){
   if(t==='calm')t='adobe';
   theme=t;
@@ -1699,7 +1703,10 @@ function syncCustomized(){
 const elapsed=()=>((paused?pauseStart:Date.now())-brewStart)/1000;
 /* Corner clock: actual vs. goal. The goal is the schedule end, fixed, known
    up front. Finishing well past it is the "grind coarser" tell. */
-const timerHTML=t=>`${fmtT(t)}<small> / ${fmtT(totalDur)}</small>`;
+// total-time counter: clean mm:ss elapsed / total, no tenths (tenths live on the step countdown)
+const timerHTML=t=>`${fmtClock(t)}<small> / ${fmtClock(totalDur)}</small>`;
+// brewer shown at the top of the brew screen (basic uses the saved brewer, print uses the picked tool)
+function currentBrewerName(){const id=isBasic()?((basicState()&&basicState().brewer)||'v60'):tool;const t=TOOLS.find(x=>x.id===id);return t?t.name:'';}
 function togglePause(){
   if(!brewing||brewIdx>=schedule.length)return;
   paused=!paused;
@@ -1707,9 +1714,11 @@ function togglePause(){
     pauseStart=Date.now();pourStop();
     $('btnPause').textContent='Resume ▶';
     $('pace').textContent='⏸ PAUSED';$('pace').className='pace hold';$('pace').style.display='inline-block';
+    $('btnNext').style.display='none';   // no forward step while paused — just Resume or Exit
   }else{
     brewStart+=Date.now()-pauseStart;
     $('btnPause').textContent='Pause ⏸';
+    $('btnNext').style.display='';
   }
   if(navigator.vibrate)navigator.vibrate(40);
   updateBrewUI();
@@ -1776,6 +1785,7 @@ function startCountdown(){
   $('setup').style.display='none';$('basic').style.display='none';$('brew').style.display='block';
   document.body.classList.add('brewing');$('settingsCard').style.display='none';
   buildTimeline();renderLiveMethodStatic();
+  $('brewHead').textContent=currentBrewerName();
   $('countdown').style.display='flex';
   audioInit();
   let n=3;$('cdNum').textContent=n;sfxTick();
@@ -1795,9 +1805,9 @@ function beginBrew(){
   disarmExit();
 
   brewTrace=[];
-  paused=false;$('btnPause').textContent='Pause ⏸';
+  paused=false;$('btnPause').textContent='Pause ⏸';$('btnNext').style.display='';
   clearInterval(timerIv);                      // no zombie timers from prior brews
-  timerIv=setInterval(tick,150);tick();
+  timerIv=setInterval(tick,100);tick();   // 100ms so the tenths animate smoothly
 }
 function buildTimeline(){
   $('timeline').innerHTML=schedule.map((st,i)=>
@@ -1866,17 +1876,18 @@ function updateBrewUI(){
   renderWaterBar(w);
   if(!st){finishUI();return;}
   $('instrKicker').textContent=isBasic()
-    ?(st.type==='pour'?'POUR UNTIL THE SCALE READS':st.type==='wait'?'WAIT, HANDS OFF':st.type.toUpperCase())
+    ?(st.type==='pour'?'POUR UNTIL THE SCALE READS':st.type==='wait'?(/bloom/i.test(st.label||'')?'WAIT, LET IT BLOOM':(brewIdx===schedule.length-1||/draw|drain/i.test(st.label||''))?'LAST STEP · DRAWDOWN':'WAIT, HANDS OFF'):st.type.toUpperCase())
     :`STEP ${brewIdx+1} OF ${schedule.length} · ${st.type.toUpperCase()}`;
   // The number IS the instruction: cumulative target = what the scale should read.
   // Tare happens once at GO, never mid-brew, so this always matches the scale face.
-  $('instrMain').textContent=st.type==='pour'
+  const stepRem=st.dur-(el-stepStart);   // time left in THIS step
+  $('instrMain').innerHTML=st.type==='pour'
     ?fmtW(st.target)
-    :(isBasic()?fmtT(Math.max(0,Math.ceil(st.dur-(el-stepStart)))):st.label);
+    :(isBasic()?stepCountdownHTML(stepRem):escapeHTML(st.label));
   const nxt=schedule[brewIdx+1];
-  $('instrSub').textContent=isBasic()
-    ?(st.type==='pour'?`${fmtT(Math.max(0,Math.ceil(st.dur-(el-stepStart))))} to get there`:'')
-    :(st.note?st.note+'  ·  ':'')+(nxt?`next: ${ICONS[nxt.type]} ${nxt.label}${nxt.type==='pour'?` (→ ${fmtW(nxt.target)})`:''}`:'last step!');
+  $('instrSub').innerHTML=isBasic()
+    ?(st.type==='pour'?`${stepCountdownHTML(stepRem)} to get there`:'')
+    :(st.note?escapeHTML(st.note)+'  ·  ':'')+(nxt?`next: ${ICONS[nxt.type]} ${escapeHTML(nxt.label)}${nxt.type==='pour'?` (→ ${fmtW(nxt.target)})`:''}`:'last step!');
   // flow gauge
   if(st.type==='pour'&&hasLiveWeight()){
     const fr=liveFlowRate(),target=st.amount/st.dur;
@@ -1976,7 +1987,8 @@ function finishUI(){
     clearInterval(timerIv);timerIv=null;      // brew is over: stop the clock
     if(navigator.vibrate)navigator.vibrate([80,60,160]);
   }
-  $('timer').innerHTML=timerHTML(finishedAt);  // frozen: actual vs. goal at a glance
+  // completed: clean mm:ss with no live tenths, clamped so tick latency can't read past the goal — lands on the total
+  $('timer').innerHTML=`${fmtClock(Math.min(finishedAt,totalDur))}<small> / ${fmtClock(totalDur)}</small>`;
   $('instrKicker').textContent='BREW COMPLETE';
   $('instrMain').textContent='☕ Pull the dripper, enjoy';
   $('instrSub').textContent='';

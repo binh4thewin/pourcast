@@ -183,7 +183,7 @@
   <div class="mp-value">A live brew timer that <b>paces every pour in real time</b>, not just a ratio calculator. Guided pours, with or without a scale.</div>
   <button class="btn-primary mp-btn" id="mpBasic">Just Brew<div class="mp-sub">You love good coffee and want a consistent cup, no bean-tracking. We set the ratio and pace every pour.</div></button>
   <button class="mp-btn" id="mpPrint">Brew Print<div class="mp-sub">For the tinkerer who wants control and likes to fine-tune different methods.</div></button>
-  <button class="btn-sm iconbtn" id="btnSettings" aria-label="Settings" title="Settings" style="position:absolute;top:18px;right:18px">
+  <button class="btn-sm iconbtn" id="btnSettings" aria-label="Settings" title="Settings" style="position:absolute;top:calc(18px + var(--sa-top));right:calc(18px + var(--sa-right))">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
   </button>
   <div class="card" id="settingsCard" style="display:none">
@@ -206,7 +206,7 @@
       </div>
       <div><label>Look</label>
         <div class="unitseg" role="group" aria-label="Theme">
-          <button class="btn-sm useg on" id="themeMax">Max</button><button class="btn-sm useg" id="themeAdobe">Adobe</button><button class="btn-sm useg" id="themeSage">Sage</button><button class="btn-sm useg" id="themeBurnt">Burnt</button>
+          <button class="btn-sm useg on" id="themeMax">Max</button><button class="btn-sm useg" id="themeAdobe">Adobe</button><button class="btn-sm useg" id="themeSage">Haze</button><button class="btn-sm useg" id="themeBurnt">Burnt</button>
         </div>
       </div>
     </div>
@@ -281,49 +281,49 @@
 </div>
 
 <div id="brew">
-  <div class="card">
-    <div class="brew-top">
-      <div class="timer" id="timer">0:00</div>
-      <div class="timeline" id="timeline"></div>
-      <div class="scaletag" id="scaleTag" style="display:none"></div>
-      <div class="pace ok" id="pace" style="display:none">ON PACE</div>
-    </div>
-    <div class="tl-times" style="display:none"><span>0:00</span><span id="tlMid"></span><span id="tlEnd"></span></div>
+  <div class="brew-head" id="brewHead"></div>
+  <div class="brew-top">
+    <div class="timer" id="timer">0:00</div>
+    <div class="timeline" id="timeline"></div>
+    <div class="scaletag" id="scaleTag" style="display:none"></div>
+    <div class="pace ok" id="pace" style="display:none">ON PACE</div>
+  </div>
+  <div class="tl-times" style="display:none"><span>0:00</span><span id="tlMid"></span><span id="tlEnd"></span></div>
+  <div class="card brew-card">
+    <div class="brew-focus">
+      <div class="instruction">
+        <div class="instr-kicker" id="instrKicker">STEP 1 OF 9</div>
+        <div class="instr-main" id="instrMain">Pour slowly to 60 g</div>
+        <div class="instr-sub" id="instrSub"></div>
+      </div>
 
-    <div class="instruction">
-      <div class="instr-kicker" id="instrKicker">STEP 1 OF 9</div>
-      <div class="instr-main" id="instrMain">Pour slowly to 60 g</div>
-      <div class="instr-sub" id="instrSub"></div>
-    </div>
+      <div class="stepbar-wrap">
+        <div class="stepbar" id="stepbar"></div>
+        <div class="stepbar-label" id="stepbarLabel"></div>
+      </div>
 
-    <div class="stepbar-wrap">
-      <div class="stepbar" id="stepbar"></div>
-      <div class="stepbar-label" id="stepbarLabel"></div>
-    </div>
+      <div class="waterbar-wrap" id="waterbarWrap">
+        <div class="waterbar" id="waterbar"></div>
+        <div class="waterbar-label" id="waterbarLabel">0 / 300 g</div>
+      </div>
 
-    <div class="waterbar-wrap" id="waterbarWrap">
-      <div class="waterbar" id="waterbar"></div>
-      <div class="waterbar-label" id="waterbarLabel">0 / 300 g</div>
-    </div>
-
-    <div class="flow" id="flow" style="display:none">
-      <span class="fr-now"><b id="frNow">0.0</b> g/s</span>
-      <span class="fr-arrow">→</span>
-      <span class="fr-target">target <b id="frTarget">0.0</b> g/s</span>
-      <span class="fr-verdict" id="frVerdict"></span>
-    </div>
-    <span id="bedInfo" style="display:none"></span>
-
-    <div class="brew-btns">
-      <button id="btnBack">Exit</button>
-
-      <button class="btn-teal" id="btnPause">Pause ⏸</button>
-      <button class="btn-acid" id="btnNext">Next step ›</button>
+      <div class="flow" id="flow" style="display:none">
+        <span class="fr-now"><b id="frNow">0.0</b> g/s</span>
+        <span class="fr-arrow">→</span>
+        <span class="fr-target">target <b id="frTarget">0.0</b> g/s</span>
+        <span class="fr-verdict" id="frVerdict"></span>
+      </div>
+      <span id="bedInfo" style="display:none"></span>
     </div>
   </div>
   <div class="card" id="methodCard">
     <button class="btn-sm" id="btnMethodToggle" style="width:100%">Show full method ▾</button>
     <div id="stepList" style="display:none;margin-top:12px"></div>
+  </div>
+  <div class="brew-btns">
+    <button id="btnBack">Exit</button>
+    <button class="btn-teal" id="btnPause">Pause ⏸</button>
+    <button class="btn-acid" id="btnNext">Next step ›</button>
   </div>
 </div>
 </div>
