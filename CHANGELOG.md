@@ -10,6 +10,12 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.4.6] — 2026-08-10
+
+### Added
+- **Real app icon + favicons.** Replaced the default Capacitor placeholder with the Pourcast pour-over dripper mark. The web app now has a proper browser-tab favicon (16/32/48), an iOS "Add to Home Screen" icon (apple-touch-icon 180), and PWA icons (192/512).
+- **Web app manifest** (`manifest.json`) — Pourcast is now installable to the home screen and launches full-screen (standalone), with the cream theme color matching the app. The 1024 icon master is tracked at `pourcast-ios/assets/icon.png` and applied to the native iOS icon too.
+
 ## [1.4.5] — 2026-08-10
 
 ### Fixed
