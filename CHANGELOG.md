@@ -10,6 +10,16 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.4.3] — 2026-07-24
+
+### Changed
+- Trimmed the theme lineup to **Max · Haze · Burnt** to keep the choice simple. A saved Adobe look now migrates to Haze automatically.
+- Tightened the tagline — dropped "Make the perfect pour over coffee," leaving the "Pour over ratios made easy" badge.
+- Reworded the Brew Print description: "…likes to fine-tune their pour over routine."
+
+### Removed
+- The **Adobe** theme (it overlapped Haze).
+
 ## [1.4.2] — 2026-07-24
 
 ### Added

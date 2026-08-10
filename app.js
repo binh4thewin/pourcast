@@ -1653,18 +1653,16 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.4.2';
+const APP_VERSION='1.4.3';
 let theme='max';
-const THEME_ORDER=['max','adobe','sage','burnt'];
-const THEME_LABEL={max:'Max',adobe:'Adobe',sage:'Haze',burnt:'Burnt'};
+const THEME_ORDER=['max','sage','burnt'];
+const THEME_LABEL={max:'Max',sage:'Haze',burnt:'Burnt'};
 function setTheme(t){
-  if(t==='calm')t='adobe';
+  if(t==='calm'||t==='adobe')t='sage';   // Adobe retired → Haze (legacy 'calm' migrates here too)
   theme=t;
-  document.body.classList.toggle('adobe',t==='adobe');
   document.body.classList.toggle('sage',t==='sage');
   document.body.classList.toggle('burnt',t==='burnt');
   $('themeMax').classList.toggle('on',t==='max');
-  $('themeAdobe').classList.toggle('on',t==='adobe');
   $('themeSage').classList.toggle('on',t==='sage');
   $('themeBurnt').classList.toggle('on',t==='burnt');
   const ln=$('mpLookName');if(ln)ln.textContent=THEME_LABEL[t]||t;
@@ -2556,7 +2554,6 @@ function wireSetup(){
   $('wOz').onclick=()=>setWeightUnit(true);
   {const av=$('appVersion');if(av)av.textContent='Pourcast v'+APP_VERSION;}
   $('themeMax').onclick=()=>setTheme('max');
-  $('themeAdobe').onclick=()=>setTheme('adobe');
   $('themeSage').onclick=()=>setTheme('sage');
   $('themeBurnt').onclick=()=>setTheme('burnt');
   $('btnSettings').onclick=()=>{
