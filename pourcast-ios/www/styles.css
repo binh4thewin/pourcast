@@ -202,14 +202,14 @@ body.sage .scaletag.real{background:#D8E4F4}body.sage .scaletag.sim{background:#
 body.brewing.basic .instr-sub{font-size:12px}
 /* In-step progress: big bar for pours, countdown for waits */
 .stepbar-wrap{border:var(--border);border-radius:14px;background:#fff;overflow:hidden;height:64px;position:relative;margin-bottom:12px}
-.stepbar{position:absolute;inset:0;width:0%;background:linear-gradient(92deg,var(--magenta),var(--orange),var(--violet))}
+.stepbar{position:absolute;inset:0;transform-origin:left center;transform:scaleX(0);background:linear-gradient(92deg,var(--magenta),var(--orange),var(--violet))}
 .stepbar-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Bricolage Grotesque';font-weight:800;font-size:26px;font-variant-numeric:tabular-nums;z-index:1;mix-blend-mode:normal}
 .stepbar-label small{font-size:14px;font-weight:700}
 /* Overall water bar */
 .waterbar-wrap{border:var(--border);border-radius:12px;background:#fff;overflow:hidden;height:30px;position:relative;margin:2px 0 14px 0}
-.waterbar{position:absolute;left:0;top:0;bottom:0;width:0%;background:var(--teal)}
+.waterbar{position:absolute;left:0;top:0;bottom:0;width:100%;transform-origin:left center;transform:scaleX(0);background:var(--teal)}
 /* let the fill glide between the 100ms timer updates instead of stepping — calmer motion */
-@media (prefers-reduced-motion: no-preference){.waterbar,.stepbar{transition:width .45s cubic-bezier(.4,0,.2,1)}}
+@media (prefers-reduced-motion: no-preference){.waterbar,.stepbar{transition:transform .45s cubic-bezier(.4,0,.2,1)}}
 /* target ticks removed — they overran the rounded container when the bar scaled/shifted */
 .watertick{display:none}
 .waterbar-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;z-index:1}

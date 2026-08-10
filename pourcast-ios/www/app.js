@@ -1653,7 +1653,7 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.4.3';
+const APP_VERSION='1.4.4';
 let theme='max';
 const THEME_ORDER=['max','sage','burnt'];
 const THEME_LABEL={max:'Max',sage:'Haze',burnt:'Burnt'};
@@ -1833,7 +1833,7 @@ function tick(){
     }
     // water sound rides along with pour steps only
     if(st.type==='pour'&&!paused)pourStart();else pourStop();
-    if(st.type!=='pour'&&inStep>=st.dur){advance();return;}
+    if(st.type!=='pour'&&inStep>=st.dur&&!isFinalDrawdown()){advance();return;}
     if(st.type==='pour'&&!hasLiveWeight()&&inStep>=st.dur){advance();return;}
   }
   updateBrewUI();
@@ -1844,6 +1844,20 @@ function paceState(){
   if(Math.abs(d)<6)return['ON PACE','ok'];
   if(d>0)return[`+${Math.round(d)}s BEHIND`,'behind'];
   return[`${Math.round(-d)}s AHEAD`,'ahead'];
+}
+/* The final drain of a percolation brew is where grind size shows up. For the tinkerer
+   (Brew Print) we let them end it by hand so the finish time reads as a grind signal.
+   Autopilot (Basic) and immersion brews still end on the clock. */
+function isFinalDrawdown(){
+  const st=schedule[brewIdx];
+  return !isBasic()&&recipe&&!recipe.immersion&&brewIdx===schedule.length-1&&st&&st.type!=='pour';
+}
+function drawdownHint(){
+  if(isBasic()||!recipe||recipe.immersion)return '';   // these end on the clock, no drawdown to read
+  const drift=finishedAt-totalDur;   // + ran long (slow drain) · − finished early (fast drain)
+  if(drift>=15)return `Drawdown ran ~${Math.round(drift)}s long. If the bed was slow to drain, the grind may be a touch too fine — try one notch coarser next time.`;
+  if(drift<=-15)return `Finished ~${Math.round(-drift)}s early. If the bed drained fast, the grind may be a touch too coarse — try one notch finer next time.`;
+  return `Landed right on the estimate — the grind's dialed in for this coffee. Repeat it.`;
 }
 function pourFrac(st,w){
   const prevPour=[...schedule.slice(0,schedule.indexOf(st))].reverse().find(x=>x.type==='pour');
@@ -1873,9 +1887,11 @@ function updateBrewUI(){
   });
   renderWaterBar(w);
   if(!st){finishUI();return;}
+  const finalDraw=isFinalDrawdown();
+  if(finalDraw)$('btnNext').textContent='Cup drained ✓';
   $('instrKicker').textContent=isBasic()
     ?(st.type==='pour'?'POUR UNTIL THE SCALE READS':st.type==='wait'?(/bloom/i.test(st.label||'')?'WAIT, LET IT BLOOM':(brewIdx===schedule.length-1||/draw|drain/i.test(st.label||''))?'LAST STEP · DRAWDOWN':'WAIT, HANDS OFF'):st.type.toUpperCase())
-    :`STEP ${brewIdx+1} OF ${schedule.length} · ${st.type.toUpperCase()}`;
+    :(finalDraw?'DRAWDOWN · LAST STEP':`STEP ${brewIdx+1} OF ${schedule.length} · ${st.type.toUpperCase()}`);
   // The number IS the instruction: cumulative target = what the scale should read.
   // Tare happens once at GO, never mid-brew, so this always matches the scale face.
   const stepRem=st.dur-(el-stepStart);   // time left in THIS step
@@ -1885,7 +1901,7 @@ function updateBrewUI(){
   const nxt=schedule[brewIdx+1];
   $('instrSub').innerHTML=isBasic()
     ?(st.type==='pour'?`${stepCountdownHTML(stepRem)} to get there`:'')
-    :(st.note?escapeHTML(st.note)+'  ·  ':'')+(nxt?`next: ${ICONS[nxt.type]} ${escapeHTML(nxt.label)}${nxt.type==='pour'?` (→ ${fmtW(nxt.target)})`:''}`:'last step!');
+    :(finalDraw?`Let the bed drain, then tap <b>Cup drained ✓</b> — the finish time tells you if your grind was on.`:(st.note?escapeHTML(st.note)+'  ·  ':'')+(nxt?`next: ${ICONS[nxt.type]} ${escapeHTML(nxt.label)}${nxt.type==='pour'?` (→ ${fmtW(nxt.target)})`:''}`:'last step!'));
   // flow gauge
   if(st.type==='pour'&&hasLiveWeight()){
     const fr=liveFlowRate(),target=st.amount/st.dur;
@@ -1904,15 +1920,20 @@ function updateBrewUI(){
   // in-step bar
   if(st.type==='pour'){
     const frac=hasLiveWeight()?pourFrac(st,w):Math.min(1,(el-stepStart)/st.dur);
-    $('stepbar').style.width=(frac*100)+'%';
+    $('stepbar').style.transform='scaleX('+frac+')';
     $('stepbarLabel').innerHTML=hasLiveWeight()
       ?`${weightOz?(w*G2OZ).toFixed(2):w.toFixed(1)}<small> / ${fmtW(st.target)}</small>`
       :`${Math.max(0,Math.ceil(st.dur-(el-stepStart)))}<small>s of pouring left</small>`;
     if(hasLiveWeight()&&w>=st.target-1)advance();
   }else{
-    const remain=Math.max(0,Math.ceil(st.dur-(el-stepStart)));
-    $('stepbar').style.width=(Math.min(1,(el-stepStart)/st.dur)*100)+'%';
-    $('stepbarLabel').innerHTML=`${remain}<small>s, ${st.type==='wait'?'hands off':'go!'}</small>`;
+    const inStep=el-stepStart;
+    $('stepbar').style.transform='scaleX('+Math.min(1,inStep/st.dur)+')';
+    if(finalDraw&&inStep>=st.dur){
+      $('stepbarLabel').innerHTML=`+${Math.round(inStep-st.dur)}<small>s past estimate · still draining?</small>`;
+    }else{
+      const remain=Math.max(0,Math.ceil(st.dur-inStep));
+      $('stepbarLabel').innerHTML=`${remain}<small>s, ${finalDraw?'drawdown (est.)':st.type==='wait'?'hands off':'go!'}</small>`;
+    }
   }
   if(methodOpen)renderLiveMethod(el,w);
 }
@@ -1928,7 +1949,7 @@ function pourTarget(){
 function renderWaterBar(w){
   const shown=hasLiveWeight()?w:estimatedWater();
   const tgt=pourTarget();
-  $('waterbar').style.width=Math.max(0,Math.min(100,100*(tgt?shown/tgt:0)))+'%';
+  $('waterbar').style.transform='scaleX('+Math.max(0,Math.min(1,(tgt?shown/tgt:0)))+')';
   $('waterbarLabel').textContent=`${weightOz?(shown*G2OZ).toFixed(2):Math.round(shown)} / ${fmtW(tgt)}${hasLiveWeight()?'':' (est.)'}`;
   const st=schedule[brewIdx];
   const schedTime=st?Math.min(st.end,st.start+(elapsed()-stepStart)):totalDur;
@@ -1985,13 +2006,15 @@ function finishUI(){
     clearInterval(timerIv);timerIv=null;      // brew is over: stop the clock
     if(navigator.vibrate)navigator.vibrate([80,60,160]);
   }
-  // completed: clean mm:ss with no live tenths, clamped so tick latency can't read past the goal — lands on the total
-  $('timer').innerHTML=`${fmtClock(Math.min(finishedAt,totalDur))}<small> / ${fmtClock(totalDur)}</small>`;
+  // completed: show the REAL finish time — running over or under the estimate is the grind signal, don't hide it
+  $('timer').innerHTML=`${fmtClock(finishedAt)}<small> / ${fmtClock(totalDur)}</small>`;
   $('instrKicker').textContent='BREW COMPLETE';
   $('instrMain').textContent='☕ Pull the dripper, enjoy';
-  $('instrSub').textContent='';
-  $('stepbar').style.width='100%';
-  $('stepbarLabel').innerHTML=`${fmtT(finishedAt)}<small> total</small>`;
+  $('instrSub').textContent=drawdownHint();
+  $('stepbar').style.transform='scaleX(1)';
+  const dd=finishedAt-totalDur;
+  const deltaTag=(recipe&&!recipe.immersion&&!isBasic()&&Math.abs(dd)>=5)?`  <small>· ${dd>0?'+':'−'}${Math.abs(Math.round(dd))}s vs est.</small>`:'';
+  $('stepbarLabel').innerHTML=`${fmtT(finishedAt)}<small> total</small>${deltaTag}`;
   $('flow').style.display='none';
   const n=$('btnNext');
   n.textContent=isBasic()?'Done ✓':'⭐ Rate this brew';

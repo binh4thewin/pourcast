@@ -10,6 +10,17 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.4.4] — 2026-08-10
+
+### Added
+- **Grind-size coaching.** In Brew Print, the final drawdown no longer auto-ends — you tap **"Cup drained ✓"** the moment the bed goes dry. The timer keeps counting past the estimate, and the finish screen reads that time back as a grind signal: ran long → grind may be too fine (go coarser); finished early → may be too coarse (go finer); on the estimate → dialed in. A `± vs est.` tag shows the gap at a glance.
+
+### Changed
+- The completed timer now shows the **real** finish time instead of snapping to the estimated total, so an over- or under-run is visible rather than hidden. (Autopilot "Just Brew" and immersion recipes still end on the clock.)
+
+### Fixed
+- The step and water progress bars now fill via `transform: scaleX()` instead of animating `width`, so the fill is GPU-composited and no longer triggers layout on every tick — smoother motion, especially on iOS. (Respects reduced-motion.)
+
 ## [1.4.3] — 2026-07-24
 
 ### Changed
