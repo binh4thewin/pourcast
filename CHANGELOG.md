@@ -10,6 +10,15 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.4.1] — 2026-07-24
+
+### Fixed
+- **Water bar** no longer overflows its rounded container when full — the fill is clipped cleanly to the pill. Also removed the pour-target tick marks, which broke out of the bar when it scaled or shifted.
+- **Burnt theme** "Just Brew / Brew Print" toggle: the first tab was inheriting Burnt's all-corners button radius, so it was a different shape than the second tab. Both are now matching left/right-rounded halves of one pill.
+
+### Changed
+- Page title updated to "POURCAST - Make the perfect pour over coffee".
+
 ## [1.4.0] — 2026-07-24
 
 ### Added

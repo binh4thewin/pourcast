@@ -1653,7 +1653,7 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.4.0';
+const APP_VERSION='1.4.1';
 let theme='max';
 const THEME_ORDER=['max','adobe','sage','burnt'];
 const THEME_LABEL={max:'Max',adobe:'Adobe',sage:'Haze',burnt:'Burnt'};
