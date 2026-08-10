@@ -1653,7 +1653,7 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.4.4';
+const APP_VERSION='1.4.5';
 let theme='max';
 const THEME_ORDER=['max','sage','burnt'];
 const THEME_LABEL={max:'Max',sage:'Haze',burnt:'Burnt'};
@@ -1803,7 +1803,7 @@ function beginBrew(){
   disarmExit();
 
   brewTrace=[];
-  paused=false;$('btnPause').textContent='Pause ⏸';$('btnNext').style.display='';
+  paused=false;$('btnPause').textContent='Pause ⏸';$('btnPause').style.display='';$('btnNext').style.display='';
   clearInterval(timerIv);                      // no zombie timers from prior brews
   timerIv=setInterval(tick,100);tick();   // 100ms so the tenths animate smoothly
 }
@@ -2016,6 +2016,7 @@ function finishUI(){
   const deltaTag=(recipe&&!recipe.immersion&&!isBasic()&&Math.abs(dd)>=5)?`  <small>· ${dd>0?'+':'−'}${Math.abs(Math.round(dd))}s vs est.</small>`:'';
   $('stepbarLabel').innerHTML=`${fmtT(finishedAt)}<small> total</small>${deltaTag}`;
   $('flow').style.display='none';
+  $('btnPause').style.display='none';   // brew's over — Pause is dead here, leave just Exit + finish
   const n=$('btnNext');
   n.textContent=isBasic()?'Done ✓':'⭐ Rate this brew';
   n.classList.add('pulse');
