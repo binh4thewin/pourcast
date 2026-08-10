@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.4.2] — 2026-07-24
+
+### Added
+- **SEO / AI discoverability**: a meta description, Open Graph + Twitter card tags, a canonical URL, and `WebApplication` JSON-LD structured data (name, description, free-offer, and real feature list) so search engines and AI assistants (ChatGPT, Perplexity, Google AI Overviews) can understand and cite the app.
+
 ## [1.4.1] — 2026-07-24
 
 ### Fixed
