@@ -1,8 +1,8 @@
 # Pourcast
 
-> A free pour-over coffee brew timer that paces every pour in real time — not just a ratio calculator. Guided recipes for popular drippers, usable with or without a scale.
+> A free pour-over coffee brew timer that paces every pour in real time, not just a ratio calculator. Guided recipes for popular drippers, usable with or without a scale.
 
-Pourcast is a web app (also shipped as an iOS app) for brewing pour-over coffee. You pick a brewer and dose — or fine-tune a full recipe — and Pourcast runs a live, guided brew timer that tells you exactly how much water to pour and when: bloom, pours, swirls, and drawdown, paced step by step in real time. It works fully offline and needs no scale, though it can connect to a Bluetooth coffee scale for live weight where the browser supports it.
+Pourcast is a web app (also shipped as an iOS app) for brewing pour-over coffee. You pick a brewer and dose (or fine-tune a full recipe) and Pourcast runs a live, guided brew timer that tells you exactly how much water to pour and when: bloom, pours, swirls, and drawdown, paced step by step in real time. It works fully offline and needs no scale, though it can connect to a Bluetooth coffee scale for live weight where the browser supports it.
 
 ## Features
 - Real-time guided brew timer: bloom → pours → drawdown, each step paced with a countdown
@@ -10,7 +10,7 @@ Pourcast is a web app (also shipped as an iOS app) for brewing pour-over coffee.
 - Recipes for Hario V60, Kalita Wave, Chemex, Origami, Melitta, AeroPress, French press, and Phin
 - Two modes: "Just Brew" (we set the ratio and pace) and "Brew Print" (fine-tune method, grind, and temperature)
 - Optional Bluetooth scale support for live weight (desktop Chrome/Edge and Android Chrome; iOS uses guided timers)
-- Four visual themes; works fully offline
+- Three visual themes; works fully offline
 
 ## Links
 - App: https://binh4thewin.github.io/pourcast/

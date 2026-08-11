@@ -1653,7 +1653,7 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.4.6';
+const APP_VERSION='1.4.7';
 let theme='max';
 const THEME_ORDER=['max','sage','burnt'];
 const THEME_LABEL={max:'Max',sage:'Haze',burnt:'Burnt'};
@@ -1855,9 +1855,9 @@ function isFinalDrawdown(){
 function drawdownHint(){
   if(isBasic()||!recipe||recipe.immersion)return '';   // these end on the clock, no drawdown to read
   const drift=finishedAt-totalDur;   // + ran long (slow drain) · − finished early (fast drain)
-  if(drift>=15)return `Drawdown ran ~${Math.round(drift)}s long. If the bed was slow to drain, the grind may be a touch too fine — try one notch coarser next time.`;
-  if(drift<=-15)return `Finished ~${Math.round(-drift)}s early. If the bed drained fast, the grind may be a touch too coarse — try one notch finer next time.`;
-  return `Landed right on the estimate — the grind's dialed in for this coffee. Repeat it.`;
+  if(drift>=15)return `Drawdown ran ~${Math.round(drift)}s long. If the bed was slow to drain, the grind may be a touch too fine. Try one notch coarser next time.`;
+  if(drift<=-15)return `Finished ~${Math.round(-drift)}s early. If the bed drained fast, the grind may be a touch too coarse. Try one notch finer next time.`;
+  return `Landed right on the estimate. Your grind's dialed in for this coffee, so repeat it.`;
 }
 function pourFrac(st,w){
   const prevPour=[...schedule.slice(0,schedule.indexOf(st))].reverse().find(x=>x.type==='pour');
@@ -1901,7 +1901,7 @@ function updateBrewUI(){
   const nxt=schedule[brewIdx+1];
   $('instrSub').innerHTML=isBasic()
     ?(st.type==='pour'?`${stepCountdownHTML(stepRem)} to get there`:'')
-    :(finalDraw?`Let the bed drain, then tap <b>Cup drained ✓</b> — the finish time tells you if your grind was on.`:(st.note?escapeHTML(st.note)+'  ·  ':'')+(nxt?`next: ${ICONS[nxt.type]} ${escapeHTML(nxt.label)}${nxt.type==='pour'?` (→ ${fmtW(nxt.target)})`:''}`:'last step!'));
+    :(finalDraw?`Let the bed drain, then tap <b>Cup drained ✓</b> when it goes dry. The finish time tells you if your grind was on.`:(st.note?escapeHTML(st.note)+'  ·  ':'')+(nxt?`next: ${ICONS[nxt.type]} ${escapeHTML(nxt.label)}${nxt.type==='pour'?` (→ ${fmtW(nxt.target)})`:''}`:'last step!'));
   // flow gauge
   if(st.type==='pour'&&hasLiveWeight()){
     const fr=liveFlowRate(),target=st.amount/st.dur;
@@ -2006,7 +2006,7 @@ function finishUI(){
     clearInterval(timerIv);timerIv=null;      // brew is over: stop the clock
     if(navigator.vibrate)navigator.vibrate([80,60,160]);
   }
-  // completed: show the REAL finish time — running over or under the estimate is the grind signal, don't hide it
+  // completed: show the REAL finish time. Running over or under the estimate is the grind signal, so don't hide it
   $('timer').innerHTML=`${fmtClock(finishedAt)}<small> / ${fmtClock(totalDur)}</small>`;
   $('instrKicker').textContent='BREW COMPLETE';
   $('instrMain').textContent='☕ Pull the dripper, enjoy';

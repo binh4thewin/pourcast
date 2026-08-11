@@ -10,29 +10,37 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
-## [1.4.6] — 2026-08-10
+## [1.4.7] - 2026-08-10
+
+### Added
+- **Social share image.** Sharing the Pourcast link (iMessage, Slack, Twitter/X, etc.) now shows a branded 1200×630 preview card with the dripper icon, gradient wordmark, and tagline, instead of plain text. Wired up via Open Graph plus `summary_large_image` Twitter tags, and added to the structured-data schema.
+
+### Fixed
+- `llms.txt` said "Four visual themes"; corrected to three (Max · Haze · Burnt) after the Adobe theme was removed.
+
+## [1.4.6] - 2026-08-10
 
 ### Added
 - **Real app icon + favicons.** Replaced the default Capacitor placeholder with the Pourcast pour-over dripper mark. The web app now has a proper browser-tab favicon (16/32/48), an iOS "Add to Home Screen" icon (apple-touch-icon 180), and PWA icons (192/512).
-- **Web app manifest** (`manifest.json`) — Pourcast is now installable to the home screen and launches full-screen (standalone), with the cream theme color matching the app. The 1024 icon master is tracked at `pourcast-ios/assets/icon.png` and applied to the native iOS icon too.
+- **Web app manifest** (`manifest.json`): Pourcast is now installable to the home screen and launches full-screen (standalone), with the cream theme color matching the app. The 1024 icon master is tracked at `pourcast-ios/assets/icon.png` and applied to the native iOS icon too.
 
-## [1.4.5] — 2026-08-10
+## [1.4.5] - 2026-08-10
 
 ### Fixed
-- The **Pause** button is now hidden on the "brew complete" screen — the brew is over, so pausing did nothing. Only **Exit** and the rate/done action remain. It returns to normal on the next brew.
+- The **Pause** button is now hidden on the "brew complete" screen, since the brew is over and pausing did nothing. Only **Exit** and the rate/done action remain. It returns to normal on the next brew.
 
-## [1.4.4] — 2026-08-10
+## [1.4.4] - 2026-08-10
 
 ### Added
-- **Grind-size coaching.** In Brew Print, the final drawdown no longer auto-ends — you tap **"Cup drained ✓"** the moment the bed goes dry. The timer keeps counting past the estimate, and the finish screen reads that time back as a grind signal: ran long → grind may be too fine (go coarser); finished early → may be too coarse (go finer); on the estimate → dialed in. A `± vs est.` tag shows the gap at a glance.
+- **Grind-size coaching.** In Brew Print, the final drawdown no longer auto-ends. You tap **"Cup drained ✓"** the moment the bed goes dry. The timer keeps counting past the estimate, and the finish screen reads that time back as a grind signal: ran long means the grind may be too fine (go coarser); finished early means too coarse (go finer); on the estimate means dialed in. A `± vs est.` tag shows the gap at a glance.
 
 ### Changed
 - The completed timer now shows the **real** finish time instead of snapping to the estimated total, so an over- or under-run is visible rather than hidden. (Autopilot "Just Brew" and immersion recipes still end on the clock.)
 
 ### Fixed
-- The step and water progress bars now fill via `transform: scaleX()` instead of animating `width`, so the fill is GPU-composited and no longer triggers layout on every tick — smoother motion, especially on iOS. (Respects reduced-motion.)
+- The step and water progress bars now fill via `transform: scaleX()` instead of animating `width`, so the fill is GPU-composited and no longer triggers layout on every tick, for smoother motion, especially on iOS. (Respects reduced-motion.)
 
-## [1.4.3] — 2026-07-24
+## [1.4.3] - 2026-07-24
 
 ### Changed
 - Trimmed the theme lineup to **Max · Haze · Burnt** to keep the choice simple. A saved Adobe look now migrates to Haze automatically.
@@ -42,12 +50,12 @@ _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verific
 ### Removed
 - The **Adobe** theme (it overlapped Haze).
 
-## [1.4.2] — 2026-07-24
+## [1.4.2] - 2026-07-24
 
 ### Added
 - **SEO / AI discoverability**: a meta description, Open Graph + Twitter card tags, a canonical URL, and `WebApplication` JSON-LD structured data (name, description, free-offer, and real feature list) so search engines and AI assistants (ChatGPT, Perplexity, Google AI Overviews) can understand and cite the app.
 
-## [1.4.1] — 2026-07-24
+## [1.4.1] - 2026-07-24
 
 ### Fixed
 - **Water bar** no longer overflows its rounded container when full — the fill is clipped cleanly to the pill. Also removed the pour-target tick marks, which broke out of the bar when it scaled or shifted.
@@ -56,7 +64,7 @@ _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verific
 ### Changed
 - Page title updated to "POURCAST - Make the perfect pour over coffee".
 
-## [1.4.0] — 2026-07-24
+## [1.4.0] - 2026-07-24
 
 ### Added
 - **Haze** — a new calming theme: a soft pastel-sky gradient (peach → periwinkle → watery teal) with frosted cards. Replaces Sage in the lineup (Max · Adobe · Haze · Burnt).
@@ -78,7 +86,7 @@ _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verific
 ### Removed
 - The **Sage** theme (reworked into Haze; a saved Sage look now shows as Haze automatically).
 
-## [1.3.0] — 2026-07-23
+## [1.3.0] - 2026-07-23
 
 ### Added
 - New brewing recipe **"Basic 60/40 · Two Pours"** — a beginner-friendly V60 method: bloom (15%) with a ~30s rest, one larger pour for 60% of the post-bloom water, a stir, then a final pour for the last 40%. Adaptive timing; ratio 1:16.
@@ -86,7 +94,7 @@ _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verific
 ### Fixed
 - **4:6** and **4:6 Sweet** recipes: the drain before the 5th pour was `20s` instead of `35s`, so the final pour landed ~15s early and broke the fixed 45s clock. Corrected to `35s`; pours now fall on 0:00 / 0:45 / 1:30 / 2:15 / 3:00.
 
-## [1.2.0] — 2026-07-22
+## [1.2.0] - 2026-07-22
 
 ### Changed
 - Refactored the single `index.html` into `index.html` + `styles.css` + `app.js` for maintainability (no behavior change). `sync-ios.sh` now bundles all three into the iOS payload.
@@ -94,7 +102,7 @@ _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verific
 ### Added
 - Native Bluetooth bridge (Capacitor/iOS) scaffolding in `app.js`: a Web-Bluetooth-shaped shim over `@capacitor-community/bluetooth-le` so the existing scale adapters and byte-parsers are reused unchanged inside the native app. Falls back to Web Bluetooth on the web build.
 
-## [1.1.0] — 2026-07-21
+## [1.1.0] - 2026-07-21
 
 ### Added
 - Two new looks built from the Succulent Hues palette: **Adobe** (warm blush background, terracotta primary button) and **Sage** (cool sage-green background, olive primary button).
@@ -109,7 +117,7 @@ _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verific
 ### Fixed
 - Old saved "Cactus" preference now migrates automatically to Adobe on load.
 
-## [1.0.0] — baseline
+## [1.0.0] - baseline
 
 - First tracked release: the two-mode brew experience (Just Brew / Brew Print), live pour-pacing timer, optional Bluetooth scale support, and the Max / Cactus / Burnt looks.
 
