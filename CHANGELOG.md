@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.4.8] - 2026-08-10
+
+### Changed
+- Switched the **POURCAST** wordmark to Archivo Black for a cleaner, more confident logo. The previous Bricolage Grotesque had quirky P/A/T letterforms. Buttons, headings, and the timer keep Bricolage. The social share image was updated to match.
+
 ## [1.4.7] - 2026-08-10
 
 ### Added
