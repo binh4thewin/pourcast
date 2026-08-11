@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.4.9] - 2026-08-10
+
+### Changed
+- Simplified to a single look (**Max**). The theme switcher, the logo "tap to switch looks" hint, and the Haze/Burnt options in Settings are hidden. Any saved Haze or Burnt preference now shows as Max. Haze and Burnt stay in the code behind a `THEMES_ENABLED` flag, so they can be shipped again later without a rebuild.
+
 ## [1.4.8] - 2026-08-10
 
 ### Changed

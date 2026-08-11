@@ -1653,12 +1653,16 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.4.8';
+const APP_VERSION='1.4.9';
 let theme='max';
+// Single-skin mode: shipping Max only for now. Haze + Burnt are fully built and kept
+// intact below (CSS + JS); flip THEMES_ENABLED to true to bring back the switcher.
+const THEMES_ENABLED=false;
 const THEME_ORDER=['max','sage','burnt'];
 const THEME_LABEL={max:'Max',sage:'Haze',burnt:'Burnt'};
 function setTheme(t){
   if(t==='calm'||t==='adobe')t='sage';   // Adobe retired → Haze (legacy 'calm' migrates here too)
+  if(!THEMES_ENABLED)t='max';            // one look for everyone; any saved Haze/Burnt collapses to Max
   theme=t;
   document.body.classList.toggle('sage',t==='sage');
   document.body.classList.toggle('burnt',t==='burnt');
@@ -1669,7 +1673,7 @@ function setTheme(t){
   saveSettings();
 }
 // Tapping the big logo on the start screen cycles the look for fun.
-function cycleTheme(){setTheme(THEME_ORDER[(THEME_ORDER.indexOf(theme)+1)%THEME_ORDER.length]);}
+function cycleTheme(){if(!THEMES_ENABLED)return;setTheme(THEME_ORDER[(THEME_ORDER.indexOf(theme)+1)%THEME_ORDER.length]);}
 function setUnit(f){
   unitF=f;
   $('unitC').classList.toggle('on',!f);
@@ -2580,6 +2584,11 @@ function wireSetup(){
   $('themeMax').onclick=()=>setTheme('max');
   $('themeSage').onclick=()=>setTheme('sage');
   $('themeBurnt').onclick=()=>setTheme('burnt');
+  if(!THEMES_ENABLED){                                   // single-skin: hide every switcher affordance
+    const hint=document.querySelector('.mp-look-hint');if(hint)hint.style.display='none';
+    const lr=$('lookRow');if(lr)lr.style.display='none';
+    const lg=$('mpLogo');if(lg){lg.style.cursor='default';lg.removeAttribute('title');}
+  }
   $('btnSettings').onclick=()=>{
     const c=$('settingsCard');
     c.style.display=c.style.display==='none'?'block':'none';
