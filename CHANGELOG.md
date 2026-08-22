@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.5.2] - 2026-08-10
+
+### Fixed
+- **The brewer picker now snaps to whole icons.** Scrolling the brewer strip left or right no longer stops with a brewer half-cut; it always settles on a full icon. (Scroll snapping changed from "proximity" to "mandatory".)
+
 ## [1.5.1] - 2026-08-10
 
 ### Fixed

@@ -68,7 +68,7 @@ button:focus-visible{outline:3px solid var(--blue)}
    selection pops with a colored ring + lift, never shadow-on-dark */
 .chips-scroll{position:relative}
 /* evenly spaced, fixed-width brewer tiles in one swipeable/scrollable row */
-#toolChips,#bBrewers{display:flex;flex-wrap:nowrap;gap:18px;overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none;padding:10px 2px;justify-content:start}
+#toolChips,#bBrewers{display:flex;flex-wrap:nowrap;gap:18px;overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-left:2px;scrollbar-width:none;padding:10px 2px;justify-content:start}
 #toolChips::-webkit-scrollbar,#bBrewers::-webkit-scrollbar{display:none}
 .tool-tile{flex:0 0 76px;scroll-snap-align:start;text-align:center;cursor:pointer;user-select:none}
 /* slim scroll indicator UNDER the strip; shown only when the icons overflow */
