@@ -10,6 +10,14 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.5.4] - 2026-08-10
+
+### Added
+- **Pin favorite brewers.** Tap the small star on a brewer to pin it; pinned brewers move to the front of the picker, in the order you pin them. Saved on your device, and it applies to both Just Brew and Brew Print.
+
+### Changed
+- **The brewer picker scrolls horizontally again**, but tiles are now sized so only whole icons show (no partial peek), and it snaps to keep icons aligned. (Reverted the full grid from 1.5.3 per preference.)
+
 ## [1.5.3] - 2026-08-10
 
 ### Changed

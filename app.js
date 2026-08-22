@@ -1537,14 +1537,22 @@ function wireCollapsibles(){
     if(h)h.onclick=()=>$(id).classList.toggle('collapsed');
   });
 }
+/* Pinned brewers float to the front of the picker (user preference, saved per device). */
+function getPinned(){try{return JSON.parse(localStorage.getItem('pourcast-pins')||'[]');}catch(_){return[];}}
+function togglePin(id){const a=getPinned();const i=a.indexOf(id);if(i>-1)a.splice(i,1);else a.push(id);localStorage.setItem('pourcast-pins',JSON.stringify(a));}
+function pinnedFirst(list){const p=getPinned();const pin=[];p.forEach(id=>{const it=list.find(x=>x.id===id);if(it)pin.push(it);});return pin.concat(list.filter(x=>p.indexOf(x.id)<0));}
+function pinBtnHTML(id){const on=getPinned().indexOf(id)>-1;return `<button class="tool-pin ${on?'pinned':''}" data-pin="${id}" aria-label="${on?'Unpin brewer':'Pin brewer to front'}" aria-pressed="${on}">${on?'★':'☆'}</button>`;}
 function renderChips(){
-  $('toolChips').innerHTML=TOOLS.map(t=>`<div class="tool-tile ${t.id===tool?'on':''}" data-t="${t.id}" role="button" tabindex="0" aria-pressed="${t.id===tool}">
+  $('toolChips').innerHTML=pinnedFirst(TOOLS).map(t=>`<div class="tool-tile ${t.id===tool?'on':''}" data-t="${t.id}" role="button" tabindex="0" aria-pressed="${t.id===tool}">
+    ${pinBtnHTML(t.id)}
     <div class="tool-circle">${TOOL_IMGS[t.id]?`<img class="timg" src="${TOOL_IMGS[t.id]}" alt="">`:(TOOL_ICONS[t.id]||'')}</div>
     <div class="tool-name">${t.name}</div>
   </div>`).join('');
   document.querySelectorAll('#toolChips .tool-tile').forEach(c=>{
     const pick=()=>{tool=c.dataset.t;renderChips();populateRecipes();updateToolSummary();setupEditing=false;updateSetupCards();saveSettings();};
     c.onclick=pick;c.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')pick()};
+    const pin=c.querySelector('.tool-pin');
+    if(pin)pin.onclick=e=>{e.stopPropagation();togglePin(pin.dataset.pin);renderChips();};
   });
   updateToolArrows();
 }
@@ -1653,7 +1661,7 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.5.3';
+const APP_VERSION='1.5.4';
 let theme='max';
 // Single-skin mode: shipping Max only for now. Haze + Burnt are fully built and kept
 // intact below (CSS + JS); flip THEMES_ENABLED to true to bring back the switcher.
@@ -2385,9 +2393,10 @@ function syncCupsField(s){
 }
 function renderBasicBrewers(){
   const s=basicState();
-  $('bBrewers').innerHTML=BASIC_BREWERS.filter(b=>b.id!=='any').map(b=>{
+  $('bBrewers').innerHTML=pinnedFirst(BASIC_BREWERS.filter(b=>b.id!=='any')).map(b=>{
     const t=TOOLS.find(x=>x.id===b.id);
     return `<div class="tool-tile ${b.id===s.brewer?'on':''}" data-b="${b.id}" role="button" tabindex="0" aria-pressed="${b.id===s.brewer}">
+      ${pinBtnHTML(b.id)}
       <div class="tool-circle">${TOOL_IMGS[b.id]?`<img class="timg" src="${TOOL_IMGS[b.id]}" alt="">`:(TOOL_ICONS[b.id]||'')}</div>
       <div class="tool-name">${t?t.name:b.id}</div>
     </div>`;}).join('');
@@ -2399,6 +2408,8 @@ function renderBasicBrewers(){
       setBasicState(st);renderBasic();
     };
     c.onclick=pick;c.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();pick();}};
+    const pin=c.querySelector('.tool-pin');
+    if(pin)pin.onclick=e=>{e.stopPropagation();togglePin(pin.dataset.pin);renderBasicBrewers();};
   });
   requestAnimationFrame(updateBrewerArrows);   // needs layout before it can measure overflow
 }

@@ -68,10 +68,17 @@ button:focus-visible{outline:3px solid var(--blue)}
    selection pops with a colored ring + lift, never shadow-on-dark */
 .chips-scroll{position:relative}
 /* evenly spaced, fixed-width brewer tiles in one swipeable/scrollable row */
-/* Wrapping grid: every brewer shows as a whole icon, no horizontal scroll, no peek */
-#toolChips,#bBrewers{display:grid;grid-template-columns:repeat(auto-fill,minmax(66px,1fr));gap:14px 6px;padding:10px 2px}
+/* Horizontal scroller sized so exactly 4 WHOLE icons fill the width (no partial peek);
+   mandatory snap keeps every resting position aligned to whole icons */
+#toolChips,#bBrewers{display:flex;flex-wrap:nowrap;gap:10px;overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-left:2px;scrollbar-width:none;padding:10px 2px}
 #toolChips::-webkit-scrollbar,#bBrewers::-webkit-scrollbar{display:none}
-.tool-tile{width:100%;text-align:center;cursor:pointer;user-select:none}
+.tool-tile{flex:0 0 calc((100% - 30px)/4);scroll-snap-align:start;text-align:center;cursor:pointer;user-select:none;position:relative}
+@media (min-width:520px){#toolChips .tool-tile,#bBrewers .tool-tile{flex-basis:calc((100% - 50px)/6)}}
+/* pin-to-front star: small, clean glyph (no pill/border/shadow) */
+.tool-pin{position:absolute;top:0;right:2px;z-index:2;width:22px;height:22px;border:none;background:transparent;color:var(--ink);font-size:15px;line-height:1;padding:0;cursor:pointer;opacity:.3;transition:opacity .15s,transform .1s}
+.tool-pin:hover,.tool-pin:focus-visible{opacity:.75}
+.tool-pin.pinned{opacity:1;color:var(--magenta)}
+.tool-pin:active{transform:scale(.82)}
 /* slim scroll indicator UNDER the strip; shown only when the icons overflow */
 .chips-ind{height:4px;border-radius:99px;background:rgba(27,11,46,.12);margin:4px 4px 0;position:relative;overflow:hidden}
 .chips-ind[hidden]{display:none}
