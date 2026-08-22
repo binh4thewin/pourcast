@@ -1653,7 +1653,7 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.5.0';
+const APP_VERSION='1.5.1';
 let theme='max';
 // Single-skin mode: shipping Max only for now. Haze + Burnt are fully built and kept
 // intact below (CSS + JS); flip THEMES_ENABLED to true to bring back the switcher.
@@ -2638,19 +2638,16 @@ function initInstallUI(){
   if('serviceWorker' in navigator){
     window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
   }
+  // static markup lives in index.html (#installWrap); JS just shows/wires it
+  const wrap=$('installWrap'),btn=$('installBtn'),x=$('installX');
+  if(!wrap)return;
+
   // already installed (opened from the home screen)? then never nag.
   const standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
-  if(standalone||localStorage.getItem('pourcast-install-dismissed')==='1')return;
+  if(standalone||localStorage.getItem('pourcast-install-dismissed')==='1'){wrap.remove();return;}
 
   const ua=navigator.userAgent||'';
   const isIOS=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-
-  const wrap=document.createElement('div');wrap.className='install-wrap';
-  const btn=document.createElement('button');btn.className='install-btn';btn.textContent='📲 Install Pourcast';
-  const x=document.createElement('button');x.className='install-x';x.setAttribute('aria-label','Dismiss');x.textContent='×';
-  wrap.appendChild(btn);wrap.appendChild(x);
-  const header=document.querySelector('header');
-  if(header&&header.parentNode)header.parentNode.insertBefore(wrap,header.nextSibling);
 
   x.onclick=()=>{localStorage.setItem('pourcast-install-dismissed','1');wrap.remove();};
 

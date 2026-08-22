@@ -4,7 +4,7 @@
      - HTML / navigations: network-first (new deploys show immediately; cache is the offline fallback)
      - same-origin assets (versioned via ?v=, plus images/audio): cache-first (immutable per version)
      - cross-origin (Google Fonts): stale-while-revalidate */
-const VERSION='1.5.0';
+const VERSION='1.5.1';
 const Q='?v='+VERSION;
 const SHELL='pourcast-shell-'+VERSION;
 const RUNTIME='pourcast-runtime-'+VERSION;

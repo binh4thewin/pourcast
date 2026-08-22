@@ -10,6 +10,12 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.5.1] - 2026-08-10
+
+### Fixed
+- **Background no longer slides or flashes while scrolling on mobile.** The ambient gradient is now pinned to a fixed layer behind the content, and the page root is painted, so scrolling and overscroll show the gradient instead of a bare, shifting background.
+- **The "Install Pourcast" button is now part of the page markup** (it was previously added by script), so it reliably appears on the home screen when the app can be installed: one-tap on Android and desktop Chrome, guided Add-to-Home-Screen on iOS.
+
 ## [1.5.0] - 2026-08-10
 
 ### Added

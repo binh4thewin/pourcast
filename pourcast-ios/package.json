@@ -1,6 +1,6 @@
 {
   "name": "pourcast-ios",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "private": true,
   "description": "Capacitor iOS wrapper for the Pourcast web app",
   "scripts": {
