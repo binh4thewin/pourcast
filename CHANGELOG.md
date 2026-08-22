@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.5.6] - 2026-08-10
+
+### Changed
+- The **Install button now appears only on the opening (front-door) screen**, not on the Just Brew / Brew Print working screens.
+
 ## [1.5.5] - 2026-08-10
 
 ### Fixed
