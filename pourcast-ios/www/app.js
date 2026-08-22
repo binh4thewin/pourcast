@@ -1542,6 +1542,19 @@ function getPinned(){try{return JSON.parse(localStorage.getItem('pourcast-pins')
 function togglePin(id){const a=getPinned();const i=a.indexOf(id);if(i>-1)a.splice(i,1);else a.push(id);localStorage.setItem('pourcast-pins',JSON.stringify(a));}
 function pinnedFirst(list){const p=getPinned();const pin=[];p.forEach(id=>{const it=list.find(x=>x.id===id);if(it)pin.push(it);});return pin.concat(list.filter(x=>p.indexOf(x.id)<0));}
 function pinBtnHTML(id){const on=getPinned().indexOf(id)>-1;return `<button class="tool-pin ${on?'pinned':''}" data-pin="${id}" aria-label="${on?'Unpin brewer':'Pin brewer to front'}" aria-pressed="${on}">${on?'★':'☆'}</button>`;}
+/* Size brewer tiles so an EXACT whole number of icons fills the strip: no partial peek at any width. */
+const STRIP_MINTILE=74;
+function sizeStrip(id){
+  const el=$(id);if(!el||!el.clientWidth)return;                      // hidden strips size when their screen shows
+  const cs=getComputedStyle(el);
+  const gap=parseFloat(cs.columnGap||cs.gap)||10;
+  const content=el.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0);
+  const n=Math.max(1,Math.floor((content+gap)/(STRIP_MINTILE+gap)));  // how many whole tiles fit
+  const tile=Math.floor((content-(n-1)*gap)/n);                       // grow them to fill exactly
+  el.querySelectorAll('.tool-tile').forEach(t=>{t.style.flexBasis=tile+'px';});
+}
+let _stripRz;
+window.addEventListener('resize',()=>{clearTimeout(_stripRz);_stripRz=setTimeout(()=>{sizeStrip('toolChips');sizeStrip('bBrewers');},120);});
 function renderChips(){
   $('toolChips').innerHTML=pinnedFirst(TOOLS).map(t=>`<div class="tool-tile ${t.id===tool?'on':''}" data-t="${t.id}" role="button" tabindex="0" aria-pressed="${t.id===tool}">
     ${pinBtnHTML(t.id)}
@@ -1554,6 +1567,7 @@ function renderChips(){
     const pin=c.querySelector('.tool-pin');
     if(pin)pin.onclick=e=>{e.stopPropagation();togglePin(pin.dataset.pin);renderChips();};
   });
+  sizeStrip('toolChips');
   updateToolArrows();
 }
 // Show a slim scroll indicator ONLY when the brewer strip overflows (e.g. mobile).
@@ -1661,7 +1675,7 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.5.4';
+const APP_VERSION='1.5.5';
 let theme='max';
 // Single-skin mode: shipping Max only for now. Haze + Burnt are fully built and kept
 // intact below (CSS + JS); flip THEMES_ENABLED to true to bring back the switcher.
@@ -2411,7 +2425,8 @@ function renderBasicBrewers(){
     const pin=c.querySelector('.tool-pin');
     if(pin)pin.onclick=e=>{e.stopPropagation();togglePin(pin.dataset.pin);renderBasicBrewers();};
   });
-  requestAnimationFrame(updateBrewerArrows);   // needs layout before it can measure overflow
+  sizeStrip('bBrewers');
+  requestAnimationFrame(()=>{sizeStrip('bBrewers');updateBrewerArrows();});   // re-size once layout settles
 }
 function renderBasic(){
   const s=basicState();
@@ -2649,40 +2664,38 @@ function initInstallUI(){
   if('serviceWorker' in navigator){
     window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
   }
-  // static markup lives in index.html (#installWrap); JS just shows/wires it
-  const wrap=$('installWrap'),btn=$('installBtn'),x=$('installX');
-  if(!wrap)return;
+  // static markup lives in index.html: one bar on the homepage (front door) + one on the main screens
+  const wraps=[].slice.call(document.querySelectorAll('.install-wrap'));
+  if(!wraps.length)return;
+  const removeAll=()=>document.querySelectorAll('.install-wrap').forEach(w=>w.remove());
+  const showAll=()=>document.querySelectorAll('.install-wrap').forEach(w=>{w.style.display='flex';});
+  const dismiss=()=>{localStorage.setItem('pourcast-install-dismissed','1');removeAll();};
 
   // already installed (opened from the home screen)? then never nag.
   const standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
-  if(standalone||localStorage.getItem('pourcast-install-dismissed')==='1'){wrap.remove();return;}
+  if(standalone||localStorage.getItem('pourcast-install-dismissed')==='1'){removeAll();return;}
 
   const ua=navigator.userAgent||'';
   const isIOS=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 
-  x.onclick=()=>{localStorage.setItem('pourcast-install-dismissed','1');wrap.remove();};
-
   let deferred=null;
-  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;wrap.style.display='flex';});
-  window.addEventListener('appinstalled',()=>{localStorage.setItem('pourcast-install-dismissed','1');wrap.remove();});
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;showAll();});   // Android/desktop: show once installable
+  window.addEventListener('appinstalled',dismiss);
 
-  if(isIOS){
-    // iOS has no install API, so show the button and reveal Add-to-Home-Screen steps on tap
-    wrap.style.display='flex';
-    btn.onclick=()=>{
-      const ex=wrap.querySelector('.install-hint');if(ex){ex.remove();return;}
-      const h=document.createElement('div');h.className='install-hint';
-      h.innerHTML='In <b>Safari</b>, tap the <b>Share</b> icon, then <b>Add to Home Screen</b>.';
-      wrap.appendChild(h);
-    };
-  }else{
-    // Android / desktop Chrome: fire the real one-tap install
-    btn.onclick=async()=>{
-      if(!deferred)return;
-      deferred.prompt();
-      try{await deferred.userChoice;}catch(_){}
-      deferred=null;wrap.remove();
-    };
-  }
+  wraps.forEach(wrap=>{
+    const btn=wrap.querySelector('.install-btn'),x=wrap.querySelector('.install-x');
+    if(x)x.onclick=dismiss;
+    if(isIOS){
+      wrap.style.display='flex';   // iOS has no install API; show it and reveal Add-to-Home-Screen steps on tap
+      if(btn)btn.onclick=()=>{
+        const ex=wrap.querySelector('.install-hint');if(ex){ex.remove();return;}
+        const h=document.createElement('div');h.className='install-hint';
+        h.innerHTML='In <b>Safari</b>, tap the <b>Share</b> icon, then <b>Add to Home Screen</b>.';
+        wrap.appendChild(h);
+      };
+    }else if(btn){
+      btn.onclick=async()=>{if(!deferred)return;deferred.prompt();try{await deferred.userChoice;}catch(_){}deferred=null;removeAll();};
+    }
+  });
 }
 

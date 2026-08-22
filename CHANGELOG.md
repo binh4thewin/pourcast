@@ -10,6 +10,14 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.5.5] - 2026-08-10
+
+### Fixed
+- **The brewer strip now shows only whole icons at every screen width** (no partial peek). Tile widths are computed to fit an exact whole number of icons, fixing a sub-pixel case where the last icon could still show a thin sliver.
+
+### Changed
+- **The Install button now also appears on the home screen** (the Just Brew / Brew Print front door), not only the main screens.
+
 ## [1.5.4] - 2026-08-10
 
 ### Added
