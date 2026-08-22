@@ -66,6 +66,19 @@ npx cap sync ios
 This creates an `ios/` folder — a real Xcode project that loads your `www/`
 files. `sync` copies your web assets in and installs native dependencies.
 
+**App icon:** the `ios/` folder is generated and NOT tracked in git, so if you
+regenerate it you must re-apply the app icon. The 1024×1024 master lives at
+`pourcast-ios/assets/icon.png` (tracked). To apply it, copy it over the default:
+
+```
+cp pourcast-ios/assets/icon.png \
+  pourcast-ios/ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png
+```
+
+(Or, for all sizes/splash at once: `npm i -D @capacitor/assets` then
+`npx @capacitor/assets generate --ios`, using `pourcast-ios/assets/icon.png`.)
+The icon must stay 1024×1024 with **no alpha channel** or the App Store rejects it.
+
 ---
 
 ## 3. Open in Xcode and set signing
@@ -143,35 +156,98 @@ above is the only thing tying them together. (You could later automate this.)
 
 ---
 
-## Milestone 2 — native Bluetooth scale support (separate build)
+## Milestone 2 — native Bluetooth scale support
 
-The wrap above gets you shipping. Real scale support is a code change, done and
-tested on your Mac because it can't be validated without hardware.
+**Status: implemented (2026-07-21). Not yet tested on hardware** — the iOS
+Simulator has no Bluetooth radio, so a real connection can only be confirmed
+on a physical iPhone with an actual scale. Testing procedure is below.
 
-Plan when you're ready:
+### What was done
 
-1. Add the plugin: `npm install @capacitor-community/bluetooth-le` then
-   `npx cap sync ios`.
-2. Add these keys to `ios/App/App/Info.plist` (Xcode: right-click Info.plist →
-   Open As → Source Code):
+1. Installed the plugin: `npm install @capacitor-community/bluetooth-le`
+   (`@capacitor-community/bluetooth-le@8.2.0`) + `npx cap sync ios`. It links
+   via Swift Package Manager (no CocoaPods step) and is statically linked into
+   the App binary.
+2. Added to `ios/App/App/Info.plist`:
    ```xml
    <key>NSBluetoothAlwaysUsageDescription</key>
-   <string>Pourcast connects to your coffee scale to show live weight and pour pace.</string>
+   <string>Pourcast connects to your coffee scale over Bluetooth to show live weight and pace each pour.</string>
+   <key>NSBluetoothPeripheralUsageDescription</key>
+   <string>Pourcast connects to your coffee scale over Bluetooth to show live weight and pace each pour.</string>
    ```
-3. In `index.html`, add a small runtime switch: when running inside Capacitor
-   (`window.Capacitor?.isNativePlatform()`), route scale calls through the
-   plugin instead of `navigator.bluetooth`.
-4. **Your protocol logic ports almost unchanged.** The Acaia/Bookoo/Timemore/
-   Felicita byte parsing, frame reassembly, and command encoding are plain JS
-   and stay as-is. Only the transport layer swaps:
-   - `navigator.bluetooth.requestDevice` → `BleClient.requestDevice`
-   - `server.getPrimaryService` / `getCharacteristic` → device/service/
-     characteristic **UUID strings** passed to `BleClient` calls
-   - `startNotifications` + `characteristicvaluechanged` event →
-     `BleClient.startNotifications(deviceId, service, char, callback)`
-   - incoming data arrives as a `DataView` (same as Web Bluetooth's
-     `e.target.value`), so your existing `parse(dataView)` functions work
-     directly.
+3. Added a runtime switch in `app.js`: when `Capacitor.isNativePlatform()` is
+   true and the plugin is present (`bleNativeAvailable()`), scale calls route
+   through the native bridge; otherwise the existing Web Bluetooth path runs.
+   The web app / GitHub Pages behavior is unchanged.
+4. **The protocol adapters are untouched.** Acaia/Bookoo/Timemore/Felicita/WSS
+   byte parsing, frame reassembly, and command encoding are exactly as before.
+   Only the transport swapped, via a shim that mimics the Web Bluetooth surface
+   the adapters already use (`device.gatt.connect` → `getPrimaryService` →
+   `getCharacteristic` → `startNotifications` / `characteristicvaluechanged` /
+   `writeValue`), backed by `window.Capacitor.Plugins.BluetoothLe`. No bundler
+   needed. Values cross the bridge as hex strings (converted to/from
+   `DataView`); the notification listener key is `notification|id|svc|chr`.
 
-When you want to tackle this, come back and I'll write the exact swapped
-scale-connection code against your current adapters.
+### How to test on your iPhone
+
+The iOS project is already synced. Get the app onto the phone and connect:
+
+**1. Put the app on your iPhone**
+Plug in the iPhone (or use wireless debugging), then:
+```
+cd "/Users/binhjo/Documents/Claude Cowork/Personal/Pourcast/pourcast-ios"
+npx cap open ios
+```
+In Xcode: pick your **iPhone** as the run target (not a simulator) → **App**
+target → **Signing & Capabilities** → set your **Team** → press **▶ Run**.
+First run only: on the iPhone, trust the cert under **Settings → General →
+VPN & Device Management**, then relaunch.
+
+> The simulator can't run this test — no Bluetooth radio. Must be a real device.
+
+**2. Connect the scale**
+1. Turn on the Acaia Pearl, keep it awake near the phone.
+2. Tap the **Bluetooth icon** (top-right, next to °F), or the ⚙ settings scale
+   section.
+3. Tap **Connect scale**.
+4. Approve the **iOS Bluetooth permission prompt** (first time only). If you
+   never see this prompt, that's a red flag — see the table below.
+5. Pick your Pearl in the **native device picker**.
+6. Confirm the status reads **"Connected: PEARL… (Acaia)"** and the header
+   icon loses its slash. If the Pearl isn't listed, tap **"show all devices"**
+   (some Acaia firmwares don't advertise their service in the scan record).
+
+**3. Confirm it actually reads weight** (connecting alone isn't enough)
+Run a brew (**Brew → Start Brewing**). With a scale connected you should see:
+- **"POUR UNTIL THE SCALE READS ___g"** tracking your real pour (not a timed estimate),
+- the water bar filling to the **actual** weight (no "(est.)" tag),
+- a **flow-rate gauge** (g/s) with on-pace / too-fast feedback,
+- the scale **zeroes at GO** — reading starts from 0 when the brew begins.
+
+**4. Built-in BLE debug log**
+In the ⚙ settings scale section, **tap the status-line text** to toggle a log
+of the last BLE events — the exact adapter handshake:
+```
+GATT connected
+trying adapter: Acaia…
+✓ matched: Acaia
+settings: battery 87% · grams · auto-off 5min
+```
+This shows precisely where a connection stalls.
+
+**Deeper debugging:** connect the iPhone and open **Safari → Develop → [your
+iPhone] → Pourcast** (Web Inspector) for the live JS console and `blog()`
+output. `window.simToggle()` forces fake-weight mode for comparison.
+
+### Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| No permission prompt, instant fail | Bluetooth off / plist key missing | Check iPhone Bluetooth is on; confirm `NSBluetoothAlwaysUsageDescription` present |
+| Pearl not in picker | Doesn't advertise its service | Use **"show all devices"** |
+| Picks device, then "Connected but no weight stream found" | Adapter matched wrong / protocol mismatch | Read the debug log — which adapter matched? Note the device name + firmware |
+| Connects, weight frozen or garbage | Byte-parse issue for this firmware | Debug log + exact Pearl model/firmware — this points at the parser to fix |
+| Drops mid-brew, then recovers | Normal — scale slept | Auto-reconnect handles it; confirm weight resumes |
+
+If a parser misbehaves, capture the debug log and the exact scale model/firmware
+— that's what's needed to fix the byte decoding for your specific device.

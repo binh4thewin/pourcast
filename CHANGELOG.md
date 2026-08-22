@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.5.0] - 2026-08-10
+
+### Added
+- **Installable app (PWA).** Pourcast can now be installed to the home screen and runs fully offline. On Android and desktop Chrome, an **"Install Pourcast"** button does a one-tap install. On iOS, the button reveals the "tap Share, then Add to Home Screen" steps (Apple does not allow one-tap web install). A service worker caches the app so it opens instantly and works with no connection, and the install prompt is dismissible.
+
 ## [1.4.9] - 2026-08-10
 
 ### Changed

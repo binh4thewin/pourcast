@@ -1653,7 +1653,7 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.4.9';
+const APP_VERSION='1.5.0';
 let theme='max';
 // Single-skin mode: shipping Max only for now. Haze + Burnt are fully built and kept
 // intact below (CSS + JS); flip THEMES_ENABLED to true to bring back the switcher.
@@ -2630,4 +2630,51 @@ restoreSettings();   // builds chips + recipes, then overlays saved values
 renderLog();
 initMode();          // basic vs brew print, first run shows the picker
 initScaleSupport();  // iPhones/iPads can't do Web Bluetooth; say so up front
+initInstallUI();     // "Install Pourcast" affordance (one-tap on Android, guided on iOS)
+
+/* ---- Installable PWA: register the service worker + surface an install button ---- */
+function initInstallUI(){
+  // register the service worker (offline + installability); localhost & https only
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+  }
+  // already installed (opened from the home screen)? then never nag.
+  const standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+  if(standalone||localStorage.getItem('pourcast-install-dismissed')==='1')return;
+
+  const ua=navigator.userAgent||'';
+  const isIOS=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+
+  const wrap=document.createElement('div');wrap.className='install-wrap';
+  const btn=document.createElement('button');btn.className='install-btn';btn.textContent='📲 Install Pourcast';
+  const x=document.createElement('button');x.className='install-x';x.setAttribute('aria-label','Dismiss');x.textContent='×';
+  wrap.appendChild(btn);wrap.appendChild(x);
+  const header=document.querySelector('header');
+  if(header&&header.parentNode)header.parentNode.insertBefore(wrap,header.nextSibling);
+
+  x.onclick=()=>{localStorage.setItem('pourcast-install-dismissed','1');wrap.remove();};
+
+  let deferred=null;
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;wrap.style.display='flex';});
+  window.addEventListener('appinstalled',()=>{localStorage.setItem('pourcast-install-dismissed','1');wrap.remove();});
+
+  if(isIOS){
+    // iOS has no install API, so show the button and reveal Add-to-Home-Screen steps on tap
+    wrap.style.display='flex';
+    btn.onclick=()=>{
+      const ex=wrap.querySelector('.install-hint');if(ex){ex.remove();return;}
+      const h=document.createElement('div');h.className='install-hint';
+      h.innerHTML='In <b>Safari</b>, tap the <b>Share</b> icon, then <b>Add to Home Screen</b>.';
+      wrap.appendChild(h);
+    };
+  }else{
+    // Android / desktop Chrome: fire the real one-tap install
+    btn.onclick=async()=>{
+      if(!deferred)return;
+      deferred.prompt();
+      try{await deferred.userChoice;}catch(_){}
+      deferred=null;wrap.remove();
+    };
+  }
+}
 
