@@ -10,10 +10,15 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.5.10] - 2026-08-24
+
+### Changed
+- The "Ready to brew?" dismiss is now a small **×** in the top-right corner instead of a Cancel button (cleaner). Tapping outside the box or pressing Escape also closes it.
+
 ## [1.5.9] - 2026-08-24
 
 ### Fixed
-- **The "Ready to brew?" confirmation can now be dismissed.** Added a **Cancel** button, and tapping outside the box or pressing Escape also closes it, so an accidental tap (or a last-second change of mind about settings) no longer traps you on that screen.
+- **The "Ready to brew?" confirmation can now be dismissed.** Added a way out (tap outside the box or press Escape), so an accidental tap (or a last-second change of mind about settings) no longer traps you on that screen. (Refined to a corner × in 1.5.10.)
 
 ## [1.5.8] - 2026-08-24
 
