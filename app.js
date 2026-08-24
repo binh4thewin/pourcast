@@ -1679,7 +1679,7 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.5.8';
+const APP_VERSION='1.5.9';
 let theme='max';
 // Single-skin mode: shipping Max only for now. Haze + Burnt are fully built and kept
 // intact below (CSS + JS); flip THEMES_ENABLED to true to bring back the switcher.
@@ -2496,6 +2496,9 @@ function wireModes(){
   $('hdrPrint').onclick=()=>setMode('print');
   $('hdrUnit').onclick=()=>setUnit(!unitF);
   $('scStart').onclick=confirmStartProceed;
+  $('scCancel').onclick=closeStartConfirm;                                   // explicit cancel
+  $('startConfirm').addEventListener('click',e=>{if(e.target===$('startConfirm'))closeStartConfirm();});  // tap outside the card
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('startConfirm').style.display==='flex')closeStartConfirm();});  // Esc
   $('mpLogo').onclick=cycleTheme;   // start-screen logo cycles the look
   // tap the in-app header logo → back to the start screen
   document.querySelector('header h1').onclick=()=>{$('modePick').style.display='flex';};

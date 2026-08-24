@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.5.9] - 2026-08-24
+
+### Fixed
+- **The "Ready to brew?" confirmation can now be dismissed.** Added a **Cancel** button, and tapping outside the box or pressing Escape also closes it, so an accidental tap (or a last-second change of mind about settings) no longer traps you on that screen.
+
 ## [1.5.8] - 2026-08-24
 
 ### Fixed
