@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.5.8] - 2026-08-24
+
+### Fixed
+- **Front-door screen no longer breaks when Settings is open.** Opening Settings made the screen taller than the viewport, which compressed the Just Brew / Brew Print buttons shorter than their text so the descriptions spilled out. The buttons now keep full height and the screen scrolls instead.
+
 ## [1.5.7] - 2026-08-24
 
 ### Added

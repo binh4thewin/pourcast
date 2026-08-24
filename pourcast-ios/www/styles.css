@@ -481,7 +481,9 @@ body.burnt #countdown .cd-num{text-shadow:none;-webkit-text-stroke:0;color:#2019
 body.burnt #countdown .cd-lbl{background:#201914;border:none;color:#F5F0E6;border-radius:12px}
 body.burnt #countdown .cd-first{background:#FBF7EE;border:2px solid #201914;color:#201914;border-radius:12px}
 /* ================= BASIC MODE + MODE PICKER ================= */
-#modePick{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;background:var(--paper);padding:calc(var(--space-5) + var(--sa-top)) calc(var(--space-5) + var(--sa-right)) calc(var(--space-5) + var(--sa-bottom)) calc(var(--space-5) + var(--sa-left));overflow-y:auto}
+#modePick{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:safe center;flex-direction:column;gap:18px;background:var(--paper);padding:calc(var(--space-5) + var(--sa-top)) calc(var(--space-5) + var(--sa-right)) calc(var(--space-5) + var(--sa-bottom)) calc(var(--space-5) + var(--sa-left));overflow-y:auto}
+/* never compress the front-door children below their content (buttons kept their text in; the screen scrolls instead) */
+#modePick>*{flex-shrink:0}
 #modePick #settingsCard{width:min(420px,92vw);max-height:60vh;overflow-y:auto;text-align:left}
 h1{cursor:pointer}
 #modePick .mp-btn{width:min(340px,90vw);padding:22px 18px;font-size:19px;text-align:center}
