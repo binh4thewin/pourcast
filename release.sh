@@ -37,6 +37,12 @@ echo "Bumping to $VERSION ..."
 # in-app marketing version (canonical source of truth; lives in app.js since the
 # index.html -> index.html + styles.css + app.js split)
 sed -i '' -E "s/const APP_VERSION='[^']*';/const APP_VERSION='$VERSION';/" app.js
+# cache-bust the web asset URLs so returning visitors get the new build immediately
+# (GitHub Pages caches app.js/styles.css hard; without this, users see stale code)
+sed -i '' -E "s/(href=\"styles\.css)(\?v=[^\"]*)?\"/\1?v=$VERSION\"/" index.html
+sed -i '' -E "s/(src=\"app\.js)(\?v=[^\"]*)?\"/\1?v=$VERSION\"/" index.html
+# service worker cache version — must match the asset ?v so a deploy replaces the old cache
+sed -i '' -E "s/const VERSION='[^']*';/const VERSION='$VERSION';/" sw.js
 # iOS wrapper package version
 sed -i '' -E "s/\"version\": \"[^\"]*\"/\"version\": \"$VERSION\"/" pourcast-ios/package.json
 
@@ -54,7 +60,20 @@ RELEASE_FILES=(
   styles.css
   app.js
   pour.mp3
+  # icons + PWA manifest + service worker + social share image served by the web app
+  manifest.json
+  sw.js
+  icons
+  og-image.png
+  og-image.html
+  # AI/SEO discovery files
+  llms.txt
+  sitemap.xml
+  # brand icon masters (source of truth; the generated ios/ tree stays untracked)
+  icon-master.png
+  pourcast-ios/assets/icon.png
   pourcast-ios/package.json
+  pourcast-ios/RUNBOOK.md
   # iOS payload mirror (kept in sync by sync-ios.sh)
   pourcast-ios/www/app.js
   pourcast-ios/www/index.html

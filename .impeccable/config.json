@@ -20,6 +20,15 @@
         "value": "fraunces",
         "createdAt": "2026-08-10T16:37:06.483Z",
         "reason": "Burnt theme's signature serif"
+      },
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "/Users/binhjo/Documents/Claude Cowork/Personal/Pourcast/pourcast/styles.css"
+        ],
+        "createdAt": "2026-08-22T19:57:03.795Z",
+        "reason": "user confirmed: the POURCAST wordmark gradient is the intentional brand identity (kept the gradient, only changed the font this session); the app icon, favicon, and OG image all use the same sweep"
       }
     ]
   }
