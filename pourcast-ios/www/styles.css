@@ -503,6 +503,8 @@ h1{cursor:pointer}
 #basic{display:none;max-width:480px;margin:0 auto}
 #basic .b-dose{font-family:'Bricolage Grotesque';font-weight:800;font-size:40px;text-align:center;padding:14px}
 #basic .b-sum{font-size:14px;font-weight:700;text-align:center;margin:12px 0;line-height:1.6}
+.noscale{display:block;margin-top:8px;font-size:12px;font-weight:600;line-height:1.5;opacity:.72}
+.noscale b{font-weight:800;opacity:1}
 /* Basic brew screen = three things: what step, the number, the water bar. */
 body.basic #pace,body.basic #flow,body.basic .tl-times,body.basic #methodCard{display:none!important}
 body.basic .stepbar-wrap{display:none!important}

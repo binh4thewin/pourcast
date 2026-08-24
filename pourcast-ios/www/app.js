@@ -418,6 +418,10 @@ const G2OZ=1/28.3495;
 /* Display-only unit: inputs stay in grams (every coffee scale doses in grams);
    oz converts what you READ, live weight, targets, bars, logs. */
 function fmtW(g,dec){ return weightOz ? (g*G2OZ).toFixed(dec===0?2:2)+' oz' : (dec===0?Math.round(g):g.toFixed(dec===undefined?0:dec))+' g'; }
+/* No-scale helper: grams of ground coffee per LEVEL tablespoon is ~5-6g (medium grind ~0.4 g/ml,
+   a US tbsp ~15ml). We use 5.3 and round to the nearest half tbsp; it's a starting point, not exact. */
+const TBSP_G=5.3;
+function tbspTxt(g){const r=Math.round((g/TBSP_G)*2)/2,w=Math.floor(r),h=(r-w)===0.5;return (w||(h?'':'0'))+(h?'½':'')+' tbsp';}
 function setWeightUnit(oz){
   weightOz=oz;
   $('wG').classList.toggle('on',!oz);
@@ -1675,7 +1679,7 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.5.6';
+const APP_VERSION='1.5.7';
 let theme='max';
 // Single-skin mode: shipping Max only for now. Haze + Burnt are fully built and kept
 // intact below (CSS + JS); flip THEMES_ENABLED to true to bring back the switcher.
@@ -2400,7 +2404,8 @@ function basicBrewTime(s){
 }
 function basicSummary(s){
   const water=Math.round(s.dose*basicRatio(s));
-  return `makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${s.dose} g</b> beans · <b>${water} g</b> water · kettle at <b>${basicTemp(s.roast,s)}</b> · ready in ~<b>${fmtT(basicBrewTime(s))}</b>`;
+  return `makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${s.dose} g</b> beans · <b>${water} g</b> water · kettle at <b>${basicTemp(s.roast,s)}</b> · ready in ~<b>${fmtT(basicBrewTime(s))}</b>`
+    + `<span class="noscale">No scale? Use about <b>${tbspTxt(s.dose)}</b> of ground coffee (level) and <b>${water} ml</b> water. A measuring cup works. Tablespoons are approximate; grind changes the weight.</span>`;
 }
 function syncCupsField(s){
   $('bCups').value=Math.round(s.dose*basicRatio(s)/CUP_G*4)/4;   // beans → cups, quarter steps

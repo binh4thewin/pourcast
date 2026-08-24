@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.5.7] - 2026-08-24
+
+### Added
+- **No-scale measuring help (Just Brew).** The summary now also gives the coffee dose in **level tablespoons** and the water in **ml**, so you can brew with just a measuring cup and no scale. Tablespoons are labeled approximate (about 5 g of ground coffee per level tablespoon; grind shifts it).
+
 ## [1.5.6] - 2026-08-10
 
 ### Changed
