@@ -500,9 +500,11 @@ h1{cursor:pointer}
 .close-x:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
 #settingsCard{position:relative}
 /* compact g/tbsp toggle inline on the Beans label */
-.unit-mini{display:inline-flex;vertical-align:middle;margin-left:6px;border:2px solid var(--ink);border-radius:8px;overflow:hidden;transform:translateY(-1px)}
-.unit-mini button{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:800;line-height:1;padding:3px 8px;border:none;border-radius:0;background:#fff;color:var(--ink);cursor:pointer;box-shadow:none;text-transform:lowercase;letter-spacing:0}
+.unit-mini{display:inline-flex;align-items:center;vertical-align:middle;margin-left:8px;border:2px solid var(--ink);border-radius:999px;overflow:hidden}
+.unit-mini button{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:800;line-height:1;min-height:0;padding:4px 11px;border:none;border-radius:0;background:#fff;color:var(--ink);cursor:pointer;box-shadow:none;text-transform:lowercase;letter-spacing:0}
 .unit-mini button.on{background:var(--violet);color:#fff}
+/* keep the Cups and Beans labels the same height so their inputs align (the Beans label carries the g/tbsp toggle) */
+#basicCard .row label{display:flex;align-items:center;min-height:26px}
 #startConfirm .sc-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:8px}
 #startConfirm .sc-line{font-family:'Space Grotesk';font-size:14px;font-weight:500;opacity:.85;margin-bottom:16px;line-height:1.5}
 #startConfirm .sc-btns{display:flex;gap:10px;justify-content:center}

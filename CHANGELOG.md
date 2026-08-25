@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.8.2] - 2026-08-25
+
+### Fixed
+- **Beans g/tbsp toggle layout.** The toggle was inheriting the global 44px touch-target height, which oversized it and pushed the Beans input badly out of line with Cups. It's now a small, tidy pill, and the two inputs align. (Latent since the toggle was added in 1.6.0.)
+
 ## [1.8.1] - 2026-08-25
 
 ### Changed
