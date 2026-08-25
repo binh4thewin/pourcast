@@ -25,7 +25,7 @@ const TOOLS=[
    'adaptive' = pour durations scale with water volume.
    tempC is calibrated for roastRec. */
 const RECIPES=[
- {id:'basic6040',tool:['v60','origami','any'],champ:'Beginner-friendly two-pour',timing:'adaptive',
+ {id:'basic6040',level:'beginner',tool:['v60','origami','any'],champ:'Beginner-friendly two-pour',timing:'adaptive',
   name:'Basic 60/40 · Two Pours',ratio:16,defaultDose:18,grind:'Medium',tempC:[92,94],roastRec:'Medium',
   desc:'A no-fuss two-pour V60 after the bloom: one bigger pour for 60% of the water, a quick stir, then a final pour for the last 40%. Forgiving and easy to nail with or without a scale.',
   steps:[
@@ -38,7 +38,7 @@ const RECIPES=[
     {type:'swirl',dur:5,label:'Gentle swirl'},
     {type:'wait',dur:45,label:'Let it drain'}
  ]},
- {id:'kasuya46',tool:['v60','origami','any'],champ:'Competition-born classic',timing:'rigid',
+ {id:'kasuya46',level:'intermediate',tool:['v60','origami','any'],champ:'Competition-born classic',timing:'rigid',
   name:'The 4:6 · World Champ Method',ratio:15,defaultDose:20,grind:'Coarse',tempC:[92,96],roastRec:'Light',
   desc:'Five equal pours on a fixed 45s clock, letting the bed fully drain between pours. First 40% of water tunes sweetness vs acidity, last 60% tunes strength.',
   steps:[
@@ -53,7 +53,7 @@ const RECIPES=[
     {type:'pour',frac:.20,dur:10,label:'Pour 5 · strength'},
     {type:'wait',dur:45,label:'Final drawdown'}
   ]},
- {id:'winton5',tool:['v60','origami','any'],champ:'Modern competition style',timing:'rigid',
+ {id:'winton5',level:'intermediate',tool:['v60','origami','any'],champ:'Modern competition style',timing:'rigid',
   name:'Five Even Pours · World Champ Method',ratio:15,defaultDose:20,grind:'Medium-coarse',tempC:[92,94],roastRec:'Light',
   desc:'Five equal center pours on a 40s clock. No dedicated bloom (pour 1 acts as one), no stirs, no swirls, minimal agitation.',
   steps:[
@@ -63,7 +63,7 @@ const RECIPES=[
     {type:'pour',frac:.20,dur:12,label:'Pour 4 · center'},{type:'wait',dur:28,label:'Settle'},
     {type:'pour',frac:.20,dur:12,label:'Pour 5 · center'},{type:'wait',dur:50,label:'Final drawdown'}
   ]},
- {id:'hoffmann',tool:['v60','origami'],champ:'World-champion barista\'s method',timing:'adaptive',
+ {id:'hoffmann',level:'intermediate',tool:['v60','origami'],champ:'World-champion barista\'s method',timing:'adaptive',
   name:'The Two-Speed V60 · World Champ Method',ratio:16.7,defaultDose:30,grind:'Medium-fine',tempC:[95,100],roastRec:'Light',roastNote:'the hotter end for the lightest roasts',
   desc:'Big bloom with a swirl, then ONE continuous pour with a speed change: brisk to 60% by 1:15, then ease off ~20% slower to 100% by 1:45 (shown as two steps so each phase gets its own flow-rate target). Stir + final swirl for a flat bed; drawdown ~3:30.',
   steps:[
@@ -77,7 +77,7 @@ const RECIPES=[
     {type:'swirl',dur:5,label:'Final gentle swirl'},
     {type:'wait',dur:90,label:'Drawdown to flat bed'}
   ]},
- {id:'rao',tool:['v60','any'],champ:'High-extraction school',timing:'adaptive',
+ {id:'rao',level:'advanced',tool:['v60','any'],champ:'High-extraction school',timing:'adaptive',
   name:'Single Spiral & Spin',ratio:16.7,defaultDose:22,grind:'Medium-fine',tempC:[93,95],roastRec:'Light',
   desc:'Bloom with 3x coffee weight and stir it thoroughly. One continuous spiral pour, then a confident spin to flatten the bed.',
   steps:[
@@ -88,7 +88,7 @@ const RECIPES=[
     {type:'swirl',dur:6,label:'Flattening spin',note:'flatten the bed'},
     {type:'wait',dur:75,label:'Drawdown'}
   ]},
- {id:'hedrick',tool:['v60','origami','any'],champ:'Sweetness-first approach',timing:'adaptive',
+ {id:'hedrick',level:'intermediate',tool:['v60','origami','any'],champ:'Sweetness-first approach',timing:'adaptive',
   name:'Low & Slow',ratio:16,defaultDose:20,grind:'Medium',tempC:[88,92],roastRec:'Medium',roastNote:'built around medium & dark roasts',
   desc:'Cooler water, gentle bloom, two low-and-slow pours keeping the slurry calm. Built for sweetness and body; rescues medium/dark roasts that go bitter on hot recipes.',
   steps:[
@@ -101,7 +101,7 @@ const RECIPES=[
     {type:'swirl',dur:5,label:'Tiny finishing swirl'},
     {type:'wait',dur:60,label:'Drawdown'}
   ]},
- {id:'chemexClassic',tool:['chemex'],champ:'House classic',timing:'adaptive',
+ {id:'chemexClassic',level:'beginner',tool:['chemex'],champ:'House classic',timing:'adaptive',
   name:'Chemex · Classic Batch',ratio:16,defaultDose:34,grind:'Medium-coarse',tempC:[94,96],roastRec:'Medium',
   desc:'Thick filters drain slowly, so stay patient. Bloom with a stir, then three spiral pours staying off the filter walls. Scales happily from 500g to 900g.',
   steps:[
@@ -115,7 +115,7 @@ const RECIPES=[
     {type:'pour',frac:.29,dur:30,label:'Pour 4 · spiral'},
     {type:'wait',dur:90,label:'Long Chemex drawdown'}
   ]},
- {id:'kalitaPulse',tool:['kalita','origami','melitta'],champ:'Flat-bed standard',timing:'adaptive',
+ {id:'kalitaPulse',level:'intermediate',tool:['kalita','origami','melitta'],champ:'Flat-bed standard',timing:'adaptive',
   name:'Kalita Wave · Pulse Pours',ratio:15.5,defaultDose:21,grind:'Medium',tempC:[92,94],roastRec:'Light',
   desc:'Flat bed loves rhythm: bloom plus four small pulses, keeping the water level low and consistent. Very even, very forgiving.',
   steps:[
@@ -126,7 +126,7 @@ const RECIPES=[
     {type:'pour',frac:.215,dur:12,label:'Pulse 3'},{type:'wait',dur:23,label:'Let it drop'},
     {type:'pour',frac:.215,dur:12,label:'Pulse 4'},{type:'wait',dur:65,label:'Drawdown'}
   ]},
- {id:'melitta1cup',tool:['melitta','kalita','any'],champ:'Daily driver',timing:'adaptive',
+ {id:'melitta1cup',level:'beginner',tool:['melitta','kalita','any'],champ:'Daily driver',timing:'adaptive',
   name:'One-Cup Wedge · Easy Morning',ratio:15,defaultDose:15,grind:'Medium-fine',tempC:[91,93],roastRec:'Medium',
   desc:'Small-dose weekday recipe: bloom then two pours. Wedge drippers restrict flow, so grind slightly finer and let the brewer do the work.',
   steps:[
@@ -137,7 +137,7 @@ const RECIPES=[
     {type:'pour',frac:.40,dur:20,label:'Pour 3'},
     {type:'wait',dur:60,label:'Drawdown'}
   ]},
- {id:'osmotic',tool:['v60','origami'],champ:"Popular in Spain's comp scene",timing:'adaptive',
+ {id:'osmotic',level:'advanced',tool:['v60','origami'],champ:"Popular in Spain's comp scene",timing:'adaptive',
   name:'Osmotic Flow · Center Drip',ratio:15,defaultDose:20,grind:'Medium-fine',tempC:[90,93],roastRec:'Light',
   desc:'After the bloom, pour pencil-thin and dead-center the entire time, letting water migrate outward through the bed. Slow, meditative, juicy.',
   steps:[
@@ -146,7 +146,7 @@ const RECIPES=[
     {type:'pour',frac:.85,dur:105,label:'Center drip · continuous',note:'thin stream, never move'},
     {type:'wait',dur:45,label:'Drawdown'}
   ]},
- {id:'v60hario1cup',tool:['v60'],champ:'Hario house method',timing:'adaptive',
+ {id:'v60hario1cup',level:'beginner',tool:['v60'],champ:'Hario house method',timing:'adaptive',
   name:'V60 · Classic 1-Cup',ratio:15,defaultDose:15,grind:'Medium-fine',tempC:[92,94],roastRec:'Medium',
   desc:'The straightforward daily single cup: bloom with 2x the coffee weight, let it rest, then two easy pours (to 60%, then 100%). Fast, forgiving, and the timing scales to your dose. The recipe to reach for before caffeine.',
   steps:[
@@ -159,7 +159,7 @@ const RECIPES=[
     {type:'swirl',dur:5,label:'Flattening swirl',note:'level the bed'},
     {type:'wait',dur:55,label:'Drawdown'}
   ]},
- {id:'v60iced',tool:['v60'],champ:'Japanese iced standard',timing:'adaptive',iced:true,
+ {id:'v60iced',level:'intermediate',tool:['v60'],champ:'Japanese iced standard',timing:'adaptive',iced:true,
   name:'V60 · Japanese Iced (flash brew)',ratio:15,defaultDose:22,grind:'Medium-fine',tempC:[93,96],roastRec:'Light',
   desc:'Brew hot, directly onto ice. Set your total water as usual, then put 40% of it IN THE SERVER AS ICE, the app schedules only the hot 60% you actually pour. Grind a touch finer since less hot water passes through.',
   steps:[
@@ -172,7 +172,7 @@ const RECIPES=[
     {type:'wait',dur:20,label:'Pause · water near bed'},
     {type:'wait',dur:55,label:'Drawdown · swirl server to melt ice'}
   ],waterNote:0.6},
- {id:'kasuyaSweet',tool:['v60','origami','any'],champ:'4:6 system · sweetness setting',timing:'rigid',
+ {id:'kasuyaSweet',level:'advanced',tool:['v60','origami','any'],champ:'4:6 system · sweetness setting',timing:'rigid',
   name:'The 4:6 Sweet · World Champ Method',ratio:15,defaultDose:20,grind:'Coarse',tempC:[92,96],roastRec:'Light',
   desc:"The 4:6 system's own sweetness dial: shrink pour 1, grow pour 2 (same first-40% total), keep the strength pours identical. Compare against standard 4:6 on the same beans to taste what the dial does.",
   steps:[
@@ -187,7 +187,7 @@ const RECIPES=[
     {type:'pour',frac:.20,dur:10,label:'Pour 5 · strength'},
     {type:'wait',dur:45,label:'Final drawdown'}
   ]},
- {id:'chemexHoffmann',tool:['chemex'],champ:'Two-speed technique',timing:'adaptive',
+ {id:'chemexHoffmann',level:'intermediate',tool:['chemex'],champ:'Two-speed technique',timing:'adaptive',
   name:'Chemex · Two-Speed · World Champ Method',ratio:16.7,defaultDose:30,grind:'Medium-coarse',tempC:[95,100],roastRec:'Light',roastNote:'the hotter end for the lightest roasts',
   desc:'His V60 logic adapted to thick Chemex paper: big stirred bloom, ONE continuous pour with a speed change at 60% (two steps = two flow-rate targets), then a gentle swirl. Patience on the drawdown, the filter is the brake.',
   steps:[
@@ -199,7 +199,7 @@ const RECIPES=[
     {type:'swirl',dur:6,label:'Gentle swirl'},
     {type:'wait',dur:110,label:'Long Chemex drawdown'}
   ]},
- {id:'chemexSmall',tool:['chemex'],champ:'Small-batch daily',timing:'adaptive',
+ {id:'chemexSmall',level:'beginner',tool:['chemex'],champ:'Small-batch daily',timing:'adaptive',
   name:'Chemex · Small Batch (1–2 cups)',ratio:16,defaultDose:22,grind:'Medium',tempC:[93,95],roastRec:'Medium',
   desc:'The Chemex at weekday scale. Grind finer than a full batch, a shallow bed drains fast through even Chemex paper. Bloom plus two patient pours.',
   steps:[
@@ -210,7 +210,7 @@ const RECIPES=[
     {type:'pour',frac:.42,dur:26,label:'Pour 3 · slow spiral'},
     {type:'wait',dur:80,label:'Drawdown'}
   ]},
- {id:'chemexIced',tool:['chemex'],champ:'Japanese iced standard',timing:'adaptive',iced:true,
+ {id:'chemexIced',level:'intermediate',tool:['chemex'],champ:'Japanese iced standard',timing:'adaptive',iced:true,
   name:'Chemex · Japanese Iced (flash brew)',ratio:15,defaultDose:34,grind:'Medium',tempC:[94,96],roastRec:'Light',
   desc:'Summer batch: set total water as usual, put 40% of it IN THE CHEMEX AS ICE, and the app schedules only the hot 60%. Grind finer than your hot Chemex, concentrated hot phase needs the extra extraction.',
   steps:[
@@ -222,7 +222,7 @@ const RECIPES=[
     {type:'pour',frac:.23,dur:20,label:'Pour 3'},
     {type:'wait',dur:90,label:'Drawdown · swirl to melt ice'}
   ],waterNote:0.6},
- {id:'aeropressHoffmann',tool:['aeropress'],champ:'World-champion barista\'s AeroPress',timing:'adaptive',immersion:true,
+ {id:'aeropressHoffmann',level:'intermediate',tool:['aeropress'],champ:'World-champion barista\'s AeroPress',timing:'adaptive',immersion:true,
   name:'AeroPress · Sealed Steep · World Champ Method',ratio:18.2,defaultDose:11,grind:'Fine',tempC:[95,99],roastRec:'Light',
   desc:'Small dose, fine grind, very hot water. Pour everything, cap immediately (plunger seal holds heat and stops dripping), long undisturbed steep, gentle swirl, slow press. No bloom, no stir.',
   steps:[
@@ -233,7 +233,7 @@ const RECIPES=[
     {type:'wait',dur:30,label:'Settle'},
     {type:'press',dur:30,label:'Press slowly to the hiss'}
   ]},
- {id:'aeropressClassic',tool:['aeropress'],champ:'House standard',timing:'adaptive',immersion:true,
+ {id:'aeropressClassic',level:'beginner',tool:['aeropress'],champ:'House standard',timing:'adaptive',immersion:true,
   name:'AeroPress · Classic',ratio:14.5,defaultDose:15,grind:'Medium-fine',tempC:[85,90],roastRec:'Medium',
   desc:'The everyday AeroPress: pour, brief stir, short steep, steady press. Cooler water than pour over, immersion extracts efficiently.',
   steps:[
@@ -242,7 +242,7 @@ const RECIPES=[
     {type:'wait',dur:60,label:'Steep'},
     {type:'press',dur:25,label:'Press steadily · stop at the hiss'}
   ]},
- {id:'frenchHoffmann',tool:['frenchpress'],champ:'The patient method',timing:'adaptive',immersion:true,
+ {id:'frenchHoffmann',level:'intermediate',tool:['frenchpress'],champ:'The patient method',timing:'adaptive',immersion:true,
   name:'French Press · Patient · World Champ Method',ratio:16.7,defaultDose:30,grind:'Medium',tempC:[95,100],roastRec:'Light',roastNote:'boiling is fine here',
   desc:'The patient method: full steep, break and skim the crust, then a LONG settle so fines sink. Plunger barely submerged, it strains, never presses. Silty-free cups.',
   steps:[
@@ -252,7 +252,7 @@ const RECIPES=[
     {type:'wait',dur:300,label:'Settle · 5 min, fines sink'},
     {type:'press',dur:10,label:'Plunger to surface only',note:'strain, don\'t plunge, pour gently'}
   ]},
- {id:'frenchClassic',tool:['frenchpress'],champ:'House standard',timing:'adaptive',immersion:true,
+ {id:'frenchClassic',level:'beginner',tool:['frenchpress'],champ:'House standard',timing:'adaptive',immersion:true,
   name:'French Press · Classic 4:00',ratio:15,defaultDose:30,grind:'Coarse',tempC:[93,96],roastRec:'Medium',
   desc:'The four-minute standard: pour, stir, steep, press. Coarse grind keeps the plunge clean.',
   steps:[
@@ -261,7 +261,7 @@ const RECIPES=[
     {type:'wait',dur:232,label:'Steep · lid on'},
     {type:'press',dur:20,label:'Press slowly & serve'}
   ]},
- {id:'phinClassic',tool:['phin'],champ:'Cà phê phin tradition',timing:'adaptive',immersion:true,
+ {id:'phinClassic',level:'beginner',tool:['phin'],champ:'Cà phê phin tradition',timing:'adaptive',immersion:true,
   name:'Phin · Classic (Cà Phê Sữa Đá)',ratio:5,defaultDose:20,grind:'Medium-fine',tempC:[95,100],roastRec:'Dark',
   desc:'The traditional Vietnamese drip. Small water, big coffee, metal filter, no hurry. Bloom is the most-skipped step and the #1 mistake, never skip it. Rest the gravity press on the grounds; never screw or twist it down. First drips should appear within ~2 minutes and the cup finishes in 4–6; faster means grind finer, slower means grind coarser. Classic serve: 2–3 tsp condensed milk waiting in the glass.',
   steps:[
@@ -271,7 +271,7 @@ const RECIPES=[
     {type:'pour',frac:0.75,dur:20,label:'Fill to the top · lid on'},
     {type:'wait',dur:280,label:'Drip · patience IS the recipe',note:'first drips by ~2:00 · done ~4–6 min'}
   ]},
- {id:'phinDouble',tool:['phin'],champ:'Double-bloom technique',timing:'adaptive',immersion:true,
+ {id:'phinDouble',level:'intermediate',tool:['phin'],champ:'Double-bloom technique',timing:'adaptive',immersion:true,
   name:'Phin · Double Bloom',ratio:5,defaultDose:20,grind:'Medium-fine',tempC:[95,100],roastRec:'Dark',
   desc:'Blooms the bed from the top AND the bottom. The first small pour blooms the surface; then you wait for the first drips below, that is the bottom of the bed finally saturating and blooming from beneath. A second small splash evens everything before the main fill. Slower to start, noticeably sweeter and more even in the cup.',
   steps:[
@@ -298,7 +298,7 @@ const RECIPES=[
     {type:'swirl',dur:5,label:'Finishing swirl'},
     {type:'wait',dur:60,label:'Drawdown'}
   ]},
- {id:'switchChronicler',tool:['switch'],champ:'Coffee Chronicler hybrid',timing:'adaptive',
+ {id:'switchChronicler',level:'intermediate',tool:['switch'],champ:'Coffee Chronicler hybrid',timing:'adaptive',
   name:'Coffee Chronicler · Switch Hybrid',ratio:16,defaultDose:20,grind:'Medium-fine',tempC:[91,93],roastRec:'Medium',
   desc:'Asser Christensen\'s modified-Kasuya Switch method. Pour half with the valve OPEN so the coffee percolates (clarity), then CLOSE the switch and fill for an immersion steep (body and sweetness), then open to drain. Clean and sweet.',
   steps:[
@@ -308,7 +308,7 @@ const RECIPES=[
     {type:'wait',dur:55,label:'Steep · switch closed',note:'immersion builds body and sweetness'},
     {type:'wait',dur:75,label:'Open the switch · drain',note:'flip the valve open, let it drain fully'}
   ]},
- {id:'switchImmersion',tool:['switch'],champ:'Full immersion, very forgiving',timing:'adaptive',
+ {id:'switchImmersion',level:'beginner',tool:['switch'],champ:'Full immersion, very forgiving',timing:'adaptive',
   name:'Switch · Easy Immersion',ratio:15,defaultDose:20,grind:'Medium',tempC:[92,94],roastRec:'Medium',
   desc:'The set-and-forget Switch method. Valve CLOSED, add all the water, stir once, let it steep, then open to drain. Almost impossible to mess up, with great body and sweetness and no pour technique.',
   steps:[
@@ -1641,11 +1641,20 @@ function wireToolScroll(){
   wireStripScroll('toolChips',updateToolArrows);
   wireStripScroll('bBrewers',updateBrewerArrows);   // Basic mode uses the same strip
 }
+const LEVEL_LABEL={beginner:'🟢 Beginner friendly',intermediate:'🟡 Intermediate',advanced:'🔴 Advanced'};
 function populateRecipes(){
   const list=allRecipes().filter(r=>r.id!=='custom'&&(r.tool.includes(tool)||tool==='any'||(tool==='switch'&&r.tool.includes('v60'))));
-  $('recipeSel').innerHTML=list.map(r=>`<option value="${r.id}">${escapeHTML(r.name)}</option>`).join('')
-    +`<optgroup label="Make your own"><option value="__edit__">Customize this method</option><option value="__scratch__">Start from scratch</option></optgroup>`;
-  loadRecipe(list[0].id);
+  // group by difficulty so the simple methods come first and the level is obvious
+  let html='',firstId=null;
+  ['beginner','intermediate','advanced'].forEach(lv=>{
+    const rs=list.filter(r=>(r.level||'intermediate')===lv);
+    if(!rs.length)return;
+    if(!firstId)firstId=rs[0].id;
+    html+=`<optgroup label="${LEVEL_LABEL[lv]}">`+rs.map(r=>`<option value="${r.id}">${escapeHTML(r.name)}</option>`).join('')+`</optgroup>`;
+  });
+  html+=`<optgroup label="Make your own"><option value="__edit__">Customize this method</option><option value="__scratch__">Start from scratch</option></optgroup>`;
+  $('recipeSel').innerHTML=html;
+  loadRecipe(firstId||list[0].id);
 }
 function loadRecipe(id){
   recipe=allRecipes().find(r=>r.id===id);
@@ -1659,7 +1668,8 @@ function loadRecipe(id){
   // rigid championship clock is worth calling out, since its timing is fixed.
   const tBadge=recipe.timing==='rigid'?'<span class="badge rigid">⏱ CHAMPIONSHIP CLOCK</span>':'';
   const roastBadge=recipe.roastRec==='Any'?'':`<span class="badge b2">☕ dialed on ${recipe.roastRec.toLowerCase()} roast</span>`;
-  $('recipeBadges').innerHTML=`${tBadge}<span class="badge b3">${recipe.grind}</span><span class="badge" id="tempBadge"></span>${roastBadge}`;
+  const lvlBadge=recipe.level?`<span class="badge b-lvl">${LEVEL_LABEL[recipe.level]}</span>`:'';
+  $('recipeBadges').innerHTML=`${lvlBadge}${tBadge}<span class="badge b3">${recipe.grind}</span><span class="badge" id="tempBadge"></span>${roastBadge}`;
   $('recipeMeta').innerHTML=recipe.desc+'<div style="margin-top:8px" id="tempAdvice"></div>';
   const tn=$('timingNote');
   if(recipe.timing==='rigid'){tn.style.display='';tn.innerHTML='⏱ <b>Championship clock:</b> pour weights scale to your dose, but pour windows and rests stay exactly on the published clock, the timing structure is the method. Big dose changes may need a grind adjustment to keep drawdown on time.';}
@@ -1721,7 +1731,7 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.7.1';
+const APP_VERSION='1.8.0';
 let theme='max';
 // Single-skin mode: shipping Max only for now. Haze + Burnt are fully built and kept
 // intact below (CSS + JS); flip THEMES_ENABLED to true to bring back the switcher.

@@ -10,6 +10,14 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.8.0] - 2026-08-25
+
+### Added
+- **Difficulty levels on every recipe.** Each method is now tagged **Beginner friendly**, **Intermediate**, or **Advanced**. The recipe picker is grouped by level with the simple methods first, and the selected recipe shows its level as a badge, so it's easy to pick something as simple (or as involved) as you want.
+
+### Notes
+- Reviewed the recipe list for duplicates: there are no true repeats. The "4:6 / 60-40" methods are genuinely different (Basic 60/40 is a beginner two-pour, The 4:6 is the classic five-pour, The 4:6 Sweet is a sweetness A/B variant), and they're now clearly separated by difficulty.
+
 ## [1.7.1] - 2026-08-25
 
 ### Changed

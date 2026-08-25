@@ -166,6 +166,7 @@ body.burnt .tool-tile.on .tool-name{color:#9C5526}
 .badges{margin-top:8px}
 .badge{display:inline-block;border:2px solid var(--ink);border-radius:99px;padding:2px 10px;font-size:11px;font-weight:700;margin:0 6px 6px 0;background:var(--acid)}
 .badge.b2{background:#FFD9EC}.badge.b3{background:#CFFFF9}
+.badge.b-lvl{background:#fff}
 .badge.rigid{background:var(--ink);color:var(--acid)}
 .badge.adaptive{background:var(--teal)}
 .timing-note{font-size:12px;font-weight:700;margin-top:10px;padding:8px 12px;border:2px dashed var(--ink);border-radius:10px;background:rgba(255,255,255,.6)}
