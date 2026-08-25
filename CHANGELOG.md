@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.8.3] - 2026-08-25
+
+### Changed
+- Made the pin/favorite **star** on the brewer icons smaller and tidier (it was also inheriting the 44px touch-target box, making it larger than intended).
+
 ## [1.8.2] - 2026-08-25
 
 ### Fixed
