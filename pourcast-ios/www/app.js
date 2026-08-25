@@ -413,7 +413,8 @@ function setSound(on){
   if(!on)pourStop();else audioInit();
   saveSettings();
 }
-let weightOz=false;
+let weightOz=false;   // kept in sync with wUnil==='oz' so all the oz-display code keeps working
+let wUnit='g';        // 'g' | 'oz' | 'tbsp'. tbsp applies to the COFFEE DOSE only (water/live scale stay grams)
 const G2OZ=1/28.3495;
 /* Display-only unit: inputs stay in grams (every coffee scale doses in grams);
    oz converts what you READ, live weight, targets, bars, logs. */
@@ -422,17 +423,31 @@ function fmtW(g,dec){ return weightOz ? (g*G2OZ).toFixed(dec===0?2:2)+' oz' : (d
    a US tbsp ~15ml). We use 5.3 and round to the nearest half tbsp; it's a starting point, not exact. */
 const TBSP_G=5.3;
 function tbspTxt(g){const r=Math.round((g/TBSP_G)*2)/2,w=Math.floor(r),h=(r-w)===0.5;return (w||(h?'':'0'))+(h?'½':'')+' tbsp';}
-function setWeightUnit(oz){
-  weightOz=oz;
-  $('wG').classList.toggle('on',!oz);
-  $('wOz').classList.toggle('on',oz);
+/* How to show the COFFEE DOSE, per the weight-unit setting (tbsp is approximate). */
+function doseTxt(g){return wUnit==='tbsp'?('≈ '+tbspTxt(g)):(wUnit==='oz'?(g*G2OZ).toFixed(2)+' oz':Math.round(g)+' g');}
+/* Just Brew beans: grams OR tablespoons only (oz is a scale-unit thing, not shown here). */
+function beansDisp(g){return wUnit==='tbsp'?('≈ '+tbspTxt(g)):(Math.round(g)+' g');}
+function beansToField(g){return wUnit==='tbsp'?(Math.round((g/TBSP_G)*2)/2):Math.round(g);}   // grams -> what the Beans field shows
+function fieldToBeans(v){v=parseFloat(v);if(!(v>0))return null;return wUnit==='tbsp'?v*TBSP_G:v;}   // field value -> grams (source of truth)
+function setWeightUnit(u){
+  if(u===true)u='oz'; else if(u===false)u='g';   // back-compat with old boolean callers
+  wUnit=u; weightOz=(u==='oz');
+  $('wG').classList.toggle('on',u!=='oz');        // Settings shows the scale unit (g unless oz)
+  $('wOz').classList.toggle('on',u==='oz');
   if(recipe){computeSchedule();}
   renderOzHint();
+  if(typeof renderBasic==='function')renderBasic();   // updates the Just Brew beans field, inline toggle, and summary
+  if($('doseSum'))renderDoseReadout();
   saveSettings();
 }
 function renderOzHint(){
   const d=parseFloat($('dose').value),w=parseFloat($('water').value);
-  $('ozHint').textContent=(weightOz&&d&&w)?`= ${(d*G2OZ).toFixed(2)} oz coffee · ${(w*G2OZ).toFixed(2)} oz water (inputs stay in grams, scales dose in grams)`:'';
+  let hint='';
+  if(d&&w){
+    if(wUnit==='oz')hint=`= ${(d*G2OZ).toFixed(2)} oz coffee · ${(w*G2OZ).toFixed(2)} oz water (inputs stay in grams, scales dose in grams)`;
+    else if(wUnit==='tbsp')hint=`= ≈ ${tbspTxt(d)} of ground coffee · ${w} ml water. Tablespoons are approximate; grind changes the weight.`;
+  }
+  $('ozHint').textContent=hint;
 }
 const hasLiveWeight=()=>ble.connected||simMode;
 const fmtT=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
@@ -459,7 +474,7 @@ function currentSettings(){
     tool, recipeId:recipe?recipe.id:null,
     dose:$('dose').value, water:$('water').value, ratio:$('ratioInput').value,
     grindSetting:$('grindSetting').value,
-    theme, weightOz, soundOn, beanName:$('beanName').value, roaster:curRoasterName()||$('roasterSel').value, bean:$('beanSel').value,
+    theme, weightOz, wUnit, soundOn, beanName:$('beanName').value, roaster:curRoasterName()||$('roasterSel').value, bean:$('beanSel').value,
     roast:$('roast').value, roastDate:$('roastDate').value,
     unitF
   };
@@ -478,7 +493,12 @@ function restoreSettings(){
   $('unitFbtn').classList.toggle('on',unitF);
   if(s&&s.theme)setTheme(s.theme);
   if(s&&'soundOn'in s){soundOn=s.soundOn;$('sndOn').classList.toggle('on',soundOn);$('sndOff').classList.toggle('on',!soundOn);}
-  if(s&&'weightOz'in s){weightOz=s.weightOz;$('wG').classList.toggle('on',!weightOz);$('wOz').classList.toggle('on',weightOz);}
+  if(s&&('wUnit'in s||'weightOz'in s)){
+    const u=('wUnit'in s)?s.wUnit:(s.weightOz?'oz':'g');   // migrate the old g/oz boolean
+    wUnit=u; weightOz=(u==='oz');
+    $('wG').classList.toggle('on',u!=='oz');   // Settings scale unit; the Just Brew g/tbsp toggle is set by renderBasic
+    $('wOz').classList.toggle('on',u==='oz');
+  }
   if(s){
     if(s.tool&&TOOLS.some(t=>t.id===s.tool))tool=s.tool;
     renderChips();populateRecipes();          // builds list for restored tool
@@ -1520,7 +1540,7 @@ function renderDoseReadout(){
   const dose=parseFloat($('dose').value)||0,r=curRatio(),water=Math.round(dose*r);
   const ice=dose?icedInfo():null;   // flash brew: show ice + hot water, not one lumped total
   const waterPart=ice?`🧊 <b>${ice.iceG} g</b> ice + <b>${ice.hotG} g</b> hot water`:`<b>${water} g</b> water`;
-  $('doseSum').innerHTML=dose?`makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${dose} g</b> beans · ${waterPart}`:'';
+  $('doseSum').innerHTML=dose?`makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${doseTxt(dose)}</b> beans · ${waterPart}`:'';
   if(document.activeElement!==$('doseCups'))$('doseCups').value=Math.round(water/CUP_G*4)/4;
 }
 function updateBeansSummary(){
@@ -1679,7 +1699,7 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.5.10';
+const APP_VERSION='1.6.0';
 let theme='max';
 // Single-skin mode: shipping Max only for now. Haze + Burnt are fully built and kept
 // intact below (CSS + JS); flip THEMES_ENABLED to true to bring back the switcher.
@@ -2404,8 +2424,10 @@ function basicBrewTime(s){
 }
 function basicSummary(s){
   const water=Math.round(s.dose*basicRatio(s));
-  return `makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${s.dose} g</b> beans · <b>${water} g</b> water · kettle at <b>${basicTemp(s.roast,s)}</b> · ready in ~<b>${fmtT(basicBrewTime(s))}</b>`
-    + `<span class="noscale">No scale? Use about <b>${tbspTxt(s.dose)}</b> of ground coffee (level) and <b>${water} ml</b> water. A measuring cup works. Tablespoons are approximate; grind changes the weight.</span>`;
+  const main=`makes ≈ <b>${cupsTxt(water/CUP_G)}</b> · <b>${beansDisp(s.dose)}</b> beans · <b>${water} g</b> water · kettle at <b>${basicTemp(s.roast,s)}</b> · ready in ~<b>${fmtT(basicBrewTime(s))}</b>`;
+  // if they're already reading in tbsp, the "no scale" helper is redundant
+  const noScale=wUnit==='tbsp'?'':`<span class="noscale">No scale? Use about <b>${tbspTxt(s.dose)}</b> of ground coffee (level) and <b>${water} ml</b> water. A measuring cup works. Tablespoons are approximate; grind changes the weight.</span>`;
+  return main+noScale;
 }
 function syncCupsField(s){
   $('bCups').value=Math.round(s.dose*basicRatio(s)/CUP_G*4)/4;   // beans → cups, quarter steps
@@ -2437,9 +2459,13 @@ function renderBasic(){
   const s=basicState();
   const brw=basicBrewer(s);
   renderBasicBrewers();
-  $('bDose').max=brw.maxDose;
+  const tb=(wUnit==='tbsp');
+  {const g=$('bUg'),t=$('bUtbsp');if(g)g.classList.toggle('on',!tb);if(t)t.classList.toggle('on',tb);}
+  $('bDose').step=tb?0.5:1;
+  $('bDose').min=tb?2:10;
+  $('bDose').max=tb?Math.round((brw.maxDose/TBSP_G)*2)/2:brw.maxDose;
   $('bCups').max=Math.round(brw.maxDose*basicRatio(s)/CUP_G*4)/4;
-  $('bDose').value=s.dose;
+  $('bDose').value=beansToField(s.dose);
   syncCupsField(s);
   document.querySelectorAll('#bRoast .chip').forEach(c=>c.classList.toggle('on',c.dataset.r===s.roast));
   document.querySelectorAll('#bStr .chip').forEach(c=>c.classList.toggle('on',c.dataset.s===(s.strength||'regular')));
@@ -2449,12 +2475,12 @@ function renderBasic(){
   $('basicCard').style.display=showAgain?'none':'block';
   if(s.brewed){
     const tn=TOOLS.find(x=>x.id===s.brewer);
-    $('againSum').innerHTML=`<b>${tn?tn.name:''}</b> · <b>${cupsTxt(s.dose*basicRatio(s)/CUP_G)}</b> · <b>${s.dose} g</b> · ${s.roast} roast · ${STRENGTH[s.strength||'regular'].label}`;
+    $('againSum').innerHTML=`<b>${tn?tn.name:''}</b> · <b>${cupsTxt(s.dose*basicRatio(s)/CUP_G)}</b> · <b>${beansDisp(s.dose)}</b> · ${s.roast} roast · ${STRENGTH[s.strength||'regular'].label}`;
   }
 }
 function readBasicInputs(){
   const s=basicState();
-  s.dose=Math.min(basicBrewer(s).maxDose,Math.max(10,parseFloat($('bDose').value)||20));
+  s.dose=Math.min(basicBrewer(s).maxDose,Math.max(10,fieldToBeans($('bDose').value)||20));
   const on=document.querySelector('#bRoast .chip.on');
   s.roast=on?on.dataset.r:'Medium';
   const st=document.querySelector('#bStr .chip.on');
@@ -2511,7 +2537,7 @@ function wireModes(){
       if(!(raw>0))return;
       const s=readBasicInputs();
       const cups=Math.min(basicBrewer(basicState()).maxDose*basicRatio(basicState())/CUP_G,Math.max(0.25,raw));
-      s.dose=doseForCups(cups,s);$('bDose').value=s.dose;
+      s.dose=doseForCups(cups,s);$('bDose').value=beansToField(s.dose);
       setBasicState(s);$('bSum').innerHTML=basicSummary(s);
     }else{
       const raw=parseFloat($('bDose').value);
@@ -2612,8 +2638,10 @@ function wireSetup(){
   const firstGestureUnlock=()=>{audioInit();
     ['touchend','pointerdown','click'].forEach(ev=>document.removeEventListener(ev,firstGestureUnlock));};
   ['touchend','pointerdown','click'].forEach(ev=>document.addEventListener(ev,firstGestureUnlock,{once:false,passive:true}));
-  $('wG').onclick=()=>setWeightUnit(false);
-  $('wOz').onclick=()=>setWeightUnit(true);
+  $('wG').onclick=()=>setWeightUnit('g');
+  $('wOz').onclick=()=>setWeightUnit('oz');
+  $('bUg').onclick=()=>setWeightUnit('g');        // inline g/tbsp toggle on the Beans field
+  $('bUtbsp').onclick=()=>setWeightUnit('tbsp');
   {const av=$('appVersion');if(av)av.textContent='Pourcast v'+APP_VERSION;}
   $('themeMax').onclick=()=>setTheme('max');
   $('themeSage').onclick=()=>setTheme('sage');
@@ -2627,6 +2655,7 @@ function wireSetup(){
     const c=$('settingsCard');
     c.style.display=c.style.display==='none'?'block':'none';
   };
+  $('settingsClose').onclick=()=>{$('settingsCard').style.display='none';};
   // Tap the header Bluetooth badge → open the scale panel over the CURRENT screen,
   // so you can connect without being kicked back to the start screen.
   const openScaleSettings=()=>{refreshScaleModal();$('scaleModal').style.display='flex';};

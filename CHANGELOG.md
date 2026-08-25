@@ -10,6 +10,15 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.6.0] - 2026-08-25
+
+### Added
+- **Measure coffee in tablespoons (no scale needed).** Just Brew now has a small **g / tbsp** toggle right on the Beans field. Flip it to **tbsp** and the bean amount shows and enters in level tablespoons, while water stays in grams. Default is grams, and tablespoons are approximate (grind changes the weight).
+
+### Changed
+- **Settings now has a close ×** in the corner, so it's obvious how to get out (tapping the gear again still toggles it too).
+- Settings → Weight Unit is back to just **g / oz**. The tablespoon option moved onto the Beans field, where a no-scale user is actually looking.
+
 ## [1.5.10] - 2026-08-24
 
 ### Changed

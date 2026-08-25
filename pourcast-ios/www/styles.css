@@ -494,6 +494,14 @@ h1{cursor:pointer}
 #startConfirm .sc-card{position:relative;background:var(--paper);border:3px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);padding:22px;max-width:min(380px,92vw);text-align:center}
 #startConfirm .sc-x{position:absolute;top:10px;right:10px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:99px;background:#fff;color:var(--ink);font-size:18px;font-weight:800;line-height:1;padding:0;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
 #startConfirm .sc-x:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
+/* reusable corner close button */
+.close-x{position:absolute;top:12px;right:12px;z-index:2;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:99px;background:#fff;color:var(--ink);font-size:18px;font-weight:800;line-height:1;padding:0;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
+.close-x:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
+#settingsCard{position:relative}
+/* compact g/tbsp toggle inline on the Beans label */
+.unit-mini{display:inline-flex;vertical-align:middle;margin-left:6px;border:2px solid var(--ink);border-radius:8px;overflow:hidden;transform:translateY(-1px)}
+.unit-mini button{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:800;line-height:1;padding:3px 8px;border:none;border-radius:0;background:#fff;color:var(--ink);cursor:pointer;box-shadow:none;text-transform:lowercase;letter-spacing:0}
+.unit-mini button.on{background:var(--violet);color:#fff}
 #startConfirm .sc-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:8px}
 #startConfirm .sc-line{font-family:'Space Grotesk';font-size:14px;font-weight:500;opacity:.85;margin-bottom:16px;line-height:1.5}
 #startConfirm .sc-btns{display:flex;gap:10px;justify-content:center}
