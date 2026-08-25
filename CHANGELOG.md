@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.7.1] - 2026-08-25
+
+### Changed
+- The Hario Switch now uses a detailed brewer illustration (the cone with its valve lever) that matches the other brewer icons, replacing the simple line icon.
+
 ## [1.7.0] - 2026-08-25
 
 ### Added
