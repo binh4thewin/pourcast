@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.7.0] - 2026-08-25
+
+### Added
+- **Hario Switch brewer.** Added the Hario Switch (with its own icon) and two guided recipes: the **Coffee Chronicler hybrid** (Asser Christensen's modified-Kasuya method: pour half with the valve open to percolate, then close for an immersion steep, then open to drain, 20 g : 320 g) and a **forgiving full-immersion** method. Steps call out exactly when to open and close the switch. Since the Switch runs as a V60 with the valve open, every V60 recipe is available for it too.
+
 ## [1.6.0] - 2026-08-25
 
 ### Added

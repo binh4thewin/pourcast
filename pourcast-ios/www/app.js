@@ -16,7 +16,7 @@
 
 /* ============================ 1. DATA ============================ */
 const TOOLS=[
- {id:'v60',name:'Hario V60'},{id:'kalita',name:'Kalita Wave'},{id:'chemex',name:'Chemex'},
+ {id:'v60',name:'Hario V60'},{id:'switch',name:'Hario Switch'},{id:'kalita',name:'Kalita Wave'},{id:'chemex',name:'Chemex'},
  {id:'origami',name:'Origami'},{id:'melitta',name:'Melitta / flat wedge'},
  {id:'aeropress',name:'AeroPress'},{id:'frenchpress',name:'French Press'},{id:'phin',name:'Phin (Việt Nam)'},{id:'any',name:'Any dripper'}
 ];
@@ -297,6 +297,25 @@ const RECIPES=[
     {type:'pour',frac:.2834,dur:15,label:'Pour 4'},
     {type:'swirl',dur:5,label:'Finishing swirl'},
     {type:'wait',dur:60,label:'Drawdown'}
+  ]},
+ {id:'switchChronicler',tool:['switch'],champ:'Coffee Chronicler hybrid',timing:'adaptive',
+  name:'Coffee Chronicler · Switch Hybrid',ratio:16,defaultDose:20,grind:'Medium-fine',tempC:[91,93],roastRec:'Medium',
+  desc:'Asser Christensen\'s modified-Kasuya Switch method. Pour half with the valve OPEN so the coffee percolates (clarity), then CLOSE the switch and fill for an immersion steep (body and sweetness), then open to drain. Clean and sweet.',
+  steps:[
+    {type:'pour',frac:.5,dur:25,label:'Switch OPEN · pour to 50%',note:'let it drip through, this is the percolation phase'},
+    {type:'wait',dur:20,label:'Let it drip'},
+    {type:'pour',frac:.5,dur:20,label:'Close the switch, fill to 100%',note:'valve shut, the coffee is now steeping'},
+    {type:'wait',dur:55,label:'Steep · switch closed',note:'immersion builds body and sweetness'},
+    {type:'wait',dur:75,label:'Open the switch · drain',note:'flip the valve open, let it drain fully'}
+  ]},
+ {id:'switchImmersion',tool:['switch'],champ:'Full immersion, very forgiving',timing:'adaptive',
+  name:'Switch · Easy Immersion',ratio:15,defaultDose:20,grind:'Medium',tempC:[92,94],roastRec:'Medium',
+  desc:'The set-and-forget Switch method. Valve CLOSED, add all the water, stir once, let it steep, then open to drain. Almost impossible to mess up, with great body and sweetness and no pour technique.',
+  steps:[
+    {type:'pour',frac:1,dur:20,label:'Switch CLOSED · add all the water',note:'valve shut, fill to 100%'},
+    {type:'stir',dur:6,label:'Stir once',note:'wet every ground'},
+    {type:'wait',dur:120,label:'Steep · switch closed',note:'let it immerse'},
+    {type:'wait',dur:60,label:'Open the switch · drain',note:'flip open, let it run out'}
   ]}
 ];
 
@@ -312,6 +331,7 @@ const ICONS={pour:'🫗',wait:'⏳',stir:'🥄',swirl:'🌀',press:'🔽'};
 const _I=(p)=>`<svg class="ticon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 const TOOL_ICONS={
   v60:_I('<path d="M4 6h16L14 15h-4L4 6z"/><path d="M9 15h6l-1 3h-4l-1-3z"/><path class="acc" d="M4 6h16"/><path d="M12 19v2"/>'),
+  switch:_I('<path d="M4 6h16L14 15h-4L4 6z"/><path d="M9 15h6l-1 3h-4l-1-3z"/><path class="acc" d="M4 6h16"/><path d="M12 19v2"/><path class="acc" d="M15 16.4h3.3"/><circle class="acc" cx="19.2" cy="16.4" r="1"/>'),
   kalita:_I('<path d="M5 6h14l-2.5 9h-9L5 6z"/><path d="M8.5 15h7"/><path d="M10 18h4"/><path class="acc" d="M5 6h14"/><path d="M8 9.5c1 .8 2 .8 3 0s2-.8 3 0 2 .8 3 0"/>'),
   chemex:_I('<path d="M8 3h8l-2.5 7 3.5 9a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2l3.5-9L8 3z"/><path class="acc" d="M8.7 10.5h6.6M8.9 12.3h6.2"/>'),
   origami:_I('<path d="M4 6h16L14 15h-4L4 6z"/><path d="M8 6l2 9M16 6l-2 9M12 6v9"/><path class="acc" d="M4 6h16"/><path d="M12 18v3"/>'),
@@ -1620,7 +1640,7 @@ function wireToolScroll(){
   wireStripScroll('bBrewers',updateBrewerArrows);   // Basic mode uses the same strip
 }
 function populateRecipes(){
-  const list=allRecipes().filter(r=>r.id!=='custom'&&(r.tool.includes(tool)||tool==='any'));
+  const list=allRecipes().filter(r=>r.id!=='custom'&&(r.tool.includes(tool)||tool==='any'||(tool==='switch'&&r.tool.includes('v60'))));
   $('recipeSel').innerHTML=list.map(r=>`<option value="${r.id}">${escapeHTML(r.name)}</option>`).join('')
     +`<optgroup label="Make your own"><option value="__edit__">Customize this method</option><option value="__scratch__">Start from scratch</option></optgroup>`;
   loadRecipe(list[0].id);
@@ -1699,7 +1719,7 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.6.0';
+const APP_VERSION='1.7.0';
 let theme='max';
 // Single-skin mode: shipping Max only for now. Haze + Burnt are fully built and kept
 // intact below (CSS + JS); flip THEMES_ENABLED to true to bring back the switcher.
@@ -2358,6 +2378,7 @@ const MODEKEY='pourfect-mode',BASICKEY='pourfect-basic';
    the brewer's sensible default strength; the Strength chips shift it from there. */
 const BASIC_BREWERS=[
  {id:'v60',        recipe:'v60hario1cup',   baseRatio:16,  maxDose:40},
+ {id:'switch',     recipe:'switchChronicler',baseRatio:16, maxDose:40},
  {id:'kalita',     recipe:'kalitaPulse',    baseRatio:16,  maxDose:35},
  {id:'chemex',     recipe:'chemexClassic',  baseRatio:16,  maxDose:60},
  {id:'origami',    recipe:'hedrick',        baseRatio:16,  maxDose:40},
