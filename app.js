@@ -299,7 +299,7 @@ const RECIPES=[
     {type:'wait',dur:60,label:'Drawdown'}
   ]},
  {id:'switchChronicler',level:'intermediate',tool:['switch'],champ:'Coffee Chronicler hybrid',timing:'adaptive',
-  name:'Coffee Chronicler · Switch Hybrid',ratio:16,defaultDose:20,grind:'Medium-fine',tempC:[91,93],roastRec:'Medium',
+  name:'Switch · Coffee Chronicler Hybrid',ratio:16,defaultDose:20,grind:'Medium-fine',tempC:[91,93],roastRec:'Medium',
   desc:'Asser Christensen\'s modified-Kasuya Switch method. Pour half with the valve OPEN so the coffee percolates (clarity), then CLOSE the switch and fill for an immersion steep (body and sweetness), then open to drain. Clean and sweet.',
   steps:[
     {type:'pour',frac:.5,dur:25,label:'Switch OPEN · pour to 50%',note:'let it drip through, this is the percolation phase'},
@@ -1731,7 +1731,7 @@ function renderAge(){
   chip.style.display='block';chip.className='age '+a.cls;chip.textContent=a.txt;
 }
 
-const APP_VERSION='1.8.0';
+const APP_VERSION='1.8.1';
 let theme='max';
 // Single-skin mode: shipping Max only for now. Haze + Burnt are fully built and kept
 // intact below (CSS + JS); flip THEMES_ENABLED to true to bring back the switcher.

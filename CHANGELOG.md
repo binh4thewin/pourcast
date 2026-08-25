@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.8.1] - 2026-08-25
+
+### Changed
+- Renamed the Switch hybrid to **"Switch · Coffee Chronicler Hybrid"** so both Switch recipes lead with "Switch" and are easy to find in the list.
+
 ## [1.8.0] - 2026-08-25
 
 ### Added
