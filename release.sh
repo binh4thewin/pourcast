@@ -68,6 +68,10 @@ RELEASE_FILES=(
   og-image.html
   # AI/SEO discovery files
   llms.txt
+  # custom 404 (both hosts serve /404.html for any missing path) + its art
+  404.html
+  404-hero.png
+  404-cup.png
   # Cloudflare Pages config (getpourcast.com) + README (carries the live URL)
   _headers
   README.md
