@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.8.5] - 2026-09-16
+
+### Changed
+- The "Made by Binh Huynh" credit now sits at the bottom of **every** screen — Just Brew, Brew Print, and the post-brew rating — not just the home screen and Settings. It stays hidden during an active brew, so the live timer keeps its full-height focused layout.
+
 ## [1.8.4] - 2026-09-16
 
 ### Added
