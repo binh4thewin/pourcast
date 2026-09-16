@@ -10,6 +10,13 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.8.8] - 2026-09-16
+
+### Changed
+- **Share card and descriptions no longer say "free."** The badge on the social preview now reads **EARLY ACCESS · WORKS OFFLINE · NO SCALE NEEDED**, and the meta/Open Graph/Twitter/JSON-LD descriptions and `llms.txt` drop the word — nothing locks in a price. (Structured-data `isAccessibleForFree`/`price: 0` stay, as facts about today.)
+- `release.sh` now cache-busts `og:image`/`twitter:image` with `?v=`, so platforms pick up a new card on release instead of showing a weeks-old cached one.
+- `og-image.html` icon path is relative again (it pointed at another machine), so the card re-renders with one headless-Chrome command.
+
 ## [1.8.7] - 2026-09-16
 
 ### Added

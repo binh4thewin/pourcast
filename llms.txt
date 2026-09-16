@@ -1,6 +1,6 @@
 # Pourcast
 
-> A free pour-over coffee brew timer that paces every pour in real time, not just a ratio calculator. Guided recipes for popular drippers, usable with or without a scale.
+> A pour-over coffee brew timer that paces every pour in real time, not just a ratio calculator. Guided recipes for popular drippers, usable with or without a scale.
 
 Pourcast is a web app (also shipped as an iOS app) for brewing pour-over coffee. You pick a brewer and dose (or fine-tune a full recipe) and Pourcast runs a live, guided brew timer that tells you exactly how much water to pour and when: bloom, pours, swirls, and drawdown, paced step by step in real time. It works fully offline and needs no scale, though it can connect to a Bluetooth coffee scale for live weight where the browser supports it.
 
