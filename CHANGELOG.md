@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.8.7] - 2026-09-16
+
+### Added
+- **Custom 404 page** in the app's own design language (wordmark, acid pill, pink card, gradient button), with a pour-over illustration and a link back to the app. Served for any missing path on both getpourcast.com and the github.io mirror; a tiny `<base>` shim keeps asset paths correct on both. `noindex` so search engines stop logging soft-404s.
+
 ## [1.8.6] - 2026-09-16
 
 ### Changed
