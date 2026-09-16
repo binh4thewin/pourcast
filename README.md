@@ -7,7 +7,7 @@ Vietnamese phin. Pick a method, enter your coffee amount, and it handles the res
 every pour amount and timing calculated for you, real-time pace coaching, and honest
 feedback afterward on what went wrong and what to change next time.
 
-**Live app → https://binh4thewin.github.io/pourcast/**
+**Live app → https://getpourcast.com/** (mirror: https://binh4thewin.github.io/pourcast/)
 
 Built by [Binh Huynh](https://www.linkedin.com/in/binhhuynh).
 

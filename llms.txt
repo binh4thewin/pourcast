@@ -13,4 +13,4 @@ Pourcast is a web app (also shipped as an iOS app) for brewing pour-over coffee.
 - Three visual themes; works fully offline
 
 ## Links
-- App: https://binh4thewin.github.io/pourcast/
+- App: https://getpourcast.com/

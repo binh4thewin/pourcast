@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.8.6] - 2026-09-16
+
+### Changed
+- **New home: https://getpourcast.com/** (Cloudflare Pages, auto-deployed from `main`). Canonical, Open Graph, Twitter, JSON-LD, sitemap, `llms.txt`, and README URLs now point there; the GitHub Pages URL keeps working as a mirror. Added `_redirects` (www → apex) and `_headers` (no-cache on `index.html` + `sw.js` so releases roll out immediately).
+
 ## [1.8.5] - 2026-09-16
 
 ### Changed

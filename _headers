@@ -1,0 +1,10 @@
+# Cloudflare Pages headers.
+# The service worker and the HTML shell must never be served stale, or a new
+# release can't roll out (sw.js is network-first by design; index.html carries
+# the ?v= cache-busters that point at the new app.js/styles.css).
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/sw.js
+  Cache-Control: no-cache
