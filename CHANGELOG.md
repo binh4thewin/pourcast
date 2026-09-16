@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.8.9] - 2026-09-16
+
+### Changed
+- **Canonical host is now `www.getpourcast.com`.** Canonical, Open Graph, Twitter, JSON-LD, sitemap, `llms.txt` and README URLs all use the `www` host; the bare `getpourcast.com` 301s to it (Cloudflare redirect rule). No app changes.
+
 ## [1.8.8] - 2026-09-16
 
 ### Changed
