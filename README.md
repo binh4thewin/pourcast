@@ -9,6 +9,8 @@ feedback afterward on what went wrong and what to change next time.
 
 **Live app → https://binh4thewin.github.io/pourcast/**
 
+Built by [Binh Huynh](https://www.linkedin.com/in/binhhuynh).
+
 ---
 
 ## What it does

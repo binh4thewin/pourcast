@@ -71,6 +71,7 @@ RELEASE_FILES=(
   sitemap.xml
   # brand icon masters (source of truth; the generated ios/ tree stays untracked)
   icon-master.png
+  switch.png
   pourcast-ios/assets/icon.png
   pourcast-ios/package.json
   pourcast-ios/RUNBOOK.md
