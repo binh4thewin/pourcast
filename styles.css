@@ -229,6 +229,12 @@ body.brewing.basic .instr-sub{font-size:12px}
 .water-caption{font-size:11px;font-weight:700;color:var(--violet);text-align:center;margin-bottom:12px}
 .brew-btns{display:flex;gap:10px;margin-top:2px}.brew-btns button{flex:1}
 .footer-note{font-size:11.5px;line-height:1.7;margin-top:22px;font-weight:500}
+/* developer credit (home screen + settings) */
+.credit{font-size:11px;font-weight:600;opacity:.6;text-align:center;margin:4px 0 0;line-height:1.6}
+.credit a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.credit a:hover{opacity:1}
+.credit-settings{margin-top:2px}
+body.brewing #modePick .credit{display:none}
 /* live method list */
 .step-row.compact{grid-template-columns:24px 1fr auto;font-size:12px;padding:4px 8px;opacity:.45}
 .step-row.expanded{display:block;background:#fff;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:12px;margin:6px 0}

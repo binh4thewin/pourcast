@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.8.4] - 2026-09-16
+
+### Added
+- Developer credit: a small "Made by Binh Huynh" line linking to LinkedIn on the home screen and in Settings, plus author metadata (meta tag, rel=author, JSON-LD author) and a README byline.
+
 ## [1.8.3] - 2026-08-25
 
 ### Changed
