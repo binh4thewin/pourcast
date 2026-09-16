@@ -13,7 +13,7 @@ _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verific
 ## [1.8.6] - 2026-09-16
 
 ### Changed
-- **New home: https://getpourcast.com/** (Cloudflare Pages, auto-deployed from `main`). Canonical, Open Graph, Twitter, JSON-LD, sitemap, `llms.txt`, and README URLs now point there; the GitHub Pages URL keeps working as a mirror. Added `_redirects` (www → apex) and `_headers` (no-cache on `index.html` + `sw.js` so releases roll out immediately).
+- **New home: https://getpourcast.com/** (Cloudflare Pages, auto-deployed from `main`). Canonical, Open Graph, Twitter, JSON-LD, sitemap, `llms.txt`, and README URLs now point there; the GitHub Pages URL keeps working as a mirror. Added `_headers` (no-cache on `index.html` + `sw.js` so releases roll out immediately). The www → apex redirect is a Cloudflare zone Redirect Rule, not a Pages `_redirects` file — Pages doesn't support domain-level redirects.
 
 ## [1.8.5] - 2026-09-16
 

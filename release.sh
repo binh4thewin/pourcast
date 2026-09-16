@@ -70,7 +70,6 @@ RELEASE_FILES=(
   llms.txt
   # Cloudflare Pages config (getpourcast.com) + README (carries the live URL)
   _headers
-  _redirects
   README.md
   sitemap.xml
   # brand icon masters (source of truth; the generated ios/ tree stays untracked)

@@ -1,2 +1,0 @@
-# Cloudflare Pages redirects. Collapse www onto the apex so there is one canonical origin.
-https://www.getpourcast.com/* https://getpourcast.com/:splat 301
