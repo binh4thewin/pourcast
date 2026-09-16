@@ -41,6 +41,8 @@ sed -i '' -E "s/const APP_VERSION='[^']*';/const APP_VERSION='$VERSION';/" app.j
 # (GitHub Pages caches app.js/styles.css hard; without this, users see stale code)
 sed -i '' -E "s/(href=\"styles\.css)(\?v=[^\"]*)?\"/\1?v=$VERSION\"/" index.html
 sed -i '' -E "s/(src=\"app\.js)(\?v=[^\"]*)?\"/\1?v=$VERSION\"/" index.html
+# social platforms cache og:image by URL for weeks; bust it too so a new card shows up
+sed -i '' -E "s#(getpourcast\.com/og-image\.png)(\?v=[^\"]*)?#\1?v=$VERSION#g" index.html
 # service worker cache version — must match the asset ?v so a deploy replaces the old cache
 sed -i '' -E "s/const VERSION='[^']*';/const VERSION='$VERSION';/" sw.js
 # iOS wrapper package version
