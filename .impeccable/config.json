@@ -56,6 +56,15 @@
         ],
         "createdAt": "2026-09-16T21:43:28.952Z",
         "reason": "Claude: 11px .credit and 12px .tag are the app's own component sizes (styles.css .credit, .tag); kept identical so the page reads as the same product"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "404.html"
+        ],
+        "createdAt": "2026-09-16T21:45:50.878Z",
+        "reason": "Claude: --paper #FFF3E4 is the app's brand background token from styles.css:2 and manifest.json theme_color; 404 must match the product"
       }
     ]
   }
