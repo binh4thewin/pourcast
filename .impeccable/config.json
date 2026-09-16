@@ -29,6 +29,33 @@
         ],
         "createdAt": "2026-08-22T19:57:03.795Z",
         "reason": "user confirmed: the POURCAST wordmark gradient is the intentional brand identity (kept the gradient, only changed the font this session); the app icon, favicon, and OG image all use the same sweep"
+      },
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "404.html"
+        ],
+        "createdAt": "2026-09-16T21:43:28.924Z",
+        "reason": "Claude: h1 is a verbatim copy of the app wordmark in styles.css:34-36 (gradient + ink text-stroke); user asked the 404 to match the app design"
+      },
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          "404.html"
+        ],
+        "createdAt": "2026-09-16T21:43:28.939Z",
+        "reason": "Claude: .credit (opacity .6) and .snark (.85) mirror the app's existing .credit/.mp-sub components in styles.css; ink #1B0B2E on cream stays legible; consistency with app chosen over local tweak"
+      },
+      {
+        "rule": "tiny-text",
+        "value": "*",
+        "files": [
+          "404.html"
+        ],
+        "createdAt": "2026-09-16T21:43:28.952Z",
+        "reason": "Claude: 11px .credit and 12px .tag are the app's own component sizes (styles.css .credit, .tag); kept identical so the page reads as the same product"
       }
     ]
   }
