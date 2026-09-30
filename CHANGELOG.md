@@ -10,6 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH
 
 _Native (Capacitor/iOS) Bluetooth is implemented in code but still needs verification on a real device + scale before an iOS/App Store release (see `pourcast-ios/RUNBOOK.md`). The web build is unaffected by it._
 
+## [1.8.10] - 2026-09-30
+
+### Changed
+- Share-card badge now reads **GUIDED RECIPES · WORKS OFFLINE · NO SCALE NEEDED** (was "Early access", which read as beta). Recipes are the one pillar the tagline above the badge doesn't already cover, and it stays true whether the app is free or paid.
+
 ## [1.8.9] - 2026-09-16
 
 ### Changed
