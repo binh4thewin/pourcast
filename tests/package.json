@@ -1,0 +1,11 @@
+{
+  "name": "pourcast-tests",
+  "private": true,
+  "type": "module",
+  "description": "Automated test gate for Pourcast releases. Runs the real app in Chromium.",
+  "scripts": {
+    "test": "playwright test",
+    "setup": "npm install && npx playwright install --with-deps chromium"
+  },
+  "devDependencies": { "@playwright/test": "^1.56.0" }
+}

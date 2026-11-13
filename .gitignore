@@ -36,3 +36,6 @@ xcuserdata/
 # NOTE: brewer icon PNGs are intentionally NOT ignored.
 # They are the only copies of the source art; index.html embeds them as base64,
 # so the loose .png files are the editable originals worth keeping in history.
+tests/node_modules/
+tests/test-results/
+tests/playwright-report/
