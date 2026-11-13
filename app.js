@@ -597,6 +597,7 @@ function grindResistance(txt){
 function simulateBrew(sched,dose){
   const K=2.1,R=grindResistance(recipe.grind)*Math.pow(dose/recipe.defaultDose,0.6);
   const dt=0.25,totalT=sched[sched.length-1].end,horizon=totalT+240;
+  const poured=sched.reduce((z,st)=>z+(st.type==='pour'?st.amount:0),0);   // iced recipes pour only the hot share of totalWater
   let t=0,slurry=0,added=0,finish=null;
   const drainEvents=[],trace=[];
   while(t<horizon){
@@ -606,7 +607,7 @@ function simulateBrew(sched,dose){
     const outflow=slurry>0?Math.min(slurry/dt,K*Math.sqrt(slurry)/R):0;
     slurry=Math.max(0,slurry+(inflow-outflow)*dt);
     for(const st of sched)if(st.type==='wait'&&Math.abs(t-st.end)<dt/2)drainEvents.push({label:st.label,end:st.end,slurryLeft:slurry});
-    if(finish===null&&added>=totalWater-0.5&&slurry<=Math.max(1.5,dose*0.06))finish=t;
+    if(finish===null&&added>=poured-0.5&&slurry<=Math.max(1.5,dose*0.06))finish=t;
     if(t%1<dt)trace.push([Math.round(t),Math.round(slurry*10)/10]);
     t+=dt;
     if(finish!==null&&t>totalT)break;
